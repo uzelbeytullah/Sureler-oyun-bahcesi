@@ -358,3 +358,7 @@ h2>.ikon,h3>.ikon,summary h3>.ikon{color:var(--accent);margin-inline-end:var(--s
 @media print{.belge{border-radius:0;max-height:calc(100vh - 20mm);width:auto;margin:0 auto}}
 /* ========== Görünüm seçimi ========== */
 .tema-sec{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+
+/* Başlık ızgarası dar ekranda taşmasın (içerik en geniş öğeye göre büyümesin) */
+header.top{grid-template-columns:minmax(0,1fr)}
+header.top>*{min-width:0}
