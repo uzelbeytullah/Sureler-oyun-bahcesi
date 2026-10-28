@@ -8,7 +8,7 @@
    - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-5ef38c02";
+const SURUM = "sob-3bb46b8e";
 const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=973bff2f", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
@@ -18,7 +18,7 @@ self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x.startsWith("sob-") && x !== SURUM && x !== SES).map(x => caches.delete(x)))).then(() => self.clients.claim()));
 });
 
-const SES = "sob-ses";   // "çevrimdışı için indir" ile kaydedilen sure sesleri; sürüm değişince silinmez
+const SES = "sob-ses";   /* kalıcı önbellek: "çevrimdışı için indir" ile kaydedilen sure sesleri ve yazı tipleri; sürüm değişince silinmez */
 
 /* İndirilmiş sure sesi: tarayıcı sesi parça parça (Range) ister; kayıtlı dosyadan o parçayı keserek veririz */
 function sesYanit(r) {
@@ -73,6 +73,10 @@ self.addEventListener("fetch", e => {
       const ag = fetch(r).then(y => { if (iyi(y)) { const k = y.clone(); caches.open(SURUM).then(c => c.put(r, k)); } return y; }).catch(() => v);
       return v || ag;
     }));
+    return;
+  }
+  if (u.pathname.includes("/fonts/")) {                    // yazı tipleri: önce kalıcı önbellek (sürümler arasında silinmez)
+    e.respondWith(caches.open(SES).then(c => c.match(r).then(v => v || fetch(r).then(y => { if (y.ok) c.put(r, y.clone()); return y; }))));
     return;
   }
   if (!u.searchParams.has("v")) {                          // sürüm eki yok: önce ağ

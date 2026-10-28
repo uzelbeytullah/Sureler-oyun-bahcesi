@@ -3,7 +3,7 @@
 /* Sık denetim döngüsü yalnız ses çalarken çalışır; durunca kendini kapatır (pil dostu) */
 const SIK=new Set();let sikT=null;
 function sikCalistir(){if(sikT)return;sikT=setInterval(()=>{let aktif=false;SIK.forEach(f=>{try{if(f())aktif=true;}catch(e){}});if(!aktif){clearInterval(sikT);sikT=null;}},15);}
-const ses=new Audio(),ses2=new Audio();ses.preload="auto";ses2.preload="auto";ses.addEventListener("play",sikCalistir);ses2.addEventListener("play",sikCalistir);
+const ses=new Audio(),ses2=new Audio();ses.preload="metadata";ses2.preload="metadata";   /* yalnız gereken kısım insin (mobil veri) */ses.addEventListener("play",sikCalistir);ses2.addEventListener("play",sikCalistir);
 let sesBitis=null,sesSonra=null,izle=null,ses2Bitis=null,ses2Sonra=null;
 const HIZLAR=[0.5,0.75,1,1.25,1.5];
 function hiz(){return HIZLAR.includes(S.hiz)?S.hiz:1;}

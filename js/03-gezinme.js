@@ -40,7 +40,7 @@ function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
   const V=$("view");if(!aktifKisi()){kisiSec();return;}if(!S.seviye){seviyeSor(anaSayfa);return;}
   if(ilkYolGoster()){ilkYol();return;}
   V.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:6px">${kisiDugme()}</div>${gorevKart()}<div id="eylemKart"></div><div id="halkaKart"></div>${namazKart()}${bugunPaneli()}<h2>Bir sure seç</h2><p>Her surede dört yıldız var: okudum, kelimeleri bildim, ayetleri tamamladım, sırayı bildim.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary yesil-dug" id="bahceAc">🌳 Bahçem</button><button id="hangiAc">🎧 Hangi sure?</button><button id="elifAc">🔤 Elif-ba</button><button id="yarKatil">👪 Aile yarışmasına katıl</button><button id="hedefAc">🤝 Ortak hedef</button><button id="ebeveynAc">👨‍👩‍👧 Ebeveyn özeti</button><button class="primary" id="atlasAc">İlke atlası: bütün surelerin ilkeleri</button></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary yesil-dug" id="bahceAc">🌳 Bahçem</button><button id="hangiAc">🎧 Hangi sure?</button><button id="elifAc">🔤 Elif-ba</button><button id="yarKur">👪 Aile yarışması kur</button><button id="yarKatil">👪 Aile yarışmasına katıl</button><button id="hedefAc">🤝 Ortak hedef</button><button id="ebeveynAc">👨‍👩‍👧 Ebeveyn özeti</button><button class="primary" id="atlasAc">İlke atlası: bütün surelerin ilkeleri</button></div>
   <input class="ara" id="ara" type="search" placeholder="Sure adı ya da numarası yaz" aria-label="Sure ara" value="${esc(araMetin)}">
   <div class="sure-grid" id="grid"></div>
   <h2>Rozetler</h2>${(()=>{const var_=BADGES.filter(([id])=>S.rozet.includes(id)),yok=BADGES.filter(([id])=>!S.rozet.includes(id));
@@ -55,7 +55,7 @@ function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
       return `<button class="sure-kart ${y===4?"tam":""}" data-n="${k.no}"><span class="ust"><span class="sno">${k.etiket||k.no+". sure"}</span><span class="yild" aria-label="${y} yıldız"><b>${"★".repeat(y)}</b>${"★".repeat(4-y)}</span></span>
       <span class="sar" lang="ar">${k.adAr}</span><span class="sad">${esc(k.ad)}</span><span class="sbilgi">${k.etiket?"Tek ayet":k.ayet+" ayet"} · ${esc(k.anlam||k.inis)}</span></button>`;}).join("")||"<p>Bu adla bir sure bulunamadı.</p>";
     $("grid").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const k=KATALOG.find(x=>x.no===+b.dataset.n);if(k.gruplar)grupMenu(k);else ac(k.no);});};
-  $("ara").oninput=e=>{araMetin=e.target.value;ciz();};ciz();bugunBagla();$("atlasAc").onclick=()=>{atlasTema=null;atlas();};$("bahceAc").onclick=()=>bahce();eylemKartCiz();halkaKartCiz();{const kd=$("kisiDeg");if(kd)kd.onclick=()=>kisiSec();}$("yarKatil").onclick=()=>yarKatil();$("hangiAc").onclick=()=>hangiSure();$("elifAc").onclick=()=>elifba();$("hedefAc").onclick=()=>hedefSayfa();$("ebeveynAc").onclick=()=>ebeveynOzet();
+  $("ara").oninput=e=>{araMetin=e.target.value;ciz();};ciz();bugunBagla();$("atlasAc").onclick=()=>{atlasTema=null;atlas();};$("bahceAc").onclick=()=>bahce();eylemKartCiz();halkaKartCiz();{const kd=$("kisiDeg");if(kd)kd.onclick=()=>kisiSec();}$("yarKatil").onclick=()=>yarKatil();$("yarKur").onclick=()=>yarKur();$("hangiAc").onclick=()=>hangiSure();$("elifAc").onclick=()=>elifba();$("hedefAc").onclick=()=>hedefSayfa();$("ebeveynAc").onclick=()=>ebeveynOzet();
 }
 /* İlk giriş: henüz hiç yıldızı olmayan kişiye tek bir yol gösterilir */
 function hicYildizYok(){return !Object.values(S.sure||{}).some(x=>x.yildiz&&Object.values(x.yildiz).some(Boolean));}

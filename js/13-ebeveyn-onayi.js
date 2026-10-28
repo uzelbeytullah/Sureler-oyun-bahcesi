@@ -10,7 +10,13 @@ function pinDogru(p){try{return localStorage.getItem(PIN_KEY)===pinOz(p);}catch(
 let KAPI_ZAMAN=0;
 const kapiAcik=()=>Date.now()-KAPI_ZAMAN<6e5;
 function ebeveynKapisi(sonra){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="Ebeveyn bölümü";$("altbaslik").textContent="Yetişkinler için";
-  const a=6+Math.floor(Math.random()*4),b=6+Math.floor(Math.random()*4);
+  if(pinVar()){$("view").innerHTML=`<button class="geri" id="kG">← Sureler</button><h2>Bu bölüm yetişkinler için</h2>
+  <p><label for="kPin"><b>Ebeveyn şifresi</b></label></p><p><input id="kPin" class="ara" type="password" inputmode="numeric" maxlength="4" autocomplete="off" style="max-width:160px"> <button class="primary" id="kTamam" style="min-height:44px">Devam</button></p>`;
+    $("kG").onclick=()=>anaSayfa();
+    const dp=()=>{if(pinDogru($("kPin").value.trim())){KAPI_ZAMAN=Date.now();sonra();}else{toast("Şifre yanlış");$("kPin").value="";$("kPin").focus();}};
+    $("kTamam").onclick=dp;$("kPin").onkeydown=e=>{if(e.key==="Enter")dp();};try{$("kPin").focus();}catch(e){}return;}
+  /* şifre henüz yoksa: küçük çocuğun çözemeyeceği iki basamaklı bir çarpma */
+  const a=6+Math.floor(Math.random()*4),b=12+Math.floor(Math.random()*7);
   $("view").innerHTML=`<button class="geri" id="kG">← Sureler</button><h2>Bu bölüm yetişkinler için</h2><p>Devam etmek için soruyu cevaplayın:</p>
   <p style="font-size:24px;font-weight:800"><label for="kCvp">${a} × ${b} kaç eder?</label></p><p><input id="kCvp" class="ara" inputmode="numeric" maxlength="3" autocomplete="off" style="max-width:140px"> <button class="primary" id="kTamam" style="min-height:44px">Devam</button></p>`;
   $("kG").onclick=()=>anaSayfa();
@@ -18,18 +24,21 @@ function ebeveynKapisi(sonra){CUR=null;baslik();setTabs();durSes();$("baslik").t
   $("kTamam").onclick=dene;$("kCvp").onkeydown=e=>{if(e.key==="Enter")dene();};try{$("kCvp").focus();}catch(e){}}
 function pinKoy(p){try{localStorage.setItem(PIN_KEY,pinOz(p));return true;}catch(e){return false;}}
 function onayBekleyenler(){const r=[];Object.entries(S.sure||{}).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.onayBekle)r.push({id:+id,i:+i});}));return r;}
+/* Ara dinletme: ayet ilk kez 3 günlük aralığa geçince çocuk ebeveynine okur ("dinletti" işareti; ezberde sayılmak değildir) */
+function dinletBekleyenler(){const r=[];Object.entries(S.sure||{}).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.dinletBekle&&!d.onayBekle)r.push({id:+id,i:+i,dinlet:true});}));return r;}
 async function sureVeri(no){if(!CACHE[no]){const r=await fetch("data/"+String(no).padStart(3,"0")+".json?v="+SURUM);if(!r.ok)throw 0;CACHE[no]=await r.json();}return CACHE[no];}
 async function onayEkrani(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="Ebeveyn onayı";$("altbaslik").textContent="Çocuk okur, ebeveyn dinler ve onaylar";
-  const V=$("view"),L=onayBekleyenler();
-  if(!L.length){V.innerHTML=`<button class="geri" id="oG">← Sureler</button><h2>Onay bekleyen ayet yok</h2><p>Ezberde son basamağa gelen ayetler burada toplanır.</p>`;$("oG").onclick=()=>anaSayfa();return;}
+  const V=$("view"),L=onayBekleyenler().concat(dinletBekleyenler());
+  if(!L.length){V.innerHTML=`<button class="geri" id="oG">← Sureler</button><h2>Onay bekleyen ayet yok</h2><p>Ezberde sayılacak basamağa (${EZ_ARALIK[EZ_TAM_KUTU-1]} günlük tekrardan sonra) gelen ayetler ve ilk kez ${EZ_ARALIK[EZ_DINLET_KUTU]} günlük aralığa geçip ebeveyne dinletilecek ayetler burada toplanır.</p>`;$("oG").onclick=()=>anaSayfa();return;}
   const x=L[0];let d;try{d=await sureVeri(x.id);}catch(e){V.innerHTML="<p>Ayet yüklenemedi.</p>";return;}
   const a=d.ayetler[x.i],ilk=d.ilkAyet||(x.id===2255?255:1);
   V.innerHTML=`<button class="geri" id="oG">← Sureler</button><h2>👨‍👩‍👧 ${esc(adBul(x.id))} · ${ilk+x.i}. ayet</h2>
   <p style="font-size:19px"><b>Çocuk:</b> Ayeti ezberden, sesli oku. <b>Ebeveyn:</b> Metne bakarak dinle.</p>
+  ${x.dinlet?`<p class="odak" role="note"><b>Ara dinletme:</b> Bu ayet yeni ezberleniyor. Dinlemeniz çocuğa güç verir; ayet yine de ${EZ_ARALIK[EZ_TAM_KUTU-1]} günlük tekrardan sonra ayrıca onaylanınca "ezberde" sayılır.</p>`:""}
   <details class="detay"><summary><b>Ebeveyn için: ayetin metni ve kâri okuyuşu</b></summary><div class="kelimeler" lang="ar" style="justify-content:center">${a.w.map((w,j)=>`<span class="k${j%12}">${esc(w.a)}</span>`).join("")}</div><p class="okunus">${esc(a.ok||"")}</p><button class="dn" id="oDinle">▶ Kâriden dinle</button></details>
   <div class="odak" style="display:grid;gap:8px"><b>Ebeveyn şifresi</b>${pinVar()?`<input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" aria-label="Ebeveyn şifresi (4 rakam)" style="max-width:200px">`:`<p>Onay için önce bir ebeveyn şifresi gerekir. Şifreyi ebeveyn bölümünden belirleyin (çocuğunuz görmesin).</p><button id="oSifreGit" class="primary" style="min-height:44px">Ebeveyn bölümüne git</button>`}
    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" data-on="1" style="font-size:19px">✓ Doğru okudu</button><button data-on="0">Biraz daha çalışsın</button></div></div>
-  <p style="font-size:14px">Sırada ${L.length} ayet var. Onaylanan ayet "ezberde" sayılır; namaz hazırlığı yolunda ilerler.</p>`;
+  <p style="font-size:14px">Sırada ${L.length} ayet var. ${x.dinlet?"Dinletilen ayet işaretlenir; ezber tekrarları sürer.":"Onaylanan ayet \"ezberde\" sayılır; namaz hazırlığı yolunda ilerler."}</p>`;
   $("oG").onclick=()=>anaSayfa();
   $("oDinle").onclick=()=>{const b=d.ses.bas,e=x.i+1<b.length?b[x.i+1]:d.ses.son;hizUygula();calParca(x.id,b[x.i],e);};
   {const sg=$("oSifreGit");if(sg)sg.onclick=()=>ebeveynOzet();}
@@ -37,7 +46,10 @@ async function onayEkrani(){CUR=null;baslik();setTabs();durSes();$("baslik").tex
     if(!pinVar()){toast("Önce ebeveyn bölümünden şifre belirleyin");return;}
     if(!pinDogru(p)){toast("Şifre yanlış");efekt("yanlis");return;}
     const D=((S.sure[x.id]||{}).ezberDurum)||{},r=D[x.i];if(!r){onayEkrani();return;}
-    if(b.dataset.on==="1"){delete r.onayBekle;r.onaylandi=today();gun();S.puan+=20;efekt("yildiz");kutla();toast("Maşallah! Ayet ezberde, 20 puan");logIsle("onay");}
+    if(x.dinlet){delete r.dinletBekle;
+      if(b.dataset.on==="1"){r.dinletti=today();gun();S.puan+=10;efekt("yildiz");kutla();toast("Maşallah! Ayeti ailene okudun");logIsle("dinlet");}
+      else{r.sonraki=gunEkle(1);toast("Olsun, yarın yeniden çalışalım 🌱");}}
+    else if(b.dataset.on==="1"){delete r.onayBekle;delete r.zayif;r.onaylandi=today();gun();S.puan+=20;efekt("yildiz");kutla();toast("Maşallah! Ayet ezberde, 20 puan");logIsle("onay");}
     else{delete r.onayBekle;delete r.tam;r.kutu=Math.max(0,(r.kutu||0)-1);r.sonraki=gunEkle(1);toast("Olsun, yarın yeniden çalışalım 🌱");}
     checkBadges();save();renderStats();onayEkrani();});}
 const NAMAZ_VARSAYILAN=[112,113,114];
@@ -64,20 +76,20 @@ function namazBelgesi(){const p=aktifKisi()||{};S.namazBelge=S.namazBelge||today
    <text x="400" y="480" text-anchor="middle" style="font:700 18px var(--f-ui)" fill="#8A6200">${esc(tarih)} · Sureler Oyun Bahçesi</text></svg>
   <p class="yazdirma-yok" style="font-size:14px">Belge çıktısını alıp çocuğunuzun odasına asabilirsiniz.</p>`;
   $("nbG").onclick=()=>anaSayfa();$("nbY").onclick=()=>{try{window.print();}catch(e){toast("Yazdırma bu görünümde açılamadı");}};kutla();}
-BADGES.push(["onay1","Bir ayetini ebeveynine okuyup onay aldı",s=>Object.values(s.sure||{}).some(x=>Object.values(x.ezberDurum||{}).some(d=>d&&d.onaylandi))],
+BADGES.push(["onay1","Bir ayeti ailesine okudu",s=>Object.values(s.sure||{}).some(x=>Object.values(x.ezberDurum||{}).some(d=>d&&(d.onaylandi||d.dinletti)))],
  ["namaz","Namaz hazırlığı yolunu tamamladı",s=>!!s.namazBelge]);
 function ebeveynAyarHtml(){const L=KATALOG.filter(k=>!k.gruplar&&k.no>=78&&k.ayet<=11),sec=namazSureler().slice(1);
   return `<section class="detay"><h3>Ebeveyn onayı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3>
-  <p>Açıkken ezberde son basamağa gelen ayet, siz dinleyip şifrenizle onaylayınca "ezberde" sayılır.</p>
+  <p>Açıkken ${EZ_ARALIK[EZ_TAM_KUTU-1]} günlük tekrardan sonra da hatırlanan ayet, siz dinleyip şifrenizle onaylayınca "ezberde" sayılır. Ayet ilk kez ${EZ_ARALIK[EZ_DINLET_KUTU]} günlük aralığa geçince çocuğunuz size bir kez de ara dinletme yapar. Sonradan "Zorlandım" denen ayetin onayı yeniden istenir.</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap"><button data-onay="1" class="${onayGerek()?"on":""}">Açık</button><button data-onay="0" class="${onayGerek()?"":"on"}">Kapalı</button></p>
   ${pinVar()?"":`<p class="odak" role="note"><b>Önemli:</b> Onayın işe yaraması için önce bir ebeveyn şifresi belirleyin. Şifre yokken onay ekranı çalışmaz.</p>`}<p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" aria-label="Yeni 4 haneli ebeveyn şifresi" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
   <section class="detay"><h3>Namaz hazırlığı yolu</h3><p>Fâtiha'nın yanında ezberlenecek üç kısa sureyi seçin:</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap">${L.map(k=>`<button data-nzs="${k.no}" class="${sec.includes(k.no)?"on":""}" style="min-height:44px">${esc(k.ad)}</button>`).join("")}</p>
   ${S.seviye==="yetiskin"?`<p><button data-nzac="1" class="${S.namazAcik?"on":""}">Ana sayfada göster</button></p>`:""}</section>
   ${window.claude&&claude.bulut?`<section class="detay"><h3>Bulut kaydı ve gizlilik</h3>
-  <p>İlerleme, telefonda ve bilgisayarda aynı kalsın diye Google Firebase'de adsız bir hesapla saklanır. Kayıtta kişi adları, yaşları ve ilerleme bulunur; başka kimse okuyamaz. Kötüye kullanımı önlemek için Google reCAPTCHA kullanılır.</p>
-  ${bulutKapali()?`<p><b>Bulut kaydı kapalı.</b> İlerleme yalnız bu cihazda.</p><button id="bulutAcB" style="min-height:44px">Bulut kaydını yeniden aç</button>`
-   :`<button id="bulutSilB" style="min-height:44px">Buluttaki kaydımızı sil</button><p style="font-size:14px">Bu cihazdaki ilerleme kalır; yalnız buluttaki kopya silinir ve eşitleme kapanır.</p>`}</section>`:""}`;}
+  <p>Varsayılan olarak her şey yalnız bu cihazda saklanır. Bulut kaydını açarsanız kişi adları, yaşları ve ilerleme, bu tarayıcıya bağlı adsız bir hesapla Google Firebase'de (yurt dışında) saklanır; başka kimse okuyamaz. Bulut açıkken kötüye kullanımı önlemek için Google reCAPTCHA kullanılır. Aile yarışmasına ya da ortak hedefe katıldığınızda da bulut kullanılır; yarışmada yazdığınız ad odadaki herkese görünür, takma ad önerilir. Ayrıntı: <button class="dn" id="gizlilikAc" style="min-height:44px">Gizlilik</button></p>
+  ${bulutKapali()?`<p><b>Bulut kaydı kapalı.</b> İlerleme yalnız bu cihazda.</p><label style="display:flex;gap:8px;align-items:flex-start;font-size:15px"><input type="checkbox" id="bulutRiza" style="width:24px;height:24px"> Velisi olarak, çocuğumun adının, yaşının ve ilerlemesinin yukarıda anlatıldığı gibi Google Firebase'de saklanmasına izin veriyorum.</label><button id="bulutAcB" style="min-height:44px">Bulut kaydını aç</button><button id="bulutSilB" style="min-height:44px">Daha önceki bulut kaydımızı sil</button>`
+   :`<button id="bulutSilB" style="min-height:44px">Buluttaki kaydımızı sil</button><p style="font-size:14px">Bu cihazdaki ilerleme kalır; buluttaki kopya, ortak hedef katkısı ve adsız hesap silinir, eşitleme kapanır.</p>`}</section>`:""}`;}
 function ebeveynAyarBagla(){const V=$("view");
   V.querySelectorAll("[data-onay]").forEach(b=>b.onclick=()=>{const ac=b.dataset.onay==="1";
     if(!ac&&pinVar()){const e=$("ePinEski");if(!pinDogru(e?e.value.trim():"")){toast("Kapatmak için mevcut şifreyi \"Mevcut şifre\" kutusuna yazın");if(e)e.focus();return;}}
@@ -87,7 +99,8 @@ function ebeveynAyarBagla(){const V=$("view");
   V.querySelectorAll("[data-nzac]").forEach(b=>b.onclick=()=>{S.namazAcik=!S.namazAcik;save();ebeveynOzet();});
   const bs=$("bulutSilB");if(bs)bs.onclick=async()=>{if(!bs.dataset.onay){bs.dataset.onay="1";bs.textContent="Emin misiniz? Silmek için bir daha basın";return;}
     bs.disabled=true;bs.textContent="Siliniyor…";try{const h=await bulutSil();toast(h?"Bazı kayıtlar silinemedi; bağlantıyı denetleyip yeniden deneyin":"Buluttaki kaydınız silindi");}catch(e){toast("Bulut bağlantısı yok; kayıt silinemedi");}ebeveynOzet();};
-  const ba=$("bulutAcB");if(ba)ba.onclick=()=>bulutAc();}
+  const ba=$("bulutAcB");if(ba)ba.onclick=()=>{if(!$("bulutRiza")||!$("bulutRiza").checked){toast("Önce izin kutusunu işaretleyin");return;}bulutAc();};
+  const ga=$("gizlilikAc");if(ga)ga.onclick=()=>hakkinda("gizlilik");}
 
 /* ========== HAFTALIK AİLE HALKASI: haftada bir, 10 dakika, ailece ========== */
 function haftaAnahtar(){const d=new Date();const y=new Date(d.getFullYear(),0,1);return d.getFullYear()+"-H"+Math.ceil(((d-y)/864e5+y.getDay()+1)/7);}

@@ -2,35 +2,47 @@
 /* ---------- genel yardımcılar: tecvid kuralları, ezber, bugün, defter ---------- */
 let TKUR=null;
 fetch("data/tecvid_kurallar.json?v="+SURUM).then(r=>r.json()).then(d=>{TKUR=d;if(CUR&&cur==="oku")oku();}).catch(()=>{});
-const VARSAYILAN_EZBER={takvim:{aciklama:"Ayetleri aralıklı tekrarla ezberle: hatırladıkça tekrarlar seyrekleşir, unuttuğunda sık sorulur. Bu takvim Fâtiha kitabınızdaki tekrar takviminden alındı.",araliklar_gun:[1,2,4,7,14,30,60]},yontemler:[],ayet_ipuclari:[],siirler:[],hikayeler:[],uyari:""};
+const VARSAYILAN_EZBER={takvim:{aciklama:"Ayetleri aralıklı tekrarla ezberle: hatırladıkça tekrarlar seyrekleşir, unuttuğunda sık sorulur. ",araliklar_gun:EZ_ARALIK},yontemler:[],ayet_ipuclari:[],siirler:[],hikayeler:[],uyari:""};
 function ezberVeri(){return (CUR.ek&&CUR.ek.ezber)||VARSAYILAN_EZBER;}
 function adBul(id){id=+id;if(id>36000){const g=YASIN().gruplar.find(x=>x.id===id);return g?`Yâsîn ${g.bas}-${g.son}`:"Yâsîn";}const k=KATALOG.find(x=>x.no===id);return k?k.ad:String(id);}
 /* Bugünün tekrarı: bütün surelerden günü gelen ayetler tek akışta */
 let TEKRAR_AKIS=false;
-function tekrarAkisi(haric){const L=tumTekrarlar().filter(x=>x.id!==haric);if(!L.length){TEKRAR_AKIS=false;toast("Bugünün bütün tekrarları bitti, maşallah!");kutla(true);anaSayfa();return;}
+function tekrarAkisi(haric){const L=tumTekrarlar().filter(x=>x.id!==haric);if(!L.length){TEKRAR_AKIS=false;
+  toast(tekrarHavuzu().length?"Bugünlük bu kadar, maşallah! Kalan tekrarlar yarın":"Bugünün bütün tekrarları bitti, maşallah!");kutla(true);anaSayfa();return;}
   TEKRAR_AKIS=true;ac(L[0].id,"ezber");}
-function tumTekrarlar(){const t=today(),r=[];Object.entries(S.sure).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.sonraki<=t)r.push({id:+id,i:+i});}));return r;}
-function bugunPaneli(){
-  const hedef=S.hedef||50,bugun=(S.gunluk||{})[today()]||0,yuzde=Math.min(100,Math.round(bugun/hedef*100));
-  const gunler=[...Array(7)].map((_,k)=>{const d=new Date();d.setDate(d.getDate()-6+k);const key=d.toLocaleDateString("sv-SE");return {g:d.toLocaleDateString("tr-TR",{weekday:"short"}),p:(S.gunluk||{})[key]||0};});
+/* Günü gelmiş bütün tekrarlar: en çok geciken önce, eşitse en düşük kutudaki önce */
+function tekrarHavuzu(){const t=today(),r=[];Object.entries(S.sure).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.sonraki&&d.sonraki<=t)r.push({id:+id,i:+i,kutu:d.kutu||0,sonraki:d.sonraki});}));
+  return r.sort((a,b)=>a.sonraki<b.sonraki?-1:a.sonraki>b.sonraki?1:a.kutu-b.kutu);}
+/* Bugün yapılmış (günü gelmiş) tekrar sayısı */
+function bugunTekrarSay(){const g=S.tekrarSay;return g&&g.g===today()?(g.n||0):0;}
+function tekrarSayIsle(){const t=today();if(!S.tekrarSay||S.tekrarSay.g!==t)S.tekrarSay={g:t,n:0};S.tekrarSay.n++;}
+/* Bugünün tekrarı: günde en çok EZ_GUNLUK ayet; kalanlar ertesi güne kalır */
+function tumTekrarlar(){return tekrarHavuzu().slice(0,Math.max(0,EZ_GUNLUK-bugunTekrarSay())).map(({id,i})=>({id,i}));}
+/* Biriken tekrar günlük sınırı aşınca yeni ayete geçmek yerine önce tekrar */
+const tekrarBirikti=()=>tekrarHavuzu().length>EZ_GUNLUK;
+/* Son yedi günün puan grafiği (HTML). Çocuğun Bugün panelinde gösterilmez; ebeveyn özetine konabilir. Kendi başına çalışır: yalnız S.gunluk ve S.hedef okunur */
+function puanGrafigiHtml(){
+  const G=S.gunluk||{},hedef=S.hedef||50;
+  const gunler=[...Array(7)].map((_,k)=>{const d=new Date();d.setDate(d.getDate()-6+k);const key=d.toLocaleDateString("sv-SE");return {g:d.toLocaleDateString("tr-TR",{weekday:"short"}),p:G[key]||0};});
   const enCok=Math.max(hedef,...gunler.map(x=>x.p));
+  return `<div style="display:grid;gap:4px"><b>Son yedi günün puanları</b><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:90px" role="img" aria-label="Son yedi günün puanları: ${gunler.map(x=>x.g+" "+x.p).join(", ")}">${gunler.map(x=>`<div style="display:grid;gap:2px;justify-items:center;align-self:end"><b style="font-size:12px">${x.p}</b><span style="display:block;width:70%;height:${Math.max(3,Math.round(x.p/enCok*56))}px;background:${x.p>=hedef?"var(--gold)":"var(--lapis)"};border-radius:4px"></span><b style="font-size:12px">${x.g}</b></div>`).join("")}</div></div>`;
+}
+function bugunPaneli(){
+  const lg=(S.log||{})[today()]||{},ayetN=lg.tekrar||0,soruN=lg.soru||0,birikim=tekrarHavuzu().length;
   const tk=tumTekrarlar();const gruplu={};tk.forEach(x=>{(gruplu[x.id]=gruplu[x.id]||[]).push(x.i);});
   const defter=Object.keys(S.defter||{}).length;
   return `<section class="detay" style="background:var(--surface);border-color:var(--lapis)" aria-label="Bugün">
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2>Bugün</h2>
-  <span style="display:flex;gap:4px;align-items:center;flex-wrap:wrap"><b style="font-size:14px">Günlük hedef:</b>${[30,50,100,200].map(h=>`<button class="hdf ${hedef===h?"on":""}" data-h="${h}" style="min-height:44px;padding:4px 10px">${h}</button>`).join("")}</span></div>
-  <div class="bar" style="height:14px"><i style="width:${yuzde}%"></i></div>
-  <p><b>${bugun} / ${hedef} puan</b>${bugun>=hedef?" · Bugünün hedefi tamam, maşallah!":""} · Günlük seri: <b>${S.seri} gün</b></p>
-  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:90px" aria-label="Son yedi günün puanları">${gunler.map(x=>`<div style="display:grid;gap:2px;justify-items:center;align-self:end"><b style="font-size:12px">${x.p}</b><span style="display:block;width:70%;height:${Math.max(3,Math.round(x.p/enCok*56))}px;background:${x.p>=hedef?"var(--gold)":"var(--lapis)"};border-radius:4px"></span><b style="font-size:12px">${x.g}</b></div>`).join("")}</div>
+  <h2>Bugün</h2>
+  <p>${ayetN?`<b>Bugün: ${ayetN} ayet çalıştın</b>${soruN?` · ${soruN} soru çözdün`:""}. Emeğin bereketli olsun!`:soruN?`<b>Bugün: ${soruN} soru çözdün.</b> Bir ayet tekrarı da ekleyebilirsin.`:"Bugün küçük bir tekrarla başlayabilirsin."} · Günlük seri: <b>${S.seri} gün</b></p>
+  ${birikim>EZ_GUNLUK?`<p class="odak" role="note"><b>Önce tekrarları bitirelim.</b> ${birikim} ayet tekrar bekliyor; her gün en çok ${EZ_GUNLUK} tanesi sorulur, yeni ayete tekrarlar azalınca geçeriz.</p>`:""}
   <p><b>Ezber tekrarları:</b> ${tk.length?`<button class="primary" id="tekrarHepsi" style="min-height:44px;padding:4px 12px;margin:2px">▶ Bugünün tekrarı (${tk.length} ayet)</button> `:""}${tk.length?Object.entries(gruplu).map(([id,l])=>`<button class="tkr-git" data-id="${id}" style="min-height:44px;padding:4px 10px;margin:2px">${esc(adBul(id))} · ${l.length} ayet</button>`).join(""):"Bugün tekrar edilecek ayet yok."}</p>
   ${ezberOzet()}
-  ${(()=>{const n=onayBekleyenler().length;return n?`<p><b>👨‍👩‍👧 Ebeveyn onayı bekleyen:</b> ${n} ayet <button class="primary" id="onayGit" style="min-height:44px;padding:4px 12px">Ebeveynine oku</button></p>`:"";})()}
+  ${(()=>{const n=onayBekleyenler().length,m=dinletBekleyenler().length;return n||m?`<p>${n?`<b>👨‍👩‍👧 Ebeveyn onayı bekleyen:</b> ${n} ayet `:""}${m?`${n?"· ":""}<b>👂 Bugün ebeveynine dinletilecek:</b> ${m} ayet `:""}<button class="primary" id="onayGit" style="min-height:44px;padding:4px 12px">Ebeveynine oku</button></p>`:"";})()}
   <p><b>Yanlışlarım:</b> ${(()=>{const n=Object.keys(S.yanlis||{}).length,b=yanlisSirada().length;return n?`${n} soru, bugün ${b} tanesi sırada ${b?`<button class="primary" id="yanlisOyna" style="min-height:44px;padding:4px 12px">Tekrar et</button>`:""}`:"Oyunlarda yanlış yaptığın sorular burada toplanır; 1, 3 ve 7 gün sonra yeniden sorulur.";})()}</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>Seviye:</b>${Object.entries(SEVIYE).map(([k,v])=>`<button class="svb ${S.seviye===k?"on":""}" data-sv="${k}" style="min-height:44px;padding:4px 10px">${v.ad}</button>`).join("")}<button id="efektAc" style="min-height:44px;padding:4px 10px">${S.efekt===false?"🔈 Oyun sesleri: kapalı":"🔊 Oyun sesleri: açık"}</button></p>
   <p><b>Kelime defterim:</b> ${defter?`${defter} kelime <button class="primary" id="defterOyna" style="min-height:44px;padding:4px 12px">Çalış</button>`:"Kelime oyununda yanlış yaptığın kelimeler burada toplanır."}</p></section>`;
 }
 function bugunBagla(){
-  document.querySelectorAll(".hdf").forEach(b=>b.onclick=()=>{S.hedef=+b.dataset.h;save();anaSayfa();});
   document.querySelectorAll(".tkr-git").forEach(b=>b.onclick=()=>ac(+b.dataset.id,"ezber"));
   {const th=$("tekrarHepsi");if(th)th.onclick=()=>tekrarAkisi();}
   {const og=$("onayGit");if(og)og.onclick=()=>onayEkrani();}

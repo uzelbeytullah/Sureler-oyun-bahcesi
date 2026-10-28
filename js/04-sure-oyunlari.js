@@ -1,5 +1,7 @@
 /* Sureler Oyun Bahçesi · Yıldızlar, Oku, oyun çatısı (quiz), kelime, tamamla, bilgi, sırala */
 /* ---------- yıldızlar ---------- */
+/* Secde (tilâvet secdesi) ayetleri: sure no → ayet no */
+const SECDE_AYET={84:21,96:19};
 function harita(){
   const t=SS(CUR.no),V=$("view");
   V.innerHTML=`<h2>${esc(CUR.ad)} · yıldızların</h2>
@@ -19,19 +21,22 @@ function oku(){
   const besmeleVar=no!==1&&!CUR.etiket&&(!CUR.ust||CUR.ilkAyet===1);
   const tecvidMod=!!(CUR.tecvid&&TKUR&&S.renkModu==="tecvid");
   const ilk=CUR.ilkAyet||1;
+  const k1=kucuk();/* küçüklerde dinle düğmesi en üstte, ayarlar katlanır */
+  const dinleSatir=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="primary${k1?" dinle-buyuk":""}" id="hepsi">▶ Baştan sona dinle</button><span style="font-size:14px;font-weight:700">Okuyan: Mişari Râşid el-Afasi</span>${indirVar()?`<button id="indir" style="min-height:44px">⬇ İnternetsiz dinlemek için indir</button>`:""}</div>`;
   V.innerHTML=`<h2>${esc(CUR.ad)} suresini oku</h2>
+  ${k1?dinleSatir+`<details class="oku-ayar"><summary>Ayarlar</summary>`:""}
   <p><b>Arapça bir kelimeye dokununca okunuşunu dinlersin.</b> Her kelime anlam alanının rengiyle yazıldı; altındaki aynı renkli kutu o kelimenin anlamıdır. Aynı alandan iki kelime yan yana gelince, ayırt edilsin diye ikincisi başka renkle yazılır. Her ayeti okuyunca işaretle; hepsi bitince yıldızı alırsın.</p>
   ${CUR.tecvid&&TKUR?`<div class="subtabs" role="group" aria-label="Renklendirme"><b style="align-self:center;font-size:14px">Renkler:</b><button data-rm="alan" class="${S.renkModu!=="tecvid"?"on":""}" aria-pressed="${S.renkModu!=="tecvid"}">Anlam alanları</button><button data-rm="tecvid" class="${S.renkModu==="tecvid"?"on":""}" aria-pressed="${S.renkModu==="tecvid"}">Tecvid kuralları</button></div>`:""}
   ${tecvidMod?tecvidLejant():`<div class="lejant">${CUR.alanlar.map((a,i)=>`<span class="k${i%12}">${esc(a.ad)}</span>`).join("")}</div>`}
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="primary" id="hepsi">▶ Baştan sona dinle</button><span style="font-size:14px;font-weight:700">Okuyan: Mişari Râşid el-Afasi</span>${indirVar()?`<button id="indir" style="min-height:44px">⬇ İnternetsiz dinlemek için indir</button>`:""}</div>
+  ${k1?"":dinleSatir}
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" role="group" aria-label="Okuma hızı"><b style="font-size:14px">Hız:</b>${HIZLAR.map(h=>`<button class="hz ${hiz()===h?"on":""}" data-h="${h}" aria-pressed="${hiz()===h}" style="min-height:44px;padding:6px 10px">${h.toFixed(2).replace(".",",")}</button>`).join("")}</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" role="group" aria-label="Ayet tekrar sayısı"><b style="font-size:14px">Her ayeti tekrarla:</b>${[1,2,3,7].map(t=>`<button class="tk ${tekrar()===t?"on":""}" data-t="${t}" aria-pressed="${tekrar()===t}" style="min-height:44px;padding:6px 12px">${t} kez</button>`).join("")}</div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button id="basaDon" class="${S.basaDon?"on":""}" aria-pressed="${!!S.basaDon}" style="min-height:44px">${S.basaDon?"↻ Bitince başa dön: açık":"↻ Bitince başa dön: kapalı"}</button><b id="tkr" style="font-size:14px;color:var(--lapis)"></b></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button id="basaDon" class="${S.basaDon?"on":""}" aria-pressed="${!!S.basaDon}" style="min-height:44px">${S.basaDon?"↻ Bitince başa dön: açık":"↻ Bitince başa dön: kapalı"}</button><b id="tkr" style="font-size:14px;color:var(--lapis)"></b></div>${k1?"</details>":""}
   ${besmeleVar?`<div class="besmele"><div class="ar" lang="ar" dir="rtl">${BESMELE}</div><button class="dn" data-s="b">▶ Besmele'yi dinle</button></div>`:""}
   ${A.map((a,i)=>`<div class="read-ayet" id="ay${i}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span style="display:flex;gap:8px;align-items:center"><span class="n-ayet">${ilk+i}</span><span class="ozet">${esc(a.oz)}</span></span><span style="display:flex;gap:8px">${CUR.ek&&CUR.ek.aciklama?`<button data-acl="${i}" class="acl" aria-label="${ilk+i}. ayetin açıklaması">Açıklama</button>`:""}<button data-s="${i}" class="dn" aria-label="${ilk+i}. ayeti dinle">▶ Dinle</button><button data-i="${i}" class="rd">Okudum</button></span></div>
-  <div class="kelimeler" lang="ar" dir="rtl" data-ai="${i}">${tecvidMod?a.w.map((w,j)=>`<span class="tw">${tecvidKelime(i,j)}</span>`).join(""):kelimeHtml(a.w,true)[0]}<span class="n-ar">﴿${arNum(ilk+i)}﴾</span></div>
+  <div class="kelimeler" lang="ar" dir="rtl" data-ai="${i}">${tecvidMod?a.w.map((w,j)=>`<span class="tw">${tecvidKelime(i,j)}</span>`).join(""):kelimeHtml(a.w,true)[0]}<span class="n-ar">﴿${arNum(ilk+i)}﴾</span>${SECDE_AYET[CUR.no]===ilk+i?`<span class="secde" role="img" aria-label="Secde ayeti">۩</span>`:""}</div>
   <div class="anlamlar">${kelimeHtml(a.w)[1]}</div><div id="tv${i}" hidden></div><div id="acp${i}" hidden></div>
-  <div class="okunus">${esc(a.ok)}</div><p class="meal">${kucuk()&&cocukAnlatim(ilk+i)?`<b>🧒</b> ${esc(cocukAnlatim(ilk+i))}`:esc(a.meal)}</p></div>`).join("")}
+  <div class="okunus">${esc(a.ok)}</div>${SECDE_AYET[CUR.no]===ilk+i?`<p class="odak" style="font-size:15px"><b>۩ Secde ayeti:</b> Bu ayeti okuyan ve dinleyen secde eder.</p>`:""}<p class="meal">${kucuk()&&cocukAnlatim(ilk+i)?`<b>🧒</b> ${esc(cocukAnlatim(ilk+i))}`:esc(a.meal)}</p></div>`).join("")}
   ${CUR.cumleler?`<h2>Cümle cümle</h2>${CUR.cumleler.map((c,ci)=>`<div class="read-ayet cumle" id="cm${ci}"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><span class="n-ayet">${ci+1}</span><span style="display:flex;gap:8px"><button data-c="${ci}" class="dnc" aria-label="${ci+1}. cümleyi dinle">▶ Dinle</button><button data-ci="${ci}" class="rdc">Okudum</button></span></div><div class="kelimeler" lang="ar" dir="rtl" data-ai="0">${tecvidMod?A[0].w.slice(c.bas,c.son).map((w,jj)=>`<span class="tw">${tecvidKelime(0,c.bas+jj)}</span>`).join(""):kelimeHtml(A[0].w.slice(c.bas,c.son))[0]}</div><div class="anlamlar">${kelimeHtml(A[0].w.slice(c.bas,c.son))[1]}</div><div class="okunus">${esc(c.ok)}</div><p class="meal">${esc(c.meal)}</p></div>`).join("")}`:""}`;
   let sira=false,calan=null;
   const dug=[...V.querySelectorAll(".dn")];
@@ -103,27 +108,28 @@ function oku(){
 
 /* ---------- oyun çatısı ---------- */
 function quiz({title,items,build,star,need=0.8,bitince,geri}){
-  const V=$("view");let i=0,dogru=0,odakla=false;const ekran=EKRAN_NO;if(star&&items.length>sv().soru)items=items.slice(0,sv().soru);
+  const V=$("view");let i=0,dogru=0,yarim=0,odakla=false;/* yarim: küçüklerde ikinci denemede bilinenler; yıldız oranında yarım sayılır */const ekran=EKRAN_NO;if(star&&items.length>sv().soru)items=items.slice(0,sv().soru);
   const ileri=()=>{i++;odakla=true;step();};
   function step(){
-    if(i>=items.length){const oran=dogru/items.length;if(star&&oran>=need)giveStar(star);if(bitince)bitince(dogru,items.length);
+    if(i>=items.length){const oran=(dogru-yarim*0.5)/items.length;if(star&&oran>=need)giveStar(star);if(bitince)bitince(dogru,items.length);
       V.innerHTML=`<div class="result pop"><h2>${title} bitti</h2><b class="big">${dogru} / ${items.length}</b>
-      <p>${!star?"Güzel çalışma.":oran>=need?"Çok güzel, yıldızı hak ettin.":"Yıldız için en az %"+Math.round(need*100)+" doğru gerekiyor. Bir daha dene."}</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="primary" id="again">${geri?"Geri dön":"Yeniden oyna"}</button></div></div>`;
+      <p>${!star?"Güzel çalışma.":oran>=need?"Çok güzel, yıldızı hak ettin.":kucuk()?"Bir daha dinleyip deneyelim mi?":"Yıldız için en az %"+Math.round(need*100)+" doğru gerekiyor. Bir daha dene."}</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="primary" id="again">${geri?"Geri dön":"Yeniden oyna"}</button></div></div>`;
       $("again").onclick=()=>geri?geri():show(cur);return;}
     const q=build(items[i]);
     V.innerHTML=`<div class="qhead"><span>${title}</span><span>${i+1} / ${items.length} · Doğru: ${dogru}</span></div>
     <div class="bar"><i style="width:${i/items.length*100}%"></i></div><div id="soruMetni" style="display:grid;gap:14px">${q.html}</div>
     <div class="opts ${q.arOpts?"ar-opts":""}" role="group" aria-label="Şıklar" aria-describedby="soruMetni" ${q.tek?'style="grid-template-columns:1fr"':""} ${q.buyuk?'data-buyuk="1"':""}>${q.opts.map((o,j)=>`<button data-j="${j}" ${q.arOpts?'lang="ar" dir="rtl"':""}>${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb" role="status" aria-live="polite"></p>`;
-    sesliSoru(q,V);
+    sesliSoru(q,V);let ikinci=false;
     if(odakla){odakla=false;const ilkSik=V.querySelector(".opts button[data-j]");if(ilkSik)try{ilkSik.focus({preventScroll:true});}catch(e){}}
     V.querySelectorAll(".opts button[data-j]").forEach(b=>b.onclick=()=>{
-      const ok=q.opts[+b.dataset.j]===q.answer;
+      const ok=q.opts[+b.dataset.j]===q.answer,k1=kucuk();
+      if(!ok&&k1&&CUR&&!ikinci&&q.opts.length>2){/* ikinci hak yalnız sure oyunlarında (Elif-ba kendi akışında) */ikinci=true;b.disabled=true;b.classList.add("soluk");const fb=$("fb");fb.className="feedback dene";fb.textContent="Bir daha dene";soyle("Bir daha dene");return;}
       V.querySelectorAll(".opts button[data-j]").forEach(x=>{x.disabled=true;if(q.opts[+x.dataset.j]===q.answer)x.classList.add("ok");});
-      if(!ok)b.classList.add("bad");if(ok)dogru++;if(q.sonuc)q.sonuc(ok);if(!ok&&!q.sonuc&&q.opts.length>1)yanlisEkle(q);answer(ok);
-      const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad");
-      fb.textContent=ok?(S.ardarda>=3?"Doğru! Art arda "+S.ardarda+" doğru, ek puan":"Doğru!"):"Doğrusu: "+q.answer;
+      if(!ok)b.classList.add("bad");if(!ok&&k1)b.classList.add("notr");if(ok){dogru++;if(ikinci)yarim++;}if(q.sonuc)q.sonuc(ok);if(!ok&&!q.sonuc&&q.opts.length>1)yanlisEkle(q);answer(ok);
+      const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad")+(!ok&&k1?" notr":"");
+      fb.textContent=ok&&ikinci?"Doğru! İkinci denemede buldun.":ok?(S.ardarda>=3?"Doğru! Art arda "+S.ardarda+" doğru":"Doğru!"):"Doğrusu: "+q.answer;
       if(q.aciklama){const p=document.createElement("div");p.className="detay";p.innerHTML=`<p>${esc(q.aciklama)}</p><button class="primary" id="devam">Devam</button>`;fb.after(p);$("devam").onclick=ileri;$("devam").focus();}
-      else if(!ok){const k1=kucuk(),d=document.createElement("button");d.className="primary"+(k1?" devam-buyuk":"");d.id="devam";d.type="button";d.textContent=k1?"▶ Devam":"Devam ▶";fb.after(d);d.onclick=ileri;try{d.focus({preventScroll:true});}catch(e){}try{d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});}catch(e){}
+      else if(!ok){const d=document.createElement("button");d.className="primary"+(k1?" devam-buyuk":"");d.id="devam";d.type="button";d.textContent=k1?"▶ Devam":"Devam ▶";fb.after(d);d.onclick=ileri;try{d.focus({preventScroll:true});}catch(e){}try{d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});}catch(e){}
         if(k1){const ek="Devam etmek için oka dokun";if(q.arOpts){const w=kelimeBul(q.answer);if(w&&kelimeSes(w))setTimeout(()=>{if(d.isConnected&&KEL.paused)soyle(ek);},1800);else soyle("Doğrusu işaretlendi. "+ek);}else soyle("Doğrusu: "+q.answer+". "+ek);}}
       else setTimeout(()=>{if(ekran!==EKRAN_NO||!fb.isConnected)return;ileri();},1500);});
   }

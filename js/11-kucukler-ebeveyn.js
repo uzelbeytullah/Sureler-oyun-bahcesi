@@ -72,32 +72,39 @@ async function ebeveynOzet(){if(!kapiAcik()){ebeveynKapisi(ebeveynOzet);return;}
     let soru="";if(enCok.length){try{const E=await ekParca(enCok[0],"a");const Q=((E.cocuk||{}).ayetler||[]).filter(a=>a.soru);if(Q.length)soru=Q[new Date().getDate()%Q.length].soru;}catch(e){}}
     const zorU=[];zor.forEach(z=>{if(!zorU.some(y=>y.s===z.s&&y.a===z.a))zorU.push(z);});
     const yanlis=Object.values(X.yanlis||{}).length;
-    bolum.push(`<section class="detay"><h3>👤 ${esc(p.ad||"Adsız kişi")}${p.yas?` · ${p.yas} yaş`:""}</h3>
+    /* ezber durumu: tamam (ezbTam), onay bekleyen, tekrar günü geçmiş (sonraki < bugün) */
+    let ezb=0,onay=0,gec=0;{const bug=today(),XS=p.id===PROF.aktif?S:X;Object.values(XS.sure||{}).forEach(x=>Object.values((x&&x.ezberDurum)||{}).forEach(d=>{if(!d)return;if(ezbTam(d))ezb++;if(d.onayBekle)onay++;if(d.sonraki&&d.sonraki<bug)gec++;}));}
+    bolum.push(`<details class="detay ozet-kisi"${PROF.liste.length===1?" open":""}><summary><h3>👤 ${esc(p.ad||"Adsız kişi")}${p.yas?` · ${p.yas} yaş`:""}</h3></summary>
+     <p><b>Ezberde ${ezb} ayet</b> · ${onay} onay bekliyor · ${gec} tekrarı gecikmiş</p>
      <div class="ozet-satir"><div><b>${aktifGun}/7</b><span>gün çalıştı</span></div><div><b>${Math.round(top.dk)}</b><span>dakika</span></div><div><b>${top.dogru}/${top.soru}</b><span>doğru cevap</span></div><div><b>${top.tekrar}</b><span>ayet tekrarı</span></div><div><b>${top.hikaye}</b><span>hikâye</span></div></div>
      <p><b>En çok çalıştığı:</b> ${enCok.length?enCok.map(n=>esc(adBul(n))).join(", "):"Bu hafta henüz çalışmadı."}</p>
      <p><b>Zorlandığı ayetler:</b> ${zorU.length?zorU.slice(0,8).map(z=>`${esc(adBul(z.s))} ${z.a}`).join(" · "):"Ezberde zorlandığını söylediği ayet yok."}</p>
      ${yanlis?`<p><b>Yanlışlar defterinde:</b> ${yanlis} soru bekliyor.</p>`:""}
      ${soru?`<p style="font-size:18px"><b>Sofrada sorabileceğin soru:</b> ${esc(soru)}</p>`:""}
-     <p style="font-size:14px">Mola uyarısı: ${(X.molaDk!==undefined?X.molaDk:(X.seviye==="kucuk"?20:X.seviye==="genc"?40:0))||"kapalı"}${(X.molaDk!==undefined?X.molaDk:(X.seviye==="kucuk"?20:X.seviye==="genc"?40:0))?" dakikada bir":""}</p></section>`);}
+     <p style="font-size:14px">Mola uyarısı: ${(X.molaDk!==undefined?X.molaDk:(X.seviye==="kucuk"?20:X.seviye==="genc"?40:0))||"kapalı"}${(X.molaDk!==undefined?X.molaDk:(X.seviye==="kucuk"?20:X.seviye==="genc"?40:0))?" dakikada bir":""}</p></details>`);}
   V.innerHTML=`<button class="geri" id="eGeri">← Sureler</button><h2>👨‍👩‍👧 Haftalık ebeveyn özeti</h2>
-  <p>Çocuğunuzun bu hafta neye çalıştığını ve nerede zorlandığını gösterir. Övgüyü emeğe yöneltin: "Bu hafta 4 gün çalıştın" demek, puandan daha çok işe yarar.</p>
+  <p>Çocuğunuzun bu hafta neye çalıştığını ve nerede zorlandığını gösterir. Övgüyü emeğe yöneltin: "Bu hafta 4 gün çalıştın" demek, puandan daha çok işe yarar. Her kişinin özetini adına dokunarak açın.</p>
+  ${typeof puanGrafigiHtml==="function"?puanGrafigiHtml():""}
   ${bolum.join("")||"<p>Henüz kayıtlı kişi yok.</p>"}
   <section class="detay"><h3>Mola ayarı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3><p style="display:flex;gap:6px;flex-wrap:wrap">${[[0,"Kapalı"],[15,"15 dk"],[20,"20 dk"],[30,"30 dk"],[45,"45 dk"]].map(([m,a])=>`<button data-mola="${m}" class="${molaDk()===m?"on":""}" aria-pressed="${molaDk()===m}" style="min-height:44px">${a}</button>`).join("")}</p></section>
   ${ebeveynAyarHtml()}`;
   $("eGeri").onclick=()=>anaSayfa();V.querySelectorAll("[data-mola]").forEach(b=>b.onclick=()=>{S.molaDk=+b.dataset.mola;save();ebeveynOzet();});ebeveynAyarBagla();window.scrollTo({top:0});}
 /* ========== ÇOCUK ANLATIMI, GÜNLÜK KÜÇÜK İYİLİK, BEN OKUYAYIM ========== */
-function cocukAnlatim(n){const A=((CUR&&CUR.ek&&CUR.ek.cocuk)||{}).ayetler||[];const x=A.find(a=>+a.ayet===+n);return x&&x.cocuk_anlatim||"";}
+function cocukAnlatim(n){const A=((CUR&&CUR.ek&&CUR.ek.cocuk)||{}).ayetler||[];const x=A.find(a=>+a.ayet===+n);if(x&&x.kucuk_gizle)return "Bu ayeti büyüyünce ailece öğreneceğiz.";return x&&x.cocuk_anlatim||"";}
 async function eylemSec(){const t=today();if(S.eylem&&S.eylem.gun===t)return S.eylem;
   const s=S.sonSure||1;let L=[];try{const E=await ekParca(s,"a");L=((E.cocuk||{}).eylem)||[];}catch(e){}
   if(!L.length)return null;const once=S.eylem;S.eylem={gun:t,s,metin:L[(new Date().getDate()+(S.eylemSay||0))%L.length]};
   if(once&&once.gun!==t&&once.durum===undefined)S.eylemSor=once;save();return S.eylem;}
 async function eylemKartCiz(){const el=$("eylemKart");if(!el)return;const e=await eylemSec();const s=S.eylemSor;
-  if(s){el.innerHTML=`<section class="detay aile-kart"><h3>🌼 Dün söz vermiştin</h3><p style="font-size:19px">"${esc(s.metin)}"</p><p><b>Yapabildin mi?</b></p>
-   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="eyEvet">Evet, yaptım</button><button id="eyHayir">Bugün olmadı</button></div></section>`;
-   $("eyEvet").onclick=()=>{S.cicek=(S.cicek||0)+1;S.eylemSay=(S.eylemSay||0)+1;s.durum="evet";delete S.eylemSor;save();efekt("gorev");kutla();toast("Maşallah! Bahçene bir çiçek açtı 🌼");eylemKartCiz();};
+  if(s){el.innerHTML=`<section class="detay aile-kart"><h3>🌼 Dünkü iyiliği hatırlıyor musun?</h3><p style="font-size:19px">"${esc(s.metin)}"</p><p><b>İstersen anlat.</b></p>
+   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="eyEvet">Evet, yaptım</button><button class="primary" id="eyAnlat">Anlattım</button><button id="eyHayir">Bugün olmadı</button></div></section>`;
+   /* çiçek yalnız "yaptım"a bağlı değil: anlatmak da yeter */
+   const cicek=(durum,mesaj)=>{S.cicek=(S.cicek||0)+1;S.eylemSay=(S.eylemSay||0)+1;s.durum=durum;delete S.eylemSor;save();efekt("gorev");kutla();toast(mesaj);eylemKartCiz();};
+   $("eyEvet").onclick=()=>cicek("evet","Maşallah! Bahçene bir çiçek açtı 🌼");
+   $("eyAnlat").onclick=()=>cicek("anlatti","Anlattığın için teşekkürler! Bahçene bir çiçek açtı 🌼");
    $("eyHayir").onclick=()=>{s.durum="hayir";delete S.eylemSor;save();toast("Olsun, bugün yeniden deneyebilirsin");eylemKartCiz();};return;}
   if(!e){el.innerHTML="";return;}
-  el.innerHTML=`<section class="detay aile-kart"><h3>🌱 Bugünün küçük iyiliği</h3><p style="font-size:19px"><b>${esc(e.metin)}</b></p><p style="font-size:14px">${esc(adBul(e.s))} suresinden. Yarın sana soracağız; yaptıysan bahçende bir çiçek açacak.</p></section>`;}
+  el.innerHTML=`<section class="detay aile-kart"><h3>🌱 Bugünün küçük iyiliği</h3><p style="font-size:19px"><b>${esc(e.metin)}</b></p><p style="font-size:14px">${esc(adBul(e.s))} suresinden. Yarın birlikte hatırlayacağız; anlatırsan bahçende bir çiçek açacak.</p></section>`;}
 /* ben okuyayım: kendi sesini kaydet, sonra Alafasy ile karşılaştır */
 let KAYIT=null;
 async function benOku(i,btn,durum){
@@ -118,22 +125,31 @@ async function benOku(i,btn,durum){
 /* ========== KİŞİ SEÇİMİ ========== */
 function kisiSec(){CUR=null;baslik();setTabs();const V=$("view");$("baslik").textContent="Kim oynuyor?";$("altbaslik").textContent="Her kişinin puanı, yıldızları ve bahçesi ayrı tutulur";
   const L=PROF.liste;
-  V.innerHTML=`<h2>Kim oynuyor?</h2>
+  const geriVar=!!(PROF.aktif&&aktifKisi());
+  V.innerHTML=`${geriVar?`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="kGeri">← Geri</button></div>`:""}<h2>Kim oynuyor?</h2>
   ${L.length?`<div class="sure-grid">${L.map(p=>`<button class="sure-kart ${p.id===PROF.aktif?"tam":""}" data-k="${p.id}"><span class="sad" style="font-size:22px">👤 ${esc(p.ad||"Adsız kişi")}</span><span class="sbilgi"><b>${p.yas?p.yas+" yaş · "+SEVIYE[yasSeviye(p.yas)].ad:"Yaşı girilmemiş"}</b></span></button>`).join("")}</div>`:"<p>Henüz kimse eklenmedi. Önce kendini ekle.</p>"}
   <section class="detay"><h3>${L.length?"Yeni kişi ekle":"Kendini ekle"}</h3>
   <p style="display:flex;gap:8px;flex-wrap:wrap;align-items:end"><label><b>Ad</b><br><input id="kAd" class="ara" maxlength="24" placeholder="Adın" style="min-width:180px"></label>
   <label><b>Yaş</b><br><input id="kYas" type="number" min="3" max="99" inputmode="numeric" style="min-height:44px;width:90px;font-size:18px"></label>
-  <button class="primary" id="kEkle" style="font-size:18px">Ekle ve başla</button></p>
-  <p style="font-size:14px">Ad ve yaş yalnız bu uygulamada, senin hesabında ve bu cihazda saklanır. Yaşa göre sorular ve görevler ayarlanır.</p></section>
+  <button class="primary" id="kEkle" style="font-size:18px">${kisiSec.daha?"Ekle":"Ekle ve başla"}</button></p>
+  <p><label style="display:inline-flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" id="kDaha" ${kisiSec.daha?"checked":""} style="width:24px;height:24px"> <b>Bir çocuk daha ekle</b> <span style="font-size:14px">(eklenince form temizlenir, bu ekranda kalırsın)</span></label></p>
+  <p style="font-size:14px">Ad ve yaş bu cihazda saklanır; yaşa göre sorular ve görevler ayarlanır. Gerçek ad yerine takma ad da yazabilirsin.</p></section>
   ${L.length?`<details><summary><b>Kişileri düzenle</b></summary>${L.map(p=>`<p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input data-ad="${p.id}" class="ara" value="${esc(p.ad)}" maxlength="24" aria-label="${esc(p.ad||"Adsız kişi")}: ad" style="max-width:200px"><input data-yas="${p.id}" type="number" min="3" max="99" value="${p.yas||""}" aria-label="${esc(p.ad||"Adsız kişi")}: yaş" style="min-height:44px;width:80px"><button data-kay="${p.id}">Kaydet</button>${L.length>1?`<button data-sil="${p.id}">Listeden çıkar</button>`:""}</p>`).join("")}</details>`:""}`;
   V.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>kisiGec(b.dataset.k));
+  {const kg=$("kGeri");if(kg)kg.onclick=()=>{kisiSec.daha=false;anaSayfa();};}
+  $("kDaha").onchange=e=>{kisiSec.daha=e.target.checked;$("kEkle").textContent=kisiSec.daha?"Ekle":"Ekle ve başla";};
   $("kEkle").onclick=()=>{const ad=$("kAd").value.trim(),yas=+$("kYas").value;if(!ad){toast("Adını yaz");return;}if(!(yas>=3&&yas<=99)){toast("Yaşını yaz (3-99)");return;}
-    const id=PROF.liste.some(p=>p.id==="p0")||PROF.liste.length?"p"+Date.now().toString(36):"p0";PROF.liste.push({id,ad,yas});profKaydet();kisiGec(id,true);};
+    const id=PROF.liste.some(p=>p.id==="p0")||PROF.liste.length?"p"+Date.now().toString(36):"p0";PROF.liste.push({id,ad,yas});profKaydet();
+    if(kisiSec.daha){toast(`${ad} eklendi`);kisiSec();const a=$("kAd");if(a)try{a.focus({preventScroll:true});}catch(e){}return;}
+    kisiSec.daha=false;kisiGec(id,true);};
   V.querySelectorAll("[data-kay]").forEach(b=>b.onclick=()=>{const p=PROF.liste.find(x=>x.id===b.dataset.kay);p.ad=V.querySelector(`[data-ad="${p.id}"]`).value.trim();p.yas=+V.querySelector(`[data-yas="${p.id}"]`).value||p.yas;profKaydet();if(p.id===PROF.aktif){S.seviye=yasSeviye(p.yas);save();}toast("Kaydedildi");kisiSec();});
-  V.querySelectorAll("[data-sil]").forEach(b=>b.onclick=()=>{const p=PROF.liste.find(x=>x.id===b.dataset.sil);if(!confirmSil(p))return;PROF.liste=PROF.liste.filter(x=>x.id!==p.id);if(PROF.aktif===p.id)PROF.aktif=null;profKaydet();kisiSec();});
+  V.querySelectorAll("[data-sil]").forEach(b=>b.onclick=()=>{if(!kapiAcik()){ebeveynKapisi(()=>kisiSec());return;}const p=PROF.liste.find(x=>x.id===b.dataset.sil);if(!confirmSil(p))return;PROF.liste=PROF.liste.filter(x=>x.id!==p.id);if(PROF.aktif===p.id)PROF.aktif=null;profKaydet();
+    /* bulutta da bu kişinin kaydını sil */
+    if(DB&&UID){try{const d=DB.collection("data/users/"+UID).doc(docAdi(p.id));if(typeof d.delete==="function")d.delete().catch(()=>{});}catch(e){}}
+    kisiSec();});
   window.scrollTo({top:0});}
 function confirmSil(p){const b=document.querySelector(`[data-sil="${p.id}"]`);if(b.dataset.onay)return true;b.dataset.onay="1";b.textContent="Emin misin? Bir daha bas";return false;}
 async function kisiGec(id,yeni){if(PROF.aktif&&PROF.aktif!==id){save();bulutGonder();}PROF.aktif=id;profKaydet();profYukle(id);const p=aktifKisi();if(p&&p.yas)S.seviye=yasSeviye(p.yas);sonPuan=S.puan;
-  if(DB&&UID){docRef=null;const ref=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await ref.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;docRef=ref;}catch(e){}}   /* okuma düşerse docRef boş kalır: yerel durum bulutun üstüne yazılmaz */
+  if(DB&&UID&&!(window.claude&&claude.bulut&&bulutKapali())){docRef=null;const ref=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await ref.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;docRef=ref;}catch(e){}}   /* okuma düşerse docRef boş kalır: yerel durum bulutun üstüne yazılmaz */
   save();toast(yeni?`Hoş geldin ${p.ad}!`:`${p.ad||"Kişi"} seçildi`);anaSayfa();}
 function kisiDugme(){const p=aktifKisi();return p?`<button id="kisiDeg" style="min-height:44px">👤 ${esc(p.ad||"Adsız")}${p.yas?" · "+p.yas:""} · Değiştir</button>`:"";}

@@ -35,7 +35,7 @@ function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="
   V.querySelectorAll("[data-ea]").forEach(b=>b.onclick=()=>{elifAlt=b.dataset.ea;elifba();});
   const el=$("ebIc");
   if(elifAlt==="tablo"){
-    el.innerHTML=`<div class="sure-grid" style="grid-template-columns:repeat(auto-fill,minmax(84px,1fr))">${HARFLER.map((h,i)=>{const r=(S.elifba||{})[h[0]]||{};return `<button class="sure-kart ${r.d>=3?"tam":""}" data-hi="${i}" style="text-align:center;justify-items:center"><span class="ar" lang="ar" style="font-size:40px;line-height:1.2">${h[0]}</span><span class="sad" style="font-size:15px">${h[1]}</span></button>`;}).join("")}</div><div id="ebD" hidden></div>`;
+    el.innerHTML=`<div class="sure-grid" style="grid-template-columns:repeat(auto-fill,minmax(84px,1fr))">${HARFLER.map((h,i)=>{const r=(S.elifba||{})[h[0]]||{};return `<button class="sure-kart ${r.d>=3?"tam":""}" data-hi="${i}" style="text-align:center;justify-items:center"><span class="ar" lang="ar" style="font-size:40px;line-height:1.7;padding-bottom:4px">${h[0]}</span><span class="sad" style="font-size:15px">${h[1]}</span></button>`;}).join("")}</div><div id="ebD" hidden></div>`;
     el.querySelectorAll("[data-hi]").forEach(b=>b.onclick=()=>{const h=HARFLER[+b.dataset.hi],d=$("ebD");d.hidden=false;d.className="detay pop";
       d.innerHTML=`<p style="font-size:22px"><b>${h[1]}</b> · okunuşu: <b>${esc(h[2])}</b></p>
       ${harfSesHtml(h)}<p style="font-size:14px;margin:0">Örnek kelimeler kâri Mişari Râşid el-Afasi'nin okuyuşundan.</p>

@@ -50,19 +50,21 @@ function pPlan(el){
   el.querySelectorAll("input[data-i]").forEach(c=>c.onchange=()=>{if(c.checked){denedim(+c.dataset.i);pPlan(el);}});
 }
 function pZit(el){
-  const P=CUR.portre,t=SS(CUR.no).portre,items=shuffle(P.oz.map((_,i)=>i));let k=0,dogru=0;const ekran=EKRAN_NO;
+  const P=CUR.portre,t=SS(CUR.no).portre,items=shuffle(P.oz.map((_,i)=>i));let k=0,dogru=0,yarim=0;const ekran=EKRAN_NO;/* yarim: küçüklerde ikinci denemede doğru; rozet oranında yarım sayılır */
   function step(){
-    if(k>=items.length){const ok=dogru>=Math.ceil(items.length*0.8);if(ok&&!t.zit){t.zit=true;checkBadges();save();}
-      el.innerHTML=`<div class="result pop"><h2>Zıddını bul bitti</h2><b class="big">${dogru} / ${items.length}</b><p>${ok?"Çok güzel, zıtları tanıdın.":"Rozet için en az %80 doğru gerekiyor."}</p><button class="primary" id="zy">Yeniden oyna</button></div>`;
+    if(k>=items.length){const ok=dogru-yarim*0.5>=Math.ceil(items.length*0.8);if(ok&&!t.zit){t.zit=true;checkBadges();save();}
+      el.innerHTML=`<div class="result pop"><h2>Zıddını bul bitti</h2><b class="big">${dogru} / ${items.length}</b><p>${ok?"Çok güzel, zıtları tanıdın.":kucuk()?"Bir daha dinleyip deneyelim mi?":"Rozet için en az %80 doğru gerekiyor."}</p><button class="primary" id="zy">Yeniden oyna</button></div>`;
       $("zy").onclick=()=>pZit(el);return;}
     const i=items[k],d=P.oz[i].zit;const opts=secenek(d,P.oz.map(p=>p.zit),2);
     el.innerHTML=`<div class="qhead"><span>Zıddını bul</span><span>${k+1} / ${items.length} · Doğru: ${dogru}</span></div><div class="bar"><i style="width:${k/items.length*100}%"></i></div>
     <p>Bu özelliğin zıddı hangisidir?</p><p style="font-size:22px;font-weight:800">${esc(P.oz[i].ad)}</p>
     <div class="opts" style="grid-template-columns:1fr">${opts.map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb"></p>`;
-    el.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{const ok=opts[+b.dataset.j]===d;
+    let ikinci=false;
+    el.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{const ok=opts[+b.dataset.j]===d,k1=kucuk();
+      if(!ok&&k1&&CUR&&!ikinci&&opts.length>2){ikinci=true;b.disabled=true;b.classList.add("soluk");const fb=$("fb");fb.className="feedback dene";fb.textContent="Bir daha dene";soyle("Bir daha dene");return;}
       el.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(opts[+x.dataset.j]===d)x.classList.add("ok");});
-      if(!ok)b.classList.add("bad");if(ok)dogru++;answer(ok);
-      const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad");fb.textContent=ok?"Doğru!":"Doğrusu işaretlendi.";
+      if(!ok)b.classList.add("bad");if(!ok&&k1)b.classList.add("notr");if(ok){dogru++;if(ikinci)yarim++;}answer(ok);
+      const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad")+(!ok&&k1?" notr":"");fb.textContent=ok?(ikinci?"Doğru! İkinci denemede buldun.":"Doğru!"):"Doğrusu işaretlendi.";
       setTimeout(()=>{if(ekran!==EKRAN_NO||!fb.isConnected)return;k++;step();},ok?900:1800);});
   }
   step();

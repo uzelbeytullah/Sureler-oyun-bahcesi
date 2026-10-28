@@ -128,4 +128,59 @@ ok('kilitli süs',/🔒/.test(V().textContent));V().querySelector('[data-sus="ha
 V().querySelector('[data-sus="kus"]').click();ok('kilitsiz süs alındı',(ev('S.sus')||[]).includes('kus'));
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
-(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
+async function test_t11(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const V=()=>w.document.getElementById('view');
+w.document.getElementById('hakkindaAc').click();await new Promise(r=>setTimeout(r,200));ok('hakkında açıldı',/Sureler Oyun Bahçesi hakkında/.test(V().textContent));
+V().querySelector('[data-hk="gizlilik"]').click();await new Promise(r=>setTimeout(r,100));ok('gizlilik sekmesi',/Haklarınız/.test(V().textContent)&&/Veri sorumlusu/.test(V().textContent));
+V().querySelector('[data-hk="kaynaklar"]').click();await new Promise(r=>setTimeout(r,100));ok('kaynaklar sekmesi',/Tanzil/.test(V().textContent)&&/Elmalılı/.test(V().textContent));
+ok('küçüklere gizlenen ayet notu',ev('(CUR={ek:{cocuk:{ayetler:[{ayet:5,cocuk_anlatim:"x",kucuk_gizle:true}]}}},cocukAnlatim(5))')==="Bu ayeti büyüyünce ailece öğreneceğiz.");ev('CUR=null');
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+/* 9a-9e: tek tekrar takvimi, eski kayıt dönüşümü, gizleyerek hatırlama, Zorlandım, onay sıfırlama, günlük sınır, ara dinletme; 13a-13b: puan geri planda */
+async function test_t12(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const V=()=>w.document.getElementById('view');const bekle=ms=>new Promise(r=>setTimeout(r,ms));
+/* 9a: eski kayıtlar bir kez yeni takvime */
+w.__E={puan:0,sure:{"112":{ezberDurum:{"0":{kutu:2,sonraki:"2030-01-01"},"1":{kutu:4,sonraki:"2030-01-01",onaylandi:"x"}}},"78":{ezberDurum:{"0":{kutu:8,sonraki:"2030-01-01"},"1":{kutu:2,sonraki:"2030-01-01"}}}}};
+const N=ev('normalize(__E)');const kt=[N.sure["112"].ezberDurum[0].kutu,N.sure["112"].ezberDurum[1].kutu,N.sure["78"].ezberDurum[0].kutu,N.sure["78"].ezberDurum[1].kutu];
+ok('eski kutular dönüştü '+kt,N.ezberSurum===2&&kt.join()==="1,4,4,1"&&ev('ezbTam(__E.sure["112"].ezberDurum[1])'));
+ok('ikinci kez dönüştürülmez',ev('normalize(__E).sure["112"].ezberDurum[0].kutu')===1);
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:11}];PROF.aktif="p0";S.seviye="genc";S.ilkYolGec=true;');
+await ev('ac(112)');await bekle(500);
+const D=i=>ev(`JSON.stringify(ekS("ezberDurum")[${i}]||null)`)&&JSON.parse(ev(`JSON.stringify(ekS("ezberDurum")[${i}]||null)`));
+/* 9a: 7 günlük aralıktan sonra hatırlanan ayet 14 güne geçer, henüz ezberde değil */
+ev('ekS("ezberDurum")[0]={kutu:2,sonraki:"2000-01-01"};ezberSeviye=3;ezberCalis(0)');w.document.querySelector('[data-d="2"]').click();
+ok('yeni takvim: kutu 3, 14 gün sonra, ezberde değil',D(0).kutu===3&&D(0).sonraki===ev('gunEkle(14)')&&!ev('ezbTam(ekS("ezberDurum")[0])'));
+/* 9b: gizlemeden "Hatırladım" yok; Zorlandım kutuyu korur, yarına */
+ev('ekS("ezberDurum")[1]={kutu:2,sonraki:"2000-01-01"};ezberAyet=null;ezberSeviye=0;ezberCalis(1)');
+ok('Hiç gizleme iken Hatırladım kapalı',w.document.querySelector('[data-d="2"]').disabled&&!!w.document.getElementById('gizleDene'));
+w.document.getElementById('gizleDene').click();ok('Gizleyip dene → Hatırladım açık',!w.document.querySelector('[data-d="2"]').disabled&&ev('ezberSeviye')>0);
+w.document.querySelector('[data-d="1"]').click();const trh=ev('gunEkle(1).split("-").reverse().join(".")');
+ok('Zorlandım: kutu yerinde, yarın',D(1).kutu===2&&D(1).sonraki===ev('gunEkle(1)'));ok('Zorlandım mesajı gerçek tarih',ev('[toast.su,...(toast.q||[])].join("|")').includes(trh));
+/* 9c: onaylı ayet unutulunca onay silinir, yeniden hatırlanınca yeniden istenir */
+ev('ekS("ezberDurum")[2]={kutu:4,sonraki:"2000-01-01",tam:true,onaylandi:"2026-01-01"};ezberAyet=null;ezberSeviye=4;ezberCalis(2)');w.document.querySelector('[data-d="1"]').click();
+ok('Zorlandım: onay silindi, ezberde sayılmıyor',!D(2).onaylandi&&!ev('ezbTam(ekS("ezberDurum")[2])'));
+ev('ekS("ezberDurum")[2].sonraki="2000-01-01";ezberAyet=null;ezberSeviye=4;ezberCalis(2)');w.document.querySelector('[data-d="2"]').click();
+ok('yeniden hatırlanınca onay yeniden isteniyor',!!D(2).onayBekle&&!ev('ezbTam(ekS("ezberDurum")[2])'));
+/* 9e: kutu 1'e (3 günlük aralığa) ilk geçişte ara dinletme */
+ev('ekS("ezberDurum")[3]={kutu:0,sonraki:"2000-01-01"};ezberAyet=null;ezberSeviye=1;ezberCalis(3)');w.document.querySelector('[data-d="2"]').click();
+ok('ara dinletme istendi',D(3).kutu===1&&!!D(3).dinletBekle&&ev('dinletBekleyenler().length')===1);
+ev('anaSayfa()');ok('Bugün panelinde dinletilecekler',/dinletilecek/.test(V().textContent)&&!!w.document.getElementById('onayGit'));
+ev('delete S.sure["112"].ezberDurum[2].onayBekle;pinKoy("1234")');await ev('onayEkrani()');await bekle(300);ok('onay ekranında ara dinletme notu',/Ara dinletme/.test(V().textContent));
+V().querySelector('#oPin').value='1234';V().querySelector('[data-on="1"]').click();await bekle(300);
+ok('dinletti işareti, ezberde sayılmaz',!!ev('S.sure["112"].ezberDurum[3].dinletti')&&!ev('S.sure["112"].ezberDurum[3].dinletBekle')&&!ev('ezbTam(S.sure["112"].ezberDurum[3])'));
+/* 9d: günde en çok 12 tekrar; en çok geciken önce; birikince yeni ayet yerine not */
+ev(`S.sure={};S.tekrarSay=null;for(const [no,n] of [[1,5],[113,5],[114,6]]){S.sure[no]={ezberDurum:{}};for(let i=0;i<n;i++)S.sure[no].ezberDurum[i]={kutu:i%3,sonraki:"2001-01-0"+(1+i)};}S.sure[114].ezberDurum[5]={kutu:3,sonraki:"1999-01-01"};`);
+ok('günlük sınır 12',ev('tumTekrarlar().length')===12&&ev('tekrarHavuzu().length')===16);ok('en çok geciken önce',ev('JSON.stringify(tumTekrarlar()[0])')==='{"id":114,"i":5}');
+ok('aynı gecikmede düşük kutu önce',ev('(()=>{const L=tekrarHavuzu().filter(x=>x.sonraki==="2001-01-01");return L.length===3&&L.every(x=>x.kutu===0)})()'));
+ev('S.tekrarSay={g:today(),n:10}');ok('bugün yapılanlar düşülür',ev('tumTekrarlar().length')===2);
+ev('anaSayfa()');ok('Bugün panelinde "Önce tekrarları bitirelim"',/Önce tekrarları bitirelim/.test(V().textContent));
+await ev('ac(1,"ezber")');await bekle(600);ok('ezber köşesinde yeni ayet önerisi yerine not',/Önce tekrarları bitirelim/.test(V().textContent)&&!w.document.getElementById('yeniAyet'));
+/* 9f: sade giriş cümlesi, akademik metin yalnız yetişkinde */
+ok('sade giriş cümlesi',/Bir ayeti 1, 3, 7 ve 14 gün sonra tekrar edince ezberin kalıcı olur\./.test(V().textContent)&&!/Ebbinghaus/.test(V().textContent));
+/* 13a-13b */
+ev('anaSayfa()');ok('Bugün panelinde puan grafiği ve günlük hedef yok',!w.document.querySelector('.hdf')&&!/Son yedi günün puanları/.test(V().textContent));
+ok('puanGrafigiHtml kendi başına',/Son yedi günün puanları/.test(ev('puanGrafigiHtml()')));
+ev('S.puan=0;S.ardarda=4;S.gunDogru=null;answer(true)');ok('art arda bonus yok',ev('S.puan')===10&&ev('S.ardarda')===5);
+ok('puan rozetleri listenin sonunda',ev('BADGES.slice(-6).map(b=>b[0]).sort().join()')==="bin,onlu,seri15,seri5,yuz,yuzdogru");
+w.__L={};for(const g of ["2026-01-01","2026-01-02","2026-01-04","2026-01-05","2026-01-07"])w.__L[g]={soru:1};ok('7 günde 5 gün rozeti',ev('haftaBesGun({log:__L})')&&!ev('(delete __L["2026-01-07"],__L["2026-01-09"]={soru:1},haftaBesGun({log:__L}))'));
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10,test_t11,test_t12]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();

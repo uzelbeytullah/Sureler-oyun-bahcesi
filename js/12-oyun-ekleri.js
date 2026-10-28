@@ -59,7 +59,8 @@ function susuz(no,kat){const ids=kat&&kat.gruplar?kat.gruplar.map(g=>g.id):[no];
 function harcanabilir(){return S.puan-(S.harcanan||0);}
 function bitkiAsama(k){if(k.gruplar){const t=grupYildiz(k),m=k.gruplar.length*4;if(t===0)return k.gruplar.some(g=>S.sure[g.id])?0.5:0;return Math.max(1,Math.round(t/m*4));}
   const y=yildizSay(k.no);if(y)return y;return S.sure[k.no]?0.5:0;}
-function bitkiSvg(a,ezb,solgun){if(solgun)return `<g style="filter:saturate(.35) brightness(1.08)">${bitkiSvg(a,ezb,false)}</g><text x="78" y="22" font-size="18">💧</text>`;
+function bitkiSvg(a,ezb,solgun){if(solgun&&kucuk())return `${bitkiSvg(a,ezb,false)}<circle cx="84" cy="17" r="12" fill="#E9F7FF" stroke="#4BA3D9" stroke-width="2"/><text x="84" y="22" font-size="14" text-anchor="middle">🌱</text>`;/* küçüklerde solma yok: olumlu işaret */
+  if(solgun)return `<g style="filter:saturate(.35) brightness(1.08)">${bitkiSvg(a,ezb,false)}</g><text x="78" y="22" font-size="18">💧</text>`;
   const toprak=`<ellipse cx="50" cy="92" rx="34" ry="8" fill="#8C6A45"/>`;
   if(a===0)return toprak+`<ellipse cx="50" cy="88" rx="5" ry="3.5" fill="#5A3A22"/>`;
   if(a===0.5)return toprak+`<path d="M50,90 v-14" stroke="#2F7A3B" stroke-width="3"/><path d="M50,80 q-10,-6 -12,-14 q10,2 12,12z M50,78 q10,-6 12,-14 q-10,2 -12,12z" fill="#4CAF50"/>`;
@@ -85,8 +86,8 @@ function bahce(){sayacIsle("bahce");CUR=null;baslik();setTabs();renderStats();$(
   V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="bGeri">← Sureler</button></div>
   ${ust}
   ${S.cicek?`<p><b>🌼 Yaptığın iyiliklerle bahçende ${S.cicek} çiçek açtı.</b></p>`:""}${S.halkaSay?`<p><b>🏮 Ailece ${S.halkaSay} haftalık halka tamamladınız; her biri bahçede bir fener yaktı.</b></p>`:""}<p><b>Bahçende ${tum.length} sure var:</b> ${sayac[4]} çiçekli ağaç · ${sayac[3]+sayac[2]} fidan · ${sayac[1]} filiz · ${sayac[0]} tohum. Bir surede yıldız kazandıkça fidanı büyür; dört yıldızla çiçek açar, sureyi ezberleyince çiçekleri altın sarısı olur.</p>
-  ${(()=>{const n=tum.filter(x=>x.su).length;return n?`<p><b>💧 ${n} fidanın suya ihtiyacı var:</b> tekrar günü geçmiş ayetleri var. Fidana dokun, ezber tekrarını yap; yeniden canlanır.</p>`:"";})()}
-  <div class="bahce-grid">${tum.map(({k,a,ezb,su})=>`<button class="bahce-hucre" data-n="${k.no}" ${su?'data-su="1"':""} aria-label="${esc(k.ad)}: ${a===0?"tohum":a<1?"filiz":a>=4?"çiçekli ağaç":"fidan"}${su?", tekrar bekliyor":""}"><svg viewBox="0 0 100 100" style="width:100%;display:block">${bitkiSvg(a,ezb,su)}</svg><b>${esc(k.ad)}</b></button>`).join("")}</div>
+  ${(()=>{const n=tum.filter(x=>x.su).length;return n&&kucuk()?`<p><b>🌱 ${n===1?"Bir fidan":n+" fidan"} seni özledi:</b> biraz suya ihtiyacı var. Dokun, birlikte tekrar edelim.</p>`:n?`<p><b>💧 ${n} fidanın suya ihtiyacı var:</b> tekrar günü geçmiş ayetleri var. Fidana dokun, ezber tekrarını yap; yeniden canlanır.</p>`:"";})()}
+  <div class="bahce-grid">${tum.map(({k,a,ezb,su})=>`<button class="bahce-hucre" data-n="${k.no}" ${su?'data-su="1"':""} aria-label="${esc(k.ad)}: ${a===0?"tohum":a<1?"filiz":a>=4?"çiçekli ağaç":"fidan"}${su?(kucuk()?", seni özledi":", tekrar bekliyor"):""}"><svg viewBox="0 0 100 100" style="width:100%;display:block">${bitkiSvg(a,ezb,su)}</svg><b>${esc(k.ad)}</b></button>`).join("")}</div>
   <h2>Süs dükkânı</h2><p>Harcanabilir puanın: <b style="font-size:20px">${harcanabilir()}</b> · Toplam kazandığın puan değişmez, rozetlerin de korunur.</p>
   <p style="font-size:14px">Bazı süsler emekle açılır: yıldızlar, ezber ve namaz hazırlığı yolu.</p>
   <div class="sure-grid">${SUSLER.map(([id,ad,f])=>{const var_=sus.includes(id),kl=SUS_KILIT[id],acik=!kl||kl[1]();return `<button class="sure-kart ${var_?"tam":""}" data-sus="${id}" ${var_?"disabled":""}><span class="sad">${acik?"":"🔒 "}${esc(ad)}</span><span class="sbilgi"><b>${var_?"Bahçende ✓":f+" puan"}</b>${!var_&&!acik?`<br>${esc(kl[0])}`:""}</span></button>`;}).join("")}</div>`;

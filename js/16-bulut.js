@@ -15,6 +15,17 @@ function yarSorular(){const Q=[];const kel=[],seen=new Set();CUR.ayetler.forEach
 /* Yarışma sorusu ekrana yalnız veriden, kaçırılarak (esc) kurulur; ağdan HTML alınmaz */
 function yarSoruHtml(q){if(!q)return "";if(q.tur==="anlam")return `<p>Bu kelimenin anlamı nedir?</p><div class="qbig ar" lang="ar">${esc(q.ar)}</div>`;
   if(q.tur==="bosluk"){const k=Number(q.k);return `<p>Boşluğa hangi kelime gelir?</p><div class="ayet-box ar" lang="ar">${(Array.isArray(q.kel)?q.kel:[]).map((w,j)=>j===k?'<span class="blank">؟</span>':esc(w)).join(" ")}</div>`;}return "";}
+/* Ana sayfadan yarışma kurma: açık sure yoksa önce sure seçtirir, sonra yarAc ile o sureden kurar */
+async function yarKur(){if(CUR&&CUR.ayetler){yarAc();return;}
+  CUR=null;baslik();setTabs();$("baslik").textContent="Aile yarışması";$("altbaslik").textContent="Önce bir sure seç";
+  const V=$("view"),calisilan=KATALOG.filter(k=>!k.gruplar&&S.sure&&S.sure[k.no]);
+  const L=(calisilan.length?calisilan:KATALOG.filter(k=>!k.gruplar&&!k.etiket&&k.ayet&&k.ayet<=11)).slice(0,30);
+  V.innerHTML=`<button class="geri" id="yG">← Sureler</button><h2>👪 Aile yarışması kur</h2>
+  <p>${calisilan.length?"Çalıştığın surelerden":"Kısa surelerden"} birini seç; o surenin kelimelerinden 8 soruluk canlı bir yarışma açılır. Bu ekranı herkesin göreceği yere koy; aile üyeleri kendi telefonlarından katılır.</p>
+  <div class="sure-grid">${L.map(k=>`<button class="sure-kart" data-yn="${k.no}"><span class="sar" lang="ar">${k.adAr}</span><span class="sad">${esc(k.ad)}</span><span class="sbilgi">${k.etiket?"Tek ayet":k.ayet+" ayet"}</span></button>`).join("")||"<p>Seçilebilecek sure bulunamadı.</p>"}</div>`;
+  $("yG").onclick=()=>anaSayfa();
+  V.querySelectorAll("[data-yn]").forEach(b=>b.onclick=async()=>{const no=+b.dataset.yn;await ac(no,"harita");if(!CUR||CUR.no!==no)return;
+    if(CUR.ayetler.flatMap(a=>a.w).length<6){toast("Bu surede yarışma için yeterli kelime yok");return;}yarAc();});}
 function yarBirak(){const Y=YAR;if(!Y)return;YAR=null;try{if(Y.host){clearInterval(Y.tik);Y.durum="bitti";Y.R.emit("durum",{kod:Y.kod,sure:Y.sure,durum:"bitti",i:Y.i,n:Y.Q.length,opts:[],takim:Y.takim?{p:Y.tp,c:Y.tc,n:Y.Q.length}:null,skor:Y.takim?[]:Object.entries(Y.puan).map(([p,n])=>[Y.ad[p]||"Oyuncu",n,p])}).catch(()=>{});}Y.R.leave().catch(()=>{});}catch(e){}}
 window.addEventListener("pagehide",()=>yarBirak());
 const TAKIM_HEDEF=6;
@@ -90,6 +101,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden&&hedefDegis
 window.addEventListener("pagehide",()=>{if(hedefDegisen.size)hedefGonder();});
 async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent="Ortak hedef";$("altbaslik").textContent="Aile ya da sınıfça birlikte ulaşılan hedef";
   const V=$("view");V.innerHTML=`<p class="yukleniyor">Yükleniyor…</p>`;
+  await bulutDB();
   if(!DB){V.innerHTML=`<button class="geri" id="hG">← Sureler</button><p>Ortak hedef için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p>`;$("hG").onclick=()=>anaSayfa();return;}
   const yaz=USR_YAZ;const H=S.hedefler||{};
   if(!hedefSayfa.ilk){hedefSayfa.ilk=1;Object.keys(H).forEach(k=>hedefDegisen.add(k));}  /* eski sürümden kalan katkıları bir kez taşı */
@@ -97,7 +109,7 @@ async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent=
   const L=(await Promise.all(Object.keys(H).map(hedefGetir))).filter(Boolean);
   V.innerHTML=`<button class="geri" id="hG">← Sureler</button><h2>🤝 Ortak hedef</h2>
   <p>Aile ya da sınıf birlikte bir hedef koyar: örneğin "Bu hafta hep birlikte 100 ayet tekrarı". Herkesin katkısı toplanır; sıralama yoktur, hedefe birlikte ulaşılır.</p>
-  ${yaz===false?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
+  ${yaz===false&&!(window.claude&&claude.bulut)?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
   ${L.map(h=>{const hd=Math.max(1,hSayi(h.hedef)),{t,k}=hedefToplam(h),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${k} kişi katıldı · Benim katkım: <b>${hSayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
   <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu" aria-label="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
   <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)" aria-label="Hedefin adı"></p>
@@ -116,15 +128,26 @@ function sayacIsle(bolum){const t=today();S.kullanim=S.kullanim||{};const g=S.ku
   const ks=Object.keys(S.kullanim).sort();while(ks.length>91)delete S.kullanim[ks.shift()];
   if(DB&&UID&&!sayacT)sayacT=setTimeout(sayacGonder,600000);}
 /* ---------- bulut kaydını silme (yalnız GitHub sürümü) ---------- */
-const BULUT_KAPALI_KEY="bahce-bulut-kapali";
-function bulutKapali(){try{return localStorage.getItem(BULUT_KAPALI_KEY)==="1";}catch(e){return false;}}
-async function bulutSil(){if(!DB||!UID)throw new Error("bulut yok");
+/* Bulut eşitlemesi isteğe bağlı: ebeveyn, ebeveyn bölümünden açar (varsayılan kapalı) */
+const BULUT_ACIK_KEY="bahce-bulut-acik";
+function bulutKapali(){try{return localStorage.getItem(BULUT_ACIK_KEY)!=="1";}catch(e){return true;}}
+/* Ortak hedef gibi kullanıcının kendi başlattığı bulut işleri için bağlantı (eşitleme kapalı olsa da) */
+async function bulutDB(){if(DB&&UID)return true;if(!window.claude||!claude.use)return false;
+  try{const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);const id=await user.id();if(!db||!id)return false;DB=db;UID=id;return true;}catch(e){return false;}}
+async function bulutSil(){await bulutDB();if(!DB||!UID)throw new Error("bulut yok");
   const kol=DB.collection("data/users/"+UID),L=[...PROF.liste.map(p=>kol.doc(docAdi(p.id))),kol.doc("profiller"),DB.collection("kullanim").doc(UID)];
   docRef=null;window.DBK=null;clearTimeout(saveTimer);saveTimer=null;clearTimeout(sayacT);sayacT=null;
-  try{localStorage.setItem(BULUT_KAPALI_KEY,"1");}catch(e){}
-  const r=await Promise.allSettled(L.map(d=>typeof d.delete==="function"?d.delete():Promise.resolve()));
+  try{localStorage.removeItem(BULUT_ACIK_KEY);}catch(e){}
+  /* ortak hedeflerdeki katkıyı sıfırla */
+  const hz=Object.keys(S.hedefler||{}).map(k=>DB.collection("hedef").doc(k)).filter(d=>typeof d.update==="function").map(d=>d.update({["u_"+UID]:0}));
+  /* listeden daha önce çıkarılmış kişilerin kayıtları da silinsin */
+  try{const s=await kol.get();(s.docs||[]).forEach(d=>{if(!L.some(x=>x.id===d.id))L.push(kol.doc(d.id));});}catch(e){}
+  const r=await Promise.allSettled([...hz,...L.map(d=>typeof d.delete==="function"?d.delete():Promise.resolve())]);
+  /* adsız hesabı da sil (GitHub sürümü) */
+  try{if(window.firebase&&firebase.auth&&firebase.auth().currentUser)await firebase.auth().currentUser.delete();}catch(e){}
+  DB=null;UID=null;
   return r.filter(x=>x.status==="rejected").length;}
-function bulutAc(){try{localStorage.removeItem(BULUT_KAPALI_KEY);}catch(e){}location.reload();}
+function bulutAc(){try{localStorage.setItem(BULUT_ACIK_KEY,"1");}catch(e){}location.reload();}
 function sayacGonder(){clearTimeout(sayacT);sayacT=null;if(!DB||!UID||!S.kullanim||bulutKapali())return;const j=JSON.stringify(S.kullanim);if(j===sayacGonder.son)return;sayacGonder.son=j;DB.collection("kullanim").doc(UID).set({g:S.kullanim,s:S.seviye||""}).catch(()=>{sayacGonder.son="";});}
 /* sayfa gizlenince ya da kapanınca bekleyen bulut yazmalarını hemen gönder */
 document.addEventListener("visibilitychange",()=>{if(document.hidden){bulutGonder();sayacGonder();}});

@@ -10,7 +10,7 @@ function calAralik(i1,i2){return new Promise(res=>{const b=CUR.ses.bas,e=i2+1<b.
 function ezberHaritasi(){
   const D=ekS("ezberDurum"),n=CUR.ayetler.length,ilk=CUR.ilkAyet||1;
   const ez=CUR.ayetler.filter((_,i)=>ezbTam(D[i])).length;
-  return `<div style="display:grid;gap:6px"><b>Ezber haritası: ${ez} / ${n} ayet ezberde</b><span style="font-size:14px;font-weight:700">Dördüncü basamağı geçen ayet ezberde sayılır. Renk koyulaştıkça ayet daha sağlam.</span>
+  return `<div style="display:grid;gap:6px"><b>Ezber haritası: ${ez} / ${n} ayet ezberde</b><span style="font-size:14px;font-weight:700">${EZ_TAM_KUTU+1}. basamağa ulaşan (${EZ_ARALIK[EZ_TAM_KUTU-1]} gün sonra da hatırlanan) ayet ezberde sayılır. Renk koyulaştıkça ayet daha sağlam.</span>
   <div style="display:grid;grid-template-columns:repeat(${Math.min(n,20)},1fr);gap:3px">${CUR.ayetler.map((_,i)=>{const k=(D[i]||{}).kutu;const r=k===undefined?"var(--line)":ezbTam(D[i])?"var(--ok)":k>=2?"var(--gold)":"var(--lapis)";
     return `<span title="${ilk+i}. ayet" style="height:22px;border-radius:5px;background:${r};display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--bg)">${ilk+i}</span>`;}).join("")}</div>
   <span style="font-size:13px;font-weight:700"><b style="color:var(--lapis)">■</b> başlandı · <b style="color:var(--gold)">■</b> pekişiyor · <b style="color:var(--ok)">■</b> ezberde</span></div>`;

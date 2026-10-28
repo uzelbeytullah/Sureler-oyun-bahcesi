@@ -21,8 +21,9 @@ return {w,dom,errs,ev:s=>w.eval(s)};};
 async function test_t3(){const {w,errs,ev}=await kur();
 const ok=(ad,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+ad);};
 // birleştirme
-const A={puan:100,dogru:10,ardarda:3,rekor:5,seri:2,sonGun:"2026-10-20",rozet:["ilk"],sus:["kus"],hiz:1.25,sure:{"112":{yildiz:{oku:true,kelime:false},ezberDurum:{"0":{kutu:2,sonraki:"2026-10-25"}}}},gunluk:{"2026-10-20":30}};
-const B={puan:80,dogru:12,ardarda:0,rekor:4,seri:5,sonGun:"2026-10-22",rozet:["onlu"],sus:["cit"],hiz:0.75,sure:{"112":{yildiz:{oku:false,kelime:true},ezberDurum:{"0":{kutu:3,sonraki:"2026-10-30"},"1":{kutu:0,sonraki:"2026-10-23"}}},"113":{yildiz:{oku:true}}},gunluk:{"2026-10-20":10,"2026-10-21":40}};
+/* ezberSurum:2 → iki kayıt da yeni takvimde; eski kayıt dönüşümü yeni-ozellikler-test.js'te (test_t12) */
+const A={ezberSurum:2,puan:100,dogru:10,ardarda:3,rekor:5,seri:2,sonGun:"2026-10-20",rozet:["ilk"],sus:["kus"],hiz:1.25,sure:{"112":{yildiz:{oku:true,kelime:false},ezberDurum:{"0":{kutu:2,sonraki:"2026-10-25"}}}},gunluk:{"2026-10-20":30}};
+const B={ezberSurum:2,puan:80,dogru:12,ardarda:0,rekor:4,seri:5,sonGun:"2026-10-22",rozet:["onlu"],sus:["cit"],hiz:0.75,sure:{"112":{yildiz:{oku:false,kelime:true},ezberDurum:{"0":{kutu:3,sonraki:"2026-10-30"},"1":{kutu:0,sonraki:"2026-10-23"}}},"113":{yildiz:{oku:true}}},gunluk:{"2026-10-20":10,"2026-10-21":40}};
 w.__A=A;w.__B=B;const M=ev('birlestir(__A,__B)');
 ok('puan en büyük',M.puan===100);ok('dogru en büyük',M.dogru===12);ok('rozet birleşim',M.rozet.length===2);ok('süs birleşim',M.sus.length===2);
 ok('ayar yerel kalır',M.hiz===1.25&&M.ardarda===3);ok('yıldızlar VEYA',M.sure["112"].yildiz.oku&&M.sure["112"].yildiz.kelime);
@@ -38,9 +39,9 @@ ev('toast("a");toast("b");toast("c")');ok('toast kuyrukta',w.document.getElement
 // tekrar akışı: iki surede günü gelen ayet
 ev(`S.sure["112"]=Object.assign(S.sure["112"]||{},{ezberDurum:{"0":{kutu:1,sonraki:"2000-01-01"}}});S.sure["113"]=Object.assign(S.sure["113"]||{},{ezberDurum:{"2":{kutu:0,sonraki:"2000-01-01"}}});`);
 ev('PROF.liste=[{id:"p0",ad:"Test",yas:8}];PROF.aktif="p0";S.seviye="genc";S.ilkYolGec=true;anaSayfa()');const b=w.document.getElementById('tekrarHepsi');ok('Bugünün tekrarı düğmesi',!!b&&/2 ayet/.test(b.textContent));
-b.click();await new Promise(r=>setTimeout(r,800));ok('ilk surede ezber ekranı',ev('CUR&&CUR.no')===112&&!!w.document.querySelector('[data-d="2"]'));
+b.click();await new Promise(r=>setTimeout(r,800));ok('ilk surede ezber ekranı (düşük kutu önce: 113)',ev('CUR&&CUR.no')===113&&!!w.document.querySelector('[data-d="2"]'));
 w.document.querySelector('[data-d="2"]').click();await new Promise(r=>setTimeout(r,800));
-ok('ikinci sureye geçti',ev('CUR&&CUR.no')===113&&!!w.document.querySelector('[data-d="2"]'));
+ok('ikinci sureye geçti',ev('CUR&&CUR.no')===112&&!!w.document.querySelector('[data-d="2"]'));
 w.document.querySelector('[data-d="2"]').click();await new Promise(r=>setTimeout(r,800));
 ok('akış bitti, ana sayfa',ev('CUR')===null&&!ev('TEKRAR_AKIS'));
 // mola

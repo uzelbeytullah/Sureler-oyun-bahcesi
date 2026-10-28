@@ -9,7 +9,7 @@ fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch((
 async function bulutBasla(){
   try{
     if(!window.claude||!claude.use)return;
-    if(claude.bulut&&bulutKapali()){$("sync").textContent="Bulut kaydı kapalı; ilerleme yalnız bu cihazda";return;}
+    if(claude.bulut&&bulutKapali()){$("sync").textContent="İlerleme bu cihazda saklanıyor";if(Object.keys(S.hedefler||{}).length)bulutDB();return;}
     const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
     if(!db||!user)return;
     const id=await user.id();if(!id)return;DB=db;USR=user;UID=id;try{USR_EDIT=!!(await user.canEdit());USR_YAZ=await user.can("data.write");}catch(e){}
@@ -28,7 +28,7 @@ async function bulutBasla(){
     if(remote){S=normalize(birlestir(S,remote));try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){}}
     sonPuan=S.puan;docRef=ref;
     bulutGonder();
-    $("sync").textContent="İlerleme hesabına kaydediliyor; telefonda ve bilgisayarda aynı kalır";bulutBasla.tamam=true;
+    $("sync").textContent=claude.bulut?"İlerleme bu tarayıcıya bağlı adsız bir hesapla buluta da kaydediliyor":"İlerleme hesabına kaydediliyor";bulutBasla.tamam=true;
     renderStats();
     /* yalnız ana sayfa ya da yıldız haritası açıksa yeniden çiz; oyun, Elif-ba, ebeveyn gibi ekranlarda çocuğu yerinden atma */
     if(!CUR){if(anaSayfa.no===EKRAN_NO)anaSayfa();}else if(cur==="harita")harita();

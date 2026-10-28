@@ -13,8 +13,9 @@ async function ekParca(no,p){const E=CACHE["ek"+no]=CACHE["ek"+no]||{};E._y=E._y
 function ekRozet(){
   const t=(S.sure["1"]||{});const e=t.ezberDurum||{};
   return [
-   ["ezber1","Bir ayeti ezber kutusunda üçüncü basamağa taşıdı",()=>Object.values(S.sure).some(x=>Object.values(x.ezberDurum||{}).some(v=>v.kutu>=3||v.tam))],
-   ["ezberF","Fâtiha ezberde (yedi ayet dördüncü basamakta)",()=>[0,1,2,3,4,5,6].every(i=>ezbTam(e[i]))],
+   /* basamak numaraları ekrandakiyle aynı: ekranda "Basamak kutu+1" yazar */
+   ["ezber1","Bir ayeti ezber kutusunda 4. basamağa taşıdı",()=>Object.values(S.sure).some(x=>Object.values(x.ezberDurum||{}).some(v=>v&&(v.kutu>=3||v.tam)))],
+   ["ezberF",`Fâtiha ezberde (yedi ayet de ${EZ_TAM_KUTU+1}. basamakta)`,()=>[0,1,2,3,4,5,6].every(i=>ezbTam(e[i]))],
    ["sinav","Kitap sınavının on kısmında %80",()=>{const s=t.sinav||{};return [1,2,3,4,5,6,7,8,9,10].every(k=>(s[k]||0)>=80);}],
    ["yol30","30 günlük yolu bitirdi",()=>((t.yol||{}).gunler||[]).length>=30],
    ["dusun5","Beş düşünme kartına cevap yazdı",()=>Object.keys(t.dusun||{}).length>=5]
@@ -54,18 +55,23 @@ function tecvidAc(V,ai,c){
 let ezberAyet=null,ezberSeviye=1;
 function ezber(){
   const V=$("view"),E=ezberVeri(),D=ekS("ezberDurum"),bugun=today(),ilk=CUR.ilkAyet||1;
-  const AR=E.takvim.araliklar_gun;
+  /* Tek takvim: surenin kitabındaki araliklar_gun yalnız eski kayıtları dönüştürmek için kullanıldı (01-temel.js, ezberGoc) */
+  const AR=EZ_ARALIK,yetiskin=S.seviye==="yetiskin";
   if(ezberAyet!==null)return ezberCalis(ezberAyet);
   if(ezberArac)return aracCiz();
-  const due=CUR.ayetler.map((_,i)=>i).filter(i=>D[i]&&D[i].sonraki<=bugun);
+  const due=tumTekrarlar().filter(x=>x.id===CUR.no).map(x=>x.i).filter(i=>D[i]);
+  const ilkAr=AR.slice(0,EZ_TAM_KUTU),sade=`Bir ayeti ${ilkAr.slice(0,-1).join(", ")} ve ${ilkAr[ilkAr.length-1]} gün sonra tekrar edince ezberin kalıcı olur.`;
+  const yeniI=CUR.ayetler.findIndex((_,i)=>!D[i]),birikti=tekrarBirikti();
   V.innerHTML=`<h2>Ezber köşesi</h2>
-  <p>${esc(E.takvim.aciklama)}</p>
+  <p>${sade}</p>
+  ${yetiskin?`<details class="detay"><summary><b>Neden aralıklı tekrar? (yetişkinler için)</b></summary><p>${esc(E.takvim.aciklama)}</p><p style="font-size:14px">Kitaptaki takvim farklı olabilir; uygulama bütün surelerde aynı takvimi kullanır: ${AR.map(g=>g+" gün").join(" · ")}. Ayet, ${AR[EZ_TAM_KUTU-1]} günlük aralıktan sonra da hatırlanınca (${EZ_TAM_KUTU+1}. basamak) ezberde sayılır. Günde en çok ${EZ_GUNLUK} ayet tekrar edilir.</p></details>`:""}
   <div class="odak"><b>Bugünün tekrarları:</b> ${due.length?due.map(i=>`${ilk+i}. ayet`).join(", "):"Bugün tekrar edilecek ayet yok."}
-  ${due.length?`<br><button class="primary" id="tekrarBasla" style="margin-top:8px">Tekrara başla</button>`:""}</div>
+  ${due.length?`<br><button class="primary" id="tekrarBasla" style="margin-top:8px">Tekrara başla</button>`:""}
+  ${yeniI<0?"":birikti?`<br><span role="note"><b>Önce tekrarları bitirelim.</b> Yeni ayete tekrarlar azalınca geçeriz.</span>`:`<br><b>Sıradaki yeni ayet:</b> <button id="yeniAyet" style="min-height:44px;padding:4px 12px">${ilk+yeniI}. ayet</button>`}</div>
   ${ezberAracVar()?ezberHaritasi()+ezberAraclari():""}
-  <p style="font-size:14px"><b>Tekrar aralıkları:</b> ${AR.map(g=>g+" gün").join(" · ")}. Bir ayeti “Hatırladım” diye işaretledikçe bir sonraki basamağa geçer ve daha seyrek sorulur.</p>
+  ${yetiskin?`<p style="font-size:14px"><b>Tekrar aralıkları:</b> ${AR.map(g=>g+" gün").join(" · ")}. Ayeti gizleyip aklından okuyup “Hatırladım” dedikçe bir sonraki basamağa geçer ve daha seyrek sorulur.</p>`:""}
   <div class="plan">${CUR.ayetler.map((a,i)=>{const d=D[i];const k=d?d.kutu:-1;
-    return `<button class="oz" data-e="${i}" style="grid-template-columns:auto 1fr auto"><span class="no">${ilk+i}</span><span><span class="ar" lang="ar" style="font-size:22px">${a.w.slice(0,3).map(w=>w.a).join(" ")}${a.w.length>3?" …":""}</span><br><span style="font-size:14px">${d?`Basamak ${k+1}/${AR.length} · sıradaki tekrar: ${d.sonraki<=bugun?"bugün":new Date(d.sonraki).toLocaleDateString("tr-TR")}${d.onayBekle?" · 👨‍👩‍👧 ebeveyn onayı bekliyor":ezbTam(d)?" · ✓ ezberde":""}`:"Henüz başlanmadı"}</span></span><span class="durum">${d?"●".repeat(k+1):""}</span></button>`;}).join("")}</div>
+    return `<button class="oz" data-e="${i}" style="grid-template-columns:auto 1fr auto"><span class="no">${ilk+i}</span><span><span class="ar" lang="ar" style="font-size:22px">${a.w.slice(0,3).map(w=>w.a).join(" ")}${a.w.length>3?" …":""}</span><br><span style="font-size:14px">${d?`Basamak ${k+1}/${AR.length} · sıradaki tekrar: ${d.sonraki<=bugun?"bugün":new Date(d.sonraki).toLocaleDateString("tr-TR")}${d.onayBekle?" · 👨‍👩‍👧 ebeveyn onayı bekliyor":ezbTam(d)?" · ✓ ezberde":""}${d.dinletBekle&&!d.onayBekle?" · 👂 bugün ebeveynine oku":""}`:"Henüz başlanmadı"}</span></span><span class="durum">${d?"●".repeat(k+1):""}</span></button>`;}).join("")}</div>
   ${E.uyari?`<p style="font-size:14px"><b>Not:</b> ${esc(E.uyari)}</p>`:""}
   ${E.yontemler.length?"<h2>Ezber yöntemleri</h2>":""}
   ${E.yontemler.map((y,i)=>`<button class="oz" data-y="${i}"><span class="no">${i+1}</span><span>${esc(y.ad)}</span><span></span></button><div id="ey${i}" hidden></div>`).join("")}
@@ -80,10 +86,14 @@ function ezber(){
   V.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{const h=E.hikayeler[+b.dataset.h];const an=CUR.animEk&&Object.values(CUR.animEk).find(a=>h.baslik.startsWith(a.baslik));ac2("eh"+b.dataset.h,`${an?`<button class="primary" id="animEz" style="font-size:20px;min-height:56px">🎬 Hikâyeyi canlandır</button>`:""}${h.metin.split("\n").filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join("")}${h.not?`<p style="font-size:14px"><b>Nasıl kullanılır:</b> ${esc(h.not)}</p>`:""}`);const ae=$("animEz");if(ae)ae.onclick=()=>{animAc(an,()=>ezber());window.scrollTo({top:0});};});
   V.querySelectorAll("[data-arac]").forEach(b=>b.onclick=()=>{ezberArac=b.dataset.arac;ezber();window.scrollTo({top:0});});
   const tb=$("tekrarBasla");if(tb)tb.onclick=()=>{ezberAyet=due[0];ezberSeviye=Math.min(4,(D[due[0]].kutu||0)+1);ezber();};
+  const ya=$("yeniAyet");if(ya)ya.onclick=()=>{ezberAyet=yeniI;ezberSeviye=0;ezber();};
   if(TEKRAR_AKIS){if(tb)tb.click();else tekrarAkisi(CUR.no);}
 }
 function ezberCalis(i){
-  const V=$("view"),E=ezberVeri(),D=ekS("ezberDurum"),a=CUR.ayetler[i],ilk=CUR.ilkAyet||1,AR=E.takvim.araliklar_gun;
+  const V=$("view"),E=ezberVeri(),D=ekS("ezberDurum"),a=CUR.ayetler[i],ilk=CUR.ilkAyet||1,AR=EZ_ARALIK;
+  const p0=D[i]||{kutu:-1};
+  /* Günü gelmiş tekrarda (kutu 1 ve üstü) "Hatırladım" yalnız ayet gizliyken; ilk öğrenmede (kutu 0) serbest */
+  const kilit=p0.kutu>=1&&(!p0.sonraki||p0.sonraki<=today())&&ezberSeviye===0;
   const ip=(E.ayet_ipuclari||[]).find(x=>+x.ayet===ilk+i)||{};
   const gizli=(j)=>ezberSeviye===4||(ezberSeviye===3&&j>0)||(ezberSeviye===2&&j%2===1)||(ezberSeviye===1&&j%3===1);
   const SV=["Hiç gizleme","Az gizle","Yarısını gizle","Yalnız ilk kelime","Hepsini gizle"].concat(ezberAracVar()?["İlk harfler"]:[]);
@@ -96,10 +106,12 @@ function ezberCalis(i){
   <div id="ipucu" hidden></div>
   <div class="detay" style="border-color:#2E7D5B"><button id="benOkuB" class="primary yesil-dug" style="font-size:18px">🎙 Ben okuyayım</button><p id="benOkuD" style="font-size:15px;margin:6px 0 0">Ayeti kendin sesli oku; sonra kendi sesini ve Alafasy'yi art arda dinle.</p></div>
   <div class="odak"><b>Bu ayeti ne kadar hatırladın?</b>
-   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="primary" data-d="2">Hatırladım</button><button data-d="1">Zorlandım</button><button data-d="0">Hatırlamadım</button></div></div>`;
+   ${kilit?`<p style="margin:6px 0 0">Tekrar gününde ayeti önce gizleyip aklından oku, sonra “Hatırladım” de. <button class="primary" id="gizleDene" style="min-height:44px;padding:4px 12px">Gizleyip dene</button></p>`:""}
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="${kilit?"":"primary"}" data-d="2" ${kilit?`disabled aria-disabled="true" title="Önce ayeti gizle"`:""}>Hatırladım</button><button data-d="1">Zorlandım</button><button data-d="0">Hatırlamadım</button></div></div>`;
   $("ezGeri").onclick=()=>{TEKRAR_AKIS=false;ezberAyet=null;durSes();ezber();};$("benOkuB").onclick=()=>benOku(i,$("benOkuB"),$("benOkuD"));
   $("ezDinle").onclick=()=>{const b=CUR.ses.bas,e=i+1<b.length?b[i+1]:CUR.ses.son;hizUygula();calParca(CUR.no,b[i],e);};
   V.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{ezberSeviye=+b.dataset.sv;ezberCalis(i);});
+  {const gd=$("gizleDene");if(gd)gd.onclick=()=>{ezberSeviye=Math.min(4,p0.kutu+1);ezberCalis(i);};}
   V.querySelectorAll(".gizli").forEach(b=>b.onclick=()=>{const w=a.w[+b.dataset.j];const s=document.createElement("span");s.className="k"+(+b.dataset.j%12);s.textContent=w.a;b.replaceWith(s);});
   V.querySelectorAll("[data-ip]").forEach(b=>b.onclick=()=>{const d=$("ipucu");d.hidden=false;d.className="detay pop";
     d.innerHTML=b.dataset.ip==="meal"?`<p>${esc(a.meal)}</p><p class="okunus">${esc(a.ok)}</p>`:`<p><b>${esc(b.textContent)}:</b> ${esc(ip[b.dataset.ip])}</p>`;});
@@ -107,17 +119,29 @@ function ezberCalis(i){
     const p=D[i]||{kutu:-1};let k=p.kutu;const not=+b.dataset.d;
     /* Basamak yalnız tekrar günü geldiğinde (ya da ilk çalışmada) yükselir; erken çalışma pekiştirir ama basamak atlatmaz */
     const vadeli=k<0||!p.sonraki||p.sonraki<=today();
+    const trh=s=>s.split("-").reverse().join(".");
+    if(not===2&&vadeli&&k>=1&&ezberSeviye===0){toast("Önce ayeti gizleyip dene");return;}
     if(not===2&&!vadeli){gun();S.puan+=2;logIsle("tekrar",null);save();renderStats();
-      toast(`Bugünlük pekiştirdin. Sıradaki tekrar ${p.sonraki.split("-").reverse().join(".")} tarihinde`);}
+      toast(`Bugünlük pekiştirdin. Sıradaki tekrar ${trh(p.sonraki)} tarihinde`);}
     else{
-      if(not===2)k=Math.min(AR.length-1,k+1);else if(not===0)k=0;else k=Math.max(0,k-1);
-      const tam=k>=Math.min(4,AR.length-1)||(p.tam&&not===2);
-      const bekle=tam&&onayGerek()&&!p.onaylandi;
-      D[i]={kutu:k,sonraki:gunEkle(not===2?AR[k]:1),...(tam?{tam:true}:{}),...(bekle?{onayBekle:true}:{}),...(p.onaylandi?{onaylandi:p.onaylandi}:{})};
+      /* günü gelmiş tekrar günlük sınıra sayılır (ilk öğrenme sayılmaz) */
+      if(k>=0&&p.sonraki&&p.sonraki<=today())tekrarSayIsle();
+      /* Hatırladım: bir kutu ileri. Zorlandım: kutu yerinde, yarın yeniden. Hatırlamadım: baştan */
+      if(not===2)k=Math.min(AR.length-1,k+1);else if(not===0)k=0;else k=Math.max(0,k);
+      const tam=not===2&&(k>=EZ_TAM_KUTU||!!p.tam);
+      /* unutulan ayetin onayı silinir; yeniden ezberde sayılınca onay yeniden istenir */
+      const onaylandi=not===2?p.onaylandi:undefined;
+      const bekle=tam&&onayGerek()&&!onaylandi;
+      const zayif=not===1&&k>=EZ_TAM_KUTU;
+      /* ara dinletme: ayet ilk kez 3 günlük aralığa geçince */
+      const dinlet=!!p.dinletBekle||(not===2&&k===EZ_DINLET_KUTU&&p.kutu<k&&!p.dinletti&&!onaylandi&&onayGerek());
+      const sonraki=gunEkle(not===2?AR[k]:1);
+      D[i]={kutu:k,sonraki,...(tam?{tam:true}:{}),...(bekle?{onayBekle:true}:{}),...(onaylandi?{onaylandi}:{}),...(zayif?{zayif:true}:{}),...(p.dinletti?{dinletti:p.dinletti}:{}),...(dinlet?{dinletBekle:true}:{})};
       if(bekle&&!p.onayBekle)setTimeout(()=>toast("Bu ayeti ezberledin gibi! Annene ya da babana oku, onaylasınlar 👨‍👩‍👧"),900);
+      else if(dinlet&&!p.dinletBekle)setTimeout(()=>toast("Bugün bu ayeti annene ya da babana oku 👂"),900);
       gun();S.puan+=vadeli?(not===2?10:5):2;if(vadeli){gorevIsle("tekrar");hedefIsle("tekrar");}logIsle("tekrar",not<2?{zor:{s:CUR.no,a:ilk+i}}:null);checkBadges();save();renderStats();
-      toast(not===2?`Güzel! ${AR[k]} gün sonra yeniden sorulacak`:not===1?"Yarın yine çalışalım; bir basamak geri aldık":"Yarın yeniden sorulacak");}
-    const due=CUR.ayetler.map((_,x)=>x).filter(x=>x!==i&&D[x]&&D[x].sonraki<=today());
+      toast(not===2?`Güzel! ${AR[k]} gün sonra, ${trh(sonraki)} tarihinde yeniden sorulacak`:not===1?`Olsun, yarın (${trh(sonraki)}) yeniden çalışalım; basamağın yerinde kaldı`:`Baştan alıyoruz; yarın (${trh(sonraki)}) yeniden sorulacak`);}
+    const due=tumTekrarlar().filter(x=>x.id===CUR.no&&x.i!==i&&D[x.i]).map(x=>x.i);
     if(due.length){ezberAyet=due[0];ezberSeviye=Math.min(4,(D[due[0]].kutu||0)+1);}else ezberAyet=null;
     if(!due.length&&TEKRAR_AKIS){tekrarAkisi(CUR.no);return;}
     ezber();
