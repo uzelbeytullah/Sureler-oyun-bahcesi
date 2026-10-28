@@ -25,7 +25,7 @@ async function hangiSure(){
   quiz({title:"Hangi sure?",items,tek:true,
     build:x=>{su=x;setTimeout(()=>window.hsDinle(false),300);
       return {html:`<p class="yazi-4 kalin">Dinle: bu hangi sure?</p><div class="esnek ara-2 sarmal"><button class="yazi-4 primary" data-hs="0">${ikon("volume-2")} Yeniden dinle</button><button data-hs="1">Biraz daha dinle</button></div>`,
-        answer:x.ad,opts:secenek(x.ad,adlar,kucukMu?2:3),tek:true,buyuk:kucukMu,otoSesYok:true,sonuc:()=>{}};},
+        answer:x.ad,opts:secenek(x.ad,adlar,kucukMu?2:3),tek:true,buyuk:kucukMu,otoSesYok:true,yonerge:"hangi-soru",sikYonerge:ad=>{const k=KATALOG.find(z=>z.ad===ad);return k?"sure-"+k.no:null;},sonuc:()=>{}};},
     bitince:(d,n)=>{durSes();S.hangiEnIyi=Math.max(S.hangiEnIyi||0,Math.round(d/n*100));if(d===n)S.hangiTam=true;checkBadges();save();},
     geri:()=>{durSes();anaSayfa();}});}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-hs]");if(b&&window.hsDinle)window.hsDinle(b.dataset.hs==="1");});

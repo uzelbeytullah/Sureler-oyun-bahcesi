@@ -1,0 +1,167 @@
+{
+  "aciklama": "Hanefî mezhebine göre namazda okunan dualar. Arapça metinler ve yaygın Türkçe okunuşlar aşağıdaki kaynaklarla karşılaştırıldı; ayet olan dualar (Rabbenâ âtinâ, Rabbenağfirlî) Kur'an metninden alındı. Türkçe anlamlar 6-10 yaş için sade bir dille yeniden yazıldı; bir mealin birebir aktarımı değildir.",
+  "kaynaklar": [
+    {"ad": "İslam ve İhsan · Namaz duaları (Arapça metin ve okunuş)", "url": "https://www.islamveihsan.com/namaz-dualari.html"},
+    {"ad": "Yeni Şafak · Kunut duaları okunuşu", "url": "https://www.yenisafak.com/kunut-dualari-arapca-ve-turkce-okunusu-kunut-dualari-oku-ezberler-h-3705894"},
+    {"ad": "TDV İslâm Ansiklopedisi · Kunut", "url": "https://islamansiklopedisi.org.tr/kunut"},
+    {"ad": "Tanzil Kur'an metni (alquran.cloud) · Bakara 201, İbrâhîm 40-41", "url": "https://api.alquran.cloud/v1/ayah/2:201/quran-simple"},
+    {"ad": "Diyanet Kur'an-ı Kerim · Bakara 201", "url": "https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/bakara-suresi-2/ayet-201"},
+    {"ad": "Diyanet Kur'an-ı Kerim · İbrâhîm 41", "url": "https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/ibrahim-suresi-14/ayet-41"}
+  ],
+  "dualar": [
+    {
+      "id": "subhaneke",
+      "ad": "Sübhâneke",
+      "adAr": "سُبْحَانَكَ",
+      "yer": {
+        "cocuk": "Namaza başlarken, “Allâhü ekber” dedikten hemen sonra okuruz.",
+        "ebeveyn": "Her namazın ilk rekâtında iftitah tekbirinden sonra, Fâtiha’dan önce okunur (sünnet). “Ve celle senâük” eki yalnız cenaze namazında söylenir."
+      },
+      "kaynak": ["https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ", "ok": "Sübhâneke’llâhümme ve bi-hamdik", "tr": "Allah’ım, Sen hiçbir eksiği olmayansın; Seni överek anarım.",
+         "w": [{"a": "سُبْحَانَكَ", "ok": "sübhâneke", "tr": "Sen her eksikten uzaksın"}, {"a": "اللَّهُمَّ", "ok": "Allâhümme", "tr": "Allah’ım"}, {"a": "وَبِحَمْدِكَ", "ok": "ve bi-hamdik", "tr": "ve Seni överek"}]},
+        {"ar": "وَتَبَارَكَ اسْمُكَ", "ok": "ve tebârake’smük", "tr": "Senin adın çok bereketli ve güzeldir.",
+         "w": [{"a": "وَتَبَارَكَ", "ok": "ve tebârake", "tr": "ve bereketlidir"}, {"a": "اسْمُكَ", "ok": "ismük", "tr": "Senin adın"}]},
+        {"ar": "وَتَعَالَى جَدُّكَ", "ok": "ve te‘âlâ ceddük", "tr": "Senin büyüklüğün her şeyden yücedir.",
+         "w": [{"a": "وَتَعَالَى", "ok": "ve te‘âlâ", "tr": "ve çok yücedir"}, {"a": "جَدُّكَ", "ok": "ceddük", "tr": "Senin şanın, büyüklüğün"}]},
+        {"ar": "وَلَا إِلَهَ غَيْرُكَ", "ok": "ve lâ ilâhe ğayrük", "tr": "Senden başka ilah yoktur.",
+         "w": [{"a": "وَلَا", "ok": "ve lâ", "tr": "ve yoktur"}, {"a": "إِلَهَ", "ok": "ilâhe", "tr": "ilah"}, {"a": "غَيْرُكَ", "ok": "ğayrük", "tr": "Senden başka"}]}
+      ]
+    },
+    {
+      "id": "ettehiyyatu",
+      "ad": "Ettehiyyâtü",
+      "adAr": "التَّحِيَّاتُ",
+      "yer": {
+        "cocuk": "Namazda her oturduğumuzda okuruz.",
+        "ebeveyn": "Her oturuşta (ka‘de) okunur. Farzlarda ve müekked sünnetlerde ilk oturuşta yalnız Ettehiyyâtü okunup üçüncü rekâta kalkılır."
+      },
+      "kaynak": ["https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ", "ok": "Ettehiyyâtü lillâhi ve’s-salevâtü ve’t-tayyibât", "tr": "Bütün selamlar, dualar ve güzel sözler Allah içindir.",
+         "w": [{"a": "التَّحِيَّاتُ", "ok": "et-tehiyyâtü", "tr": "selamlar, saygılar"}, {"a": "لِلَّهِ", "ok": "lillâhi", "tr": "Allah içindir"}, {"a": "وَالصَّلَوَاتُ", "ok": "ve’s-salevâtü", "tr": "ve dualar"}, {"a": "وَالطَّيِّبَاتُ", "ok": "ve’t-tayyibât", "tr": "ve güzel şeyler"}]},
+        {"ar": "السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ", "ok": "Esselâmü aleyke eyyühe’n-nebiyyü ve rahmetu’llâhi ve berekâtüh", "tr": "Ey Peygamberimiz, selam, Allah’ın sevgisi ve bereketi senin üzerine olsun.",
+         "w": [{"a": "السَّلَامُ", "ok": "es-selâmü", "tr": "selam, esenlik"}, {"a": "عَلَيْكَ", "ok": "aleyke", "tr": "senin üzerine"}, {"a": "أَيُّهَا", "ok": "eyyühâ", "tr": "ey"}, {"a": "النَّبِيُّ", "ok": "en-nebiyyü", "tr": "Peygamber"}, {"a": "وَرَحْمَةُ", "ok": "ve rahmetu", "tr": "ve rahmeti"}, {"a": "اللَّهِ", "ok": "’llâhi", "tr": "Allah’ın"}, {"a": "وَبَرَكَاتُهُ", "ok": "ve berekâtüh", "tr": "ve bereketleri"}]},
+        {"ar": "السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ", "ok": "Esselâmü aleynâ ve alâ ibâdi’llâhi’s-sâlihîn", "tr": "Selam bizim üzerimize ve Allah’ın bütün iyi kullarının üzerine olsun.",
+         "w": [{"a": "السَّلَامُ", "ok": "es-selâmü", "tr": "selam, esenlik"}, {"a": "عَلَيْنَا", "ok": "aleynâ", "tr": "bizim üzerimize"}, {"a": "وَعَلَى", "ok": "ve alâ", "tr": "ve üzerine"}, {"a": "عِبَادِ", "ok": "ibâdi", "tr": "kullarının"}, {"a": "اللَّهِ", "ok": "’llâhi", "tr": "Allah’ın"}, {"a": "الصَّالِحِينَ", "ok": "es-sâlihîn", "tr": "iyi olan"}]},
+        {"ar": "أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ", "ok": "Eşhedü en lâ ilâhe illa’llâh", "tr": "Allah’tan başka ilah olmadığına tanıklık ederim.",
+         "w": [{"a": "أَشْهَدُ", "ok": "eşhedü", "tr": "tanıklık ederim"}, {"a": "أَنْ", "ok": "en", "tr": "ki"}, {"a": "لَا", "ok": "lâ", "tr": "yoktur"}, {"a": "إِلَهَ", "ok": "ilâhe", "tr": "ilah"}, {"a": "إِلَّا", "ok": "illâ", "tr": "-den başka"}, {"a": "اللَّهُ", "ok": "’llâh", "tr": "Allah"}]},
+        {"ar": "وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ", "ok": "ve eşhedü enne Muhammeden ‘abdühû ve resûlüh", "tr": "Muhammed’in Allah’ın kulu ve elçisi olduğuna da tanıklık ederim.",
+         "w": [{"a": "وَأَشْهَدُ", "ok": "ve eşhedü", "tr": "ve tanıklık ederim"}, {"a": "أَنَّ", "ok": "enne", "tr": "ki"}, {"a": "مُحَمَّدًا", "ok": "Muhammeden", "tr": "Muhammed"}, {"a": "عَبْدُهُ", "ok": "‘abdühû", "tr": "O’nun kulu"}, {"a": "وَرَسُولُهُ", "ok": "ve resûlüh", "tr": "ve O’nun elçisi"}]}
+      ]
+    },
+    {
+      "id": "salli",
+      "ad": "Allâhümme salli",
+      "adAr": "اللَّهُمَّ صَلِّ",
+      "yer": {
+        "cocuk": "Namazın son oturuşunda, Ettehiyyâtü’den sonra okuruz.",
+        "ebeveyn": "Son oturuşta Ettehiyyâtü’den sonra okunur. İkindi ve yatsının ilk sünneti gibi dört rekâtlı gayr-i müekked sünnetlerde ilk oturuşta da okunur."
+      },
+      "kaynak": ["https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "اللَّهُمَّ صَلِّ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", "ok": "Allâhümme salli alâ Muhammedin ve alâ âli Muhammed", "tr": "Allah’ım, Peygamberimiz Muhammed’e ve onun ailesine rahmet et, onları yücelt.",
+         "w": [{"a": "اللَّهُمَّ", "ok": "Allâhümme", "tr": "Allah’ım"}, {"a": "صَلِّ", "ok": "salli", "tr": "rahmet et, yücelt"}, {"a": "عَلَى", "ok": "alâ", "tr": "-e"}, {"a": "مُحَمَّدٍ", "ok": "Muhammedin", "tr": "Muhammed"}, {"a": "وَعَلَى", "ok": "ve alâ", "tr": "ve -e"}, {"a": "آلِ", "ok": "âli", "tr": "ailesine"}, {"a": "مُحَمَّدٍ", "ok": "Muhammed", "tr": "Muhammed’in"}]},
+        {"ar": "كَمَا صَلَّيْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ", "ok": "Kemâ salleyte alâ İbrâhîme ve alâ âli İbrâhîm", "tr": "Tıpkı İbrahim peygambere ve ailesine rahmet ettiğin gibi.",
+         "w": [{"a": "كَمَا", "ok": "kemâ", "tr": "gibi"}, {"a": "صَلَّيْتَ", "ok": "salleyte", "tr": "rahmet ettiğin"}, {"a": "عَلَى", "ok": "alâ", "tr": "-e"}, {"a": "إِبْرَاهِيمَ", "ok": "İbrâhîme", "tr": "İbrahim"}, {"a": "وَعَلَى", "ok": "ve alâ", "tr": "ve -e"}, {"a": "آلِ", "ok": "âli", "tr": "ailesine"}, {"a": "إِبْرَاهِيمَ", "ok": "İbrâhîm", "tr": "İbrahim’in"}]},
+        {"ar": "إِنَّكَ حَمِيدٌ مَجِيدٌ", "ok": "İnneke hamîdün mecîd", "tr": "Sen bütün övgülere layıksın, şanı en yüce olan Sensin.",
+         "w": [{"a": "إِنَّكَ", "ok": "inneke", "tr": "şüphesiz Sen"}, {"a": "حَمِيدٌ", "ok": "hamîdün", "tr": "övülmeye layık"}, {"a": "مَجِيدٌ", "ok": "mecîd", "tr": "şanı yüce"}]}
+      ]
+    },
+    {
+      "id": "barik",
+      "ad": "Allâhümme bârik",
+      "adAr": "اللَّهُمَّ بَارِكْ",
+      "yer": {
+        "cocuk": "Allâhümme salli’den hemen sonra okuruz.",
+        "ebeveyn": "Salli duasından sonra, aynı oturuşta okunur. İkisi birlikte “Salli-Bârik duaları” diye bilinir."
+      },
+      "kaynak": ["https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "اللَّهُمَّ بَارِكْ عَلَى مُحَمَّدٍ وَعَلَى آلِ مُحَمَّدٍ", "ok": "Allâhümme bârik alâ Muhammedin ve alâ âli Muhammed", "tr": "Allah’ım, Peygamberimiz Muhammed’e ve onun ailesine bereket ver, iyiliklerini çoğalt.",
+         "w": [{"a": "اللَّهُمَّ", "ok": "Allâhümme", "tr": "Allah’ım"}, {"a": "بَارِكْ", "ok": "bârik", "tr": "bereket ver"}, {"a": "عَلَى", "ok": "alâ", "tr": "-e"}, {"a": "مُحَمَّدٍ", "ok": "Muhammedin", "tr": "Muhammed"}, {"a": "وَعَلَى", "ok": "ve alâ", "tr": "ve -e"}, {"a": "آلِ", "ok": "âli", "tr": "ailesine"}, {"a": "مُحَمَّدٍ", "ok": "Muhammed", "tr": "Muhammed’in"}]},
+        {"ar": "كَمَا بَارَكْتَ عَلَى إِبْرَاهِيمَ وَعَلَى آلِ إِبْرَاهِيمَ", "ok": "Kemâ bârekte alâ İbrâhîme ve alâ âli İbrâhîm", "tr": "Tıpkı İbrahim peygambere ve ailesine bereket verdiğin gibi.",
+         "w": [{"a": "كَمَا", "ok": "kemâ", "tr": "gibi"}, {"a": "بَارَكْتَ", "ok": "bârekte", "tr": "bereket verdiğin"}, {"a": "عَلَى", "ok": "alâ", "tr": "-e"}, {"a": "إِبْرَاهِيمَ", "ok": "İbrâhîme", "tr": "İbrahim"}, {"a": "وَعَلَى", "ok": "ve alâ", "tr": "ve -e"}, {"a": "آلِ", "ok": "âli", "tr": "ailesine"}, {"a": "إِبْرَاهِيمَ", "ok": "İbrâhîm", "tr": "İbrahim’in"}]},
+        {"ar": "إِنَّكَ حَمِيدٌ مَجِيدٌ", "ok": "İnneke hamîdün mecîd", "tr": "Sen bütün övgülere layıksın, şanı en yüce olan Sensin.",
+         "w": [{"a": "إِنَّكَ", "ok": "inneke", "tr": "şüphesiz Sen"}, {"a": "حَمِيدٌ", "ok": "hamîdün", "tr": "övülmeye layık"}, {"a": "مَجِيدٌ", "ok": "mecîd", "tr": "şanı yüce"}]}
+      ]
+    },
+    {
+      "id": "rabbena",
+      "ad": "Rabbenâ âtinâ",
+      "adAr": "رَبَّنَا آتِنَا",
+      "ayet": "Bakara 2:201",
+      "yer": {
+        "cocuk": "Son oturuşta Salli ve Bârik’ten sonra okuruz. Bu dua Kur'an’da bir ayettir.",
+        "ebeveyn": "Bakara suresinin 201. ayetinin dua kısmıdır. Son oturuşta Salli-Bârik’ten sonra Rabbenâ duaları okunup selam verilir. Kunut dualarını henüz bilmeyen, öğrenene kadar vitirde bunu okuyabilir."
+      },
+      "kaynak": ["https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/bakara-suresi-2/ayet-201", "https://api.alquran.cloud/v1/ayah/2:201/quran-simple", "https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً", "ok": "Rabbenâ âtinâ fi’d-dünyâ haseneten", "tr": "Rabbimiz, bize bu dünyada güzellikler ver,",
+         "w": [{"a": "رَبَّنَا", "ok": "rabbenâ", "tr": "Rabbimiz"}, {"a": "آتِنَا", "ok": "âtinâ", "tr": "bize ver"}, {"a": "فِي", "ok": "fî", "tr": "-de"}, {"a": "الدُّنْيَا", "ok": "ed-dünyâ", "tr": "dünya"}, {"a": "حَسَنَةً", "ok": "haseneten", "tr": "güzellik, iyilik"}]},
+        {"ar": "وَفِي الْآخِرَةِ حَسَنَةً", "ok": "ve fi’l-âhirati haseneten", "tr": "ahirette de güzellikler ver.",
+         "w": [{"a": "وَفِي", "ok": "ve fî", "tr": "ve -de"}, {"a": "الْآخِرَةِ", "ok": "el-âhirati", "tr": "ahiret"}, {"a": "حَسَنَةً", "ok": "haseneten", "tr": "güzellik, iyilik"}]},
+        {"ar": "وَقِنَا عَذَابَ النَّارِ", "ok": "ve kınâ azâbe’n-nâr", "tr": "Bizi ateşin acısından koru.",
+         "w": [{"a": "وَقِنَا", "ok": "ve kınâ", "tr": "ve bizi koru"}, {"a": "عَذَابَ", "ok": "azâbe", "tr": "acısından, azabından"}, {"a": "النَّارِ", "ok": "en-nâr", "tr": "ateşin"}]}
+      ]
+    },
+    {
+      "id": "rabbenagfirli",
+      "ad": "Rabbenağfirlî",
+      "adAr": "رَبَّنَا اغْفِرْ لِي",
+      "ayet": "İbrâhîm 14:41",
+      "yer": {
+        "cocuk": "Rabbenâ âtinâ’dan sonra, selam vermeden önce okuruz. Annemiz, babamız ve bütün inananlar için dua ederiz.",
+        "ebeveyn": "İbrâhîm suresinin 41. ayetidir; Türkiye’de namazda yaygın olarak Rabbenâ âtinâ’dan sonra yalnız bu ayet okunur. Bazıları önce 40. ayeti (“Rabbic‘alnî…”) de okur; aşağıda ek olarak verildi."
+      },
+      "kaynak": ["https://kuran.diyanet.gov.tr/mushaf/kuran-meal-1/ibrahim-suresi-14/ayet-41", "https://api.alquran.cloud/v1/ayah/14:41/quran-simple", "https://www.islamveihsan.com/namaz-dualari.html"],
+      "cumleler": [
+        {"ar": "رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ", "ok": "Rabbenağfirlî ve li-vâlideyye", "tr": "Rabbimiz, beni, annemi ve babamı bağışla,",
+         "w": [{"a": "رَبَّنَا", "ok": "rabbenâ", "tr": "Rabbimiz"}, {"a": "اغْفِرْ", "ok": "(i)ğfir", "tr": "bağışla"}, {"a": "لِي", "ok": "lî", "tr": "beni"}, {"a": "وَلِوَالِدَيَّ", "ok": "ve li-vâlideyye", "tr": "ve annemle babamı"}]},
+        {"ar": "وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ", "ok": "ve li’l-mü’minîne yevme yekûmü’l-hisâb", "tr": "bütün inananları da hesap gününde bağışla.",
+         "w": [{"a": "وَلِلْمُؤْمِنِينَ", "ok": "ve li’l-mü’minîne", "tr": "ve inananları"}, {"a": "يَوْمَ", "ok": "yevme", "tr": "gününde"}, {"a": "يَقُومُ", "ok": "yekûmü", "tr": "kurulacağı"}, {"a": "الْحِسَابُ", "ok": "’l-hisâb", "tr": "hesabın"}]}
+      ],
+      "ek": {
+        "baslik": "İsteyenler önce bunu da okur (İbrâhîm 14:40)",
+        "kaynak": "https://api.alquran.cloud/v1/ayah/14:40/quran-simple",
+        "ar": "رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِنْ ذُرِّيَّتِي رَبَّنَا وَتَقَبَّلْ دُعَاءِ",
+        "ok": "Rabbic‘alnî mukîme’s-salâti ve min zürriyyetî, Rabbenâ ve tekabbel du‘â’",
+        "tr": "Rabbim, beni ve çocuklarımı namazını güzelce kılanlardan eyle. Rabbimiz, duamı kabul et."
+      }
+    },
+    {
+      "id": "kunut",
+      "ad": "Kunut duaları",
+      "adAr": "دُعَاءُ الْقُنُوتِ",
+      "yer": {
+        "cocuk": "Vitir namazının son rekâtında, “Allâhü ekber” deyip ellerimizi bağladıktan sonra okuruz. İki kısımdır.",
+        "ebeveyn": "Hanefî mezhebinde vitir namazının üçüncü rekâtında, kıraatten sonra tekbir alınıp okunur (vâcip). Hz. Ömer’den rivayet edilen bu iki dua Hanefîlerce tercih edilir. Bilmeyen, öğrenene kadar Rabbenâ âtinâ’yı ya da üç kez “Allâhümmağfir lî” okuyabilir."
+      },
+      "kaynak": ["https://islamansiklopedisi.org.tr/kunut", "https://www.islamveihsan.com/namaz-dualari.html", "https://www.yenisafak.com/kunut-dualari-arapca-ve-turkce-okunusu-kunut-dualari-oku-ezberler-h-3705894"],
+      "parcalar": ["1. kunut: Allâhümme innâ neste‘înüke", "2. kunut: Allâhümme iyyâke na‘büdü"],
+      "cumleler": [
+        {"parca": 1, "ar": "اللَّهُمَّ إِنَّا نَسْتَعِينُكَ وَنَسْتَغْفِرُكَ وَنَسْتَهْدِيكَ", "ok": "Allâhümme innâ neste‘înüke ve nestağfirüke ve nestehdîk", "tr": "Allah’ım, Senden yardım isteriz; bizi bağışlamanı ve doğru yola iletmeni dileriz.",
+         "w": [{"a": "اللَّهُمَّ", "ok": "Allâhümme", "tr": "Allah’ım"}, {"a": "إِنَّا", "ok": "innâ", "tr": "biz"}, {"a": "نَسْتَعِينُكَ", "ok": "neste‘înüke", "tr": "Senden yardım isteriz"}, {"a": "وَنَسْتَغْفِرُكَ", "ok": "ve nestağfirüke", "tr": "ve bağışlamanı dileriz"}, {"a": "وَنَسْتَهْدِيكَ", "ok": "ve nestehdîk", "tr": "ve doğru yolu göstermeni isteriz"}]},
+        {"parca": 1, "ar": "وَنُؤْمِنُ بِكَ وَنَتُوبُ إِلَيْكَ", "ok": "ve nü’minü bike ve netûbü ileyk", "tr": "Sana inanırız, hata yapınca Sana döneriz.",
+         "w": [{"a": "وَنُؤْمِنُ", "ok": "ve nü’minü", "tr": "ve inanırız"}, {"a": "بِكَ", "ok": "bike", "tr": "Sana"}, {"a": "وَنَتُوبُ", "ok": "ve netûbü", "tr": "ve tövbe ederiz"}, {"a": "إِلَيْكَ", "ok": "ileyk", "tr": "Sana"}]},
+        {"parca": 1, "ar": "وَنَتَوَكَّلُ عَلَيْكَ وَنُثْنِي عَلَيْكَ الْخَيْرَ كُلَّهُ", "ok": "ve netevekkelü aleyke ve nüsnî aleyke’l-hayra küllehû", "tr": "Sana güveniriz; bütün iyilikleri Senden bilir, Seni överiz.",
+         "w": [{"a": "وَنَتَوَكَّلُ", "ok": "ve netevekkelü", "tr": "ve güveniriz"}, {"a": "عَلَيْكَ", "ok": "aleyke", "tr": "Sana"}, {"a": "وَنُثْنِي", "ok": "ve nüsnî", "tr": "ve överiz"}, {"a": "عَلَيْكَ", "ok": "aleyke", "tr": "Seni"}, {"a": "الْخَيْرَ", "ok": "’l-hayra", "tr": "iyilikle"}, {"a": "كُلَّهُ", "ok": "küllehû", "tr": "bütün"}]},
+        {"parca": 1, "ar": "نَشْكُرُكَ وَلَا نَكْفُرُكَ", "ok": "neşkürüke ve lâ nekfürük", "tr": "Sana teşekkür ederiz, verdiklerini unutup nankörlük etmeyiz.",
+         "w": [{"a": "نَشْكُرُكَ", "ok": "neşkürüke", "tr": "Sana şükrederiz"}, {"a": "وَلَا", "ok": "ve lâ", "tr": "ve etmeyiz"}, {"a": "نَكْفُرُكَ", "ok": "nekfürük", "tr": "Sana nankörlük"}]},
+        {"parca": 1, "ar": "وَنَخْلَعُ وَنَتْرُكُ مَنْ يَفْجُرُكَ", "ok": "ve nahle‘u ve netrükü men yefcürük", "tr": "Sana karşı gelenlerin yolundan ayrılırız, o yolu bırakırız.",
+         "w": [{"a": "وَنَخْلَعُ", "ok": "ve nahle‘u", "tr": "ve ayrılırız"}, {"a": "وَنَتْرُكُ", "ok": "ve netrükü", "tr": "ve bırakırız"}, {"a": "مَنْ", "ok": "men", "tr": "kimseyi"}, {"a": "يَفْجُرُكَ", "ok": "yefcürük", "tr": "Sana karşı gelen"}]},
+        {"parca": 2, "ar": "اللَّهُمَّ إِيَّاكَ نَعْبُدُ", "ok": "Allâhümme iyyâke na‘büdü", "tr": "Allah’ım, yalnız Sana kulluk ederiz.",
+         "w": [{"a": "اللَّهُمَّ", "ok": "Allâhümme", "tr": "Allah’ım"}, {"a": "إِيَّاكَ", "ok": "iyyâke", "tr": "yalnız Sana"}, {"a": "نَعْبُدُ", "ok": "na‘büdü", "tr": "kulluk ederiz"}]},
+        {"parca": 2, "ar": "وَلَكَ نُصَلِّي وَنَسْجُدُ", "ok": "ve leke nüsallî ve nescüdü", "tr": "Yalnız Senin için namaz kılar, secde ederiz.",
+         "w": [{"a": "وَلَكَ", "ok": "ve leke", "tr": "ve Senin için"}, {"a": "نُصَلِّي", "ok": "nüsallî", "tr": "namaz kılarız"}, {"a": "وَنَسْجُدُ", "ok": "ve nescüdü", "tr": "ve secde ederiz"}]},
+        {"parca": 2, "ar": "وَإِلَيْكَ نَسْعَى وَنَحْفِدُ", "ok": "ve ileyke nes‘â ve nahfidü", "tr": "Sana koşarız, Senin rızan için seve seve çalışırız.",
+         "w": [{"a": "وَإِلَيْكَ", "ok": "ve ileyke", "tr": "ve Sana"}, {"a": "نَسْعَى", "ok": "nes‘â", "tr": "koşarız"}, {"a": "وَنَحْفِدُ", "ok": "ve nahfidü", "tr": "ve gayretle çalışırız"}]},
+        {"parca": 2, "ar": "نَرْجُو رَحْمَتَكَ وَنَخْشَى عَذَابَكَ", "ok": "nercû rahmeteke ve nahşâ azâbek", "tr": "Rahmetini umarız, cezandan çekiniriz.",
+         "w": [{"a": "نَرْجُو", "ok": "nercû", "tr": "umarız"}, {"a": "رَحْمَتَكَ", "ok": "rahmeteke", "tr": "rahmetini"}, {"a": "وَنَخْشَى", "ok": "ve nahşâ", "tr": "ve çekiniriz"}, {"a": "عَذَابَكَ", "ok": "azâbek", "tr": "cezandan, azabından"}]},
+        {"parca": 2, "ar": "إِنَّ عَذَابَكَ بِالْكُفَّارِ مُلْحِقٌ", "ok": "inne azâbeke bi’l-küffâri mülhık", "tr": "Senin cezan, Seni inkâr edenlere mutlaka ulaşır.",
+         "w": [{"a": "إِنَّ", "ok": "inne", "tr": "şüphesiz"}, {"a": "عَذَابَكَ", "ok": "azâbeke", "tr": "Senin azabın"}, {"a": "بِالْكُفَّارِ", "ok": "bi’l-küffâri", "tr": "inkâr edenlere"}, {"a": "مُلْحِقٌ", "ok": "mülhık", "tr": "ulaşır"}]}
+      ]
+    }
+  ]
+}

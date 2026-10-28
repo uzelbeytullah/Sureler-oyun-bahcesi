@@ -260,4 +260,36 @@ cihaz("U1");ev(`localStorage.setItem("bahce-aile-kodu","${kod}");localStorage.se
 ok('bulutSil: aile ve aile kayıtları silindi',!A("aileler/"+kod)&&!A("aileler/"+kod+"/kayit/fatiha")&&!A("aileler/"+kod+"/kayit/profiller")&&ev('aileKodu()')==="");
 ev('window.claude=window.__eski;DB=null;UID=null;docRef=null;window.DBK=null');
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
-(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10,test_t11,test_t12,test_t13,test_t14]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
+
+/* 15: heybe (buluta gerek kalmadan cihaz değiştirme): hazırla, metne çevir, öbür cihazda birleştirerek aç */
+async function test_t15(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const bekle=ms=>new Promise(r=>setTimeout(r,ms));
+for(const k of ['CompressionStream','DecompressionStream','Response','TextEncoder','TextDecoder'])if(globalThis[k])w[k]=globalThis[k];
+ev(`PROF.liste=[{id:"p0",ad:"Ali",yas:8},{id:"pkz",ad:"Ayşe",yas:6}];PROF.aktif="p0";S.ilkYolGec=true;S.puan=120;S.rozet=["ilk"];
+  SS(1).yildiz.oku=true;SS(1).yildiz.kelime=true;S.sinif={kod:"ABCDEFGH",ad:"x"};S.hedefler={ABCDEFGH:{tur:"soru",n:3}};save();
+  localStorage.setItem(lsAnahtar("pkz"),JSON.stringify(normalize({puan:40,sure:{"112":{yildiz:{oku:true}}}})));`);
+const h=ev('heybeHazirla()');ok('heybede iki kişi',h.kisiler.length===2);
+ok('bulut anahtarları heybede yok',!('sinif' in h.kisiler[0].ilerleme)&&!('hedefler' in h.kisiler[0].ilerleme));
+const m1=await ev('heybeMetin(heybeHazirla())');ok('metin sıkıştırılmış ('+m1.slice(0,5)+', '+m1.length+' harf)',m1.startsWith(w.CompressionStream?'SOB1:':'SOB0:'));
+const geri=await ev(`heybeCoz(${JSON.stringify(m1)})`);ok('metin geri çözüldü',geri.kisiler[1].ad==="Ayşe"&&geri.kisiler[0].ilerleme.puan===120);
+let red=0;for(const bozuk of ['merhaba','SOB0:'+Buffer.from('{"tur":"baska","kisiler":[]}').toString('base64'),'{"tur":"sureler-oyun-bahcesi-heybe","surum":9,"kisiler":[]}'])
+  {try{await ev(`heybeCoz(${JSON.stringify(bozuk)})`);}catch(e){red++;}}ok('bozuk ya da yabancı heybe açılmaz',red===3);
+const elle=await ev(`heybeCoz(${JSON.stringify(JSON.stringify({tur:"sureler-oyun-bahcesi-heybe",surum:1,kisiler:[{id:"p0",ad:"Ali",ilerleme:{puan:"9e99",sure:{"1":{yildiz:{oku:"evet"}},"x<y>":{}},rozet:[1,"a"]}}]}))})`);
+ok('elle oynanmış değerler sınırlandı',elle.kisiler[0].ilerleme.puan===1e7&&elle.kisiler[0].ilerleme.sure["1"].yildiz.oku===false&&!("x<y>" in elle.kisiler[0].ilerleme.sure)&&elle.kisiler[0].ilerleme.rozet.join()==="a");
+/* öbür cihaz: Ali'nin daha az ilerlemesi var, Ayşe yok */
+ev(`localStorage.clear();PROF.liste=[{id:"q1",ad:"ali",yas:8}];PROF.aktif="q1";profYukle("q1");S.ilkYolGec=true;S.puan=200;SS(1).yildiz.tamamla=true;S.rozet=["ikinci"];save();`);
+await ev('ebeveynOzet()');await bekle(300);
+{const V=w.document.getElementById('view');if(V.querySelector('#kCvp')){const t=V.querySelector('label[for=kCvp]').textContent.match(/(\d+) × (\d+)/);V.querySelector('#kCvp').value=String(t[1]*t[2]);V.querySelector('#kTamam').click();await bekle(400);}}
+ok('ebeveyn bölümünde heybe kutusu',!!w.document.getElementById('hyDosya')&&!!w.document.getElementById('hyYapistir'));
+await ev(`heybeOku(${JSON.stringify(m1)})`);await bekle(100);
+const sec=[...w.document.querySelectorAll('[data-hyk]')];ok('önizlemede iki kişi',sec.length===2);
+ok('Ali adla eşleşti, Ayşe yeni kişi',sec[0].value==="q1"&&sec[1].value==="");
+w.document.getElementById('hyAc').click();await bekle(300);
+ok('birleşti: büyük puan kalır',ev('S.puan')===200);
+ok('birleşti: yıldızlar toplandı',ev('S.sure["1"].yildiz.oku&&S.sure["1"].yildiz.kelime&&S.sure["1"].yildiz.tamamla')===true);
+ok('birleşti: rozetler toplandı',ev('S.rozet.includes("ilk")&&S.rozet.includes("ikinci")'));
+const yeni=ev('PROF.liste.find(p=>p.ad==="Ayşe")');ok('Ayşe yeni kişi olarak eklendi',!!yeni);
+ok('Ayşe\'nin ilerlemesi yerinde',yeni&&JSON.parse(w.localStorage.getItem(ev(`lsAnahtar(${JSON.stringify(yeni&&yeni.id)})`))).sure["112"].yildiz.oku===true);
+ok('bulut anahtarı taşınmadı',!ev('S.sinif'));
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10,test_t11,test_t12,test_t13,test_t14,test_t15]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();

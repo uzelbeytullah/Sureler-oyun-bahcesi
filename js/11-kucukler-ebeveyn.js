@@ -3,7 +3,7 @@
 const KEL=new Audio();KEL.preload="metadata";let kelBit=null;KEL.addEventListener("play",sikCalistir);
 SIK.add(()=>{if(kelBit!==null&&!KEL.paused&&KEL.currentTime>=kelBit-0.02){KEL.pause();kelBit=null;}return kelBit!==null&&!KEL.paused;});
 function kelimeSes(w){if(!w||!w.k)return false;const [g,b,e]=w.k,src=surumle(`kelime/k${g}.mp3?v=${SURUM}`);
-  try{speechSynthesis.cancel();}catch(x){}
+  try{speechSynthesis.cancel();}catch(x){}yonergeDur();
   const go=()=>{try{KEL.currentTime=b;}catch(x){}kelBit=e;KEL.play().catch(()=>{});};
   if(KEL.dataset.src!==src){KEL.dataset.src=src;KEL.src=src;KEL.addEventListener("loadedmetadata",go,{once:true});KEL.load();}else go();return true;}
 function kelimeBul(ar,kaynak){const K=kaynak||CUR;if(!K||!K.ayetler)return null;const t=s=>String(s).replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0640]/g,"");const a=t(ar);
@@ -14,17 +14,17 @@ const minik=()=>S.seviye==="minik";
 /* Minik sonuç: sayı ya da yüzde yerine büyük yıldız ve "Aferin!" */
 const minikYildiz=(yazi)=>`<div class="minik-sonuc pop" role="status"><div class="minik-yildiz" aria-hidden="true">⭐</div><b>${esc(yazi||"Aferin!")}</b></div>`;
 let TRSES=null;function trSesVar(){try{if(!("speechSynthesis" in window))return false;const v=speechSynthesis.getVoices();if(!v.length)return true;TRSES=v.find(x=>/^tr/i.test(x.lang))||null;return !!TRSES;}catch(e){return false;}}
-function soyle(t){try{if(!t)return;KEL.pause();speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="tr-TR";u.rate=0.9;const v=speechSynthesis.getVoices().find(x=>/^tr/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
+function soyle(t){try{if(!t)return;yonergeDur();KEL.pause();speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="tr-TR";u.rate=0.9;const v=speechSynthesis.getVoices().find(x=>/^tr/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u);}catch(e){}}
 function duzMetin(html){const d=document.createElement("div");d.innerHTML=html;d.querySelectorAll("[lang=ar],.ar,.okunus,.qbig,.ayet-box").forEach(e=>e.remove());return d.textContent.replace(/\s+/g," ").trim();}
 function sesliSoru(q,V){if(!kucuk())return;const arW=(()=>{const m=(q.html||"").match(/class="qbig ar"[^>]*>([^<]+)</);return m?kelimeBul(m[1].trim()):null;})();
   const bar=document.createElement("div");bar.style.cssText="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0";
-  bar.innerHTML=`${trSesVar()?`<button class="yazi-4 dn" data-ss="soru">${ikon("volume-2")} Soruyu dinle</button>`:""}${arW?`<button class="yazi-4 dn" data-ss="kelime">${ikon("headphones")} Kelimeyi dinle</button>`:""}`;
+  bar.innerHTML=`${q.yonerge||trSesVar()?`<button class="yazi-4 dn" data-ss="soru">${ikon("volume-2")} Soruyu dinle</button>`:""}${arW?`<button class="yazi-4 dn" data-ss="kelime">${ikon("headphones")} Kelimeyi dinle</button>`:""}`;
   const opts=V.querySelector(".opts");if(!opts)return;opts.before(bar);
-  bar.querySelectorAll("[data-ss]").forEach(b=>b.onclick=()=>b.dataset.ss==="soru"?soyle(duzMetin(q.html)):kelimeSes(arW));
+  bar.querySelectorAll("[data-ss]").forEach(b=>b.onclick=()=>b.dataset.ss==="soru"?(q.yonerge?yonerge(q.yonerge,duzMetin(q.html)):soyle(duzMetin(q.html))):kelimeSes(arW));   /* q.yonerge: sorunun kayıtlı sesi (ses/yonerge/); q.sikYonerge(o): şıkkın kayıtlı sesinin anahtarı */
   opts.querySelectorAll("button[data-j]").forEach(b=>{const o=q.opts[+b.dataset.j];const s=document.createElement("button");s.type="button";s.className="ops-ses";s.setAttribute("aria-label",`${+b.dataset.j+1}. şıkkı dinle`);s.innerHTML=ikon("volume-2");
-    s.onclick=ev=>{ev.stopPropagation();if(q.sikAyet&&CUR&&CUR.ses){ayetCal(q.sikAyet[+b.dataset.j]);}else if(q.arOpts){kelimeSes(kelimeBul(o));}else soyle(o);};b.after(s);});
+    s.onclick=ev=>{ev.stopPropagation();if(q.sikAyet&&CUR&&CUR.ses){ayetCal(q.sikAyet[+b.dataset.j]);}else if(q.arOpts){kelimeSes(kelimeBul(o));}else{const sk=q.sikYonerge&&q.sikYonerge(o);if(sk)yonerge(sk,o);else soyle(o);}};b.after(s);});
   opts.classList.add("ops-kucuk");
-  if(!q.otoSesYok)setTimeout(()=>{if(arW)kelimeSes(arW);else if(trSesVar())soyle(duzMetin(q.html));},350);}
+  if(!q.otoSesYok)setTimeout(()=>{if(arW)kelimeSes(arW);else if(q.yonerge)yonerge(q.yonerge,duzMetin(q.html));else if(trSesVar())soyle(duzMetin(q.html));},350);}
 document.addEventListener("click",ev=>{if(!CUR||!CUR.ayetler)return;const kl=ev.target.closest(".read-ayet .kelimeler[lang=ar], .read-ayet [lang=ar].kelimeler");if(!kl)return;
   const ra=kl.closest('.read-ayet[id^="ay"]');if(!ra||kl!==ra.querySelector(".kelimeler"))return;const i=+ra.id.slice(2);
   const ws=[...kl.children].filter(e=>!e.classList.contains("n-ar"));let el=ev.target;while(el&&el.parentElement!==kl)el=el.parentElement;const j=ws.indexOf(el);
@@ -47,7 +47,7 @@ function molaGoster(){const p=aktifKisi();const once=document.activeElement;cons
   <div class="izgara ara-2"><button class="yazi-4 dokun56 primary" id="molaTamam">Mola veriyorum</button>${molaSonra>0?`<p class="kucuk-yazi">Bir kez uzattık. Daha fazla süre için annen ya da baban <b>Ebeveyn özeti</b>nden mola ayarını değiştirebilir.</p>`:`<button id="molaBes">5 dakika daha</button>`}</div></div>`;
   document.body.appendChild(d);efekt("gorev");
   const ana=document.querySelector("main");if(ana)ana.inert=true;
-  if(kucuk())setTimeout(()=>{if(d.isConnected)soyle(d.querySelector("h2").textContent+" "+d.querySelector("p").textContent);},400);
+  if(kucuk())setTimeout(()=>{if(d.isConnected)yonerge("mola",d.querySelector("h2").textContent+" "+d.querySelector("p").textContent);},400);
   /* kapanınca odak, pencere açılmadan önceki öğeye döner (o öğe yerinde kaldıysa) */
   const kapat=()=>{d.remove();if(ana)ana.inert=false;if(once&&once.isConnected&&once.focus)try{once.focus({preventScroll:true});}catch(e){}};
   $("molaTamam").onclick=()=>{S.oturumDk=0;molaSonra=0;save();kapat();durSes();animDur&&animDur();anaSayfa();};

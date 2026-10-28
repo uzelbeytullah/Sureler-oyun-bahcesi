@@ -61,7 +61,7 @@ function pZit(el){
     <div class="tek-sutun opts">${opts.map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb"></p>`;
     let ikinci=false;
     el.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{const ok=opts[+b.dataset.j]===d,k1=kucuk();
-      if(!ok&&k1&&CUR&&!ikinci&&opts.length>2){ikinci=true;b.disabled=true;b.classList.add("soluk");const fb=$("fb");fb.className="feedback dene";fb.textContent="Bir daha dene";soyle("Bir daha dene");return;}
+      if(!ok&&k1&&CUR&&!ikinci&&opts.length>2){ikinci=true;b.disabled=true;b.classList.add("soluk");const fb=$("fb");fb.className="feedback dene";fb.textContent="Bir daha dene";yonerge("bir-daha-dene","Bir daha dene");return;}
       el.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(opts[+x.dataset.j]===d)x.classList.add("ok");});
       if(!ok)b.classList.add("bad");if(!ok&&k1)b.classList.add("notr");if(ok){dogru++;if(ikinci)yarim++;}answer(ok);
       const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad")+(!ok&&k1?" notr":"");fb.textContent=ok?(ikinci?"Doğru! İkinci denemede buldun.":"Doğru!"):"Doğrusu işaretlendi.";

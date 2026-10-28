@@ -66,20 +66,20 @@ function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
   {const md=$("minikDon");if(md)md.onclick=()=>{anaSayfa.buyuk=null;anaSayfa();};}
 }
 /* Minik (4-6 yaş) ana ekranı: okuma bilmeyen çocuk için dört büyük resimli düğme; puan, seri, rozet, arama ve sure listesi yok */
-const MINIK_DUGME=[["dinle",ikon("play"),"Dinle"],["hikaye",ikon("clapperboard"),"Hikâye"],["bahce",ikon("tree-deciduous"),"Bahçem"],["aile",ikon("users"),"Ailemle"]];
+const MINIK_DUGME=[["dinle",ikon("play"),"Dinle"],["hikaye",ikon("clapperboard"),"Hikâye"],["bahce",ikon("tree-deciduous"),"Bahçem"],["aile",ikon("users"),"Ailemle"]];   /* düğme adları sesli: ses/yonerge/minik-<anahtar>.mp3 */
 function minikAna(){const V=$("view");const ekran=EKRAN_NO;
   $("baslik").textContent="Sureler Oyun Bahçesi";$("altbaslik").textContent="Dinle, izle, bahçeni büyüt";
   V.innerHTML=`<div class="minik-ana"><div class="esnek saga-yasla">${kisiDugme()}</div>
   <h2 class="minik-soru"><button type="button" class="minik-sor" id="minikSor" aria-label="Ne yapmak istersin? Dinlemek için dokun">${ikon("volume-2")}</button> Ne yapmak istersin?</h2>
   <div class="minik-grid">${MINIK_DUGME.map(([k,s,a])=>`<button type="button" class="minik-dug minik-${k}" data-mk="${k}" aria-label="${a}"><span class="minik-simge" aria-hidden="true">${s}</span><span class="minik-ad">${a}</span></button>`).join("")}</div>
   <p class="minik-buyuk"><button type="button" class="minik-buyuk-dug" id="minikBuyuk">Büyükler için</button></p></div>`;
-  const sor=()=>{if(trSesVar())soyle("Ne yapmak istersin?");};
+  const sor=()=>yonerge("minik-soru","Ne yapmak istersin?");
   /* karşılama sesi: ekran açılınca bir kez, yalnız kullanıcı daha önce dokunduysa; yoksa ilk boş alana dokunuşta */
   if(ETKILESIM)setTimeout(()=>{if(ekran===EKRAN_NO&&$("minikSor"))sor();},300);
   else{const ilk=e=>{V.removeEventListener("pointerdown",ilk);if(ekran!==EKRAN_NO||!$("minikSor"))return;if(!(e.target.closest&&e.target.closest("button")))sor();};V.addEventListener("pointerdown",ilk);}
   $("minikSor").onclick=sor;
   const GIT={dinle:()=>ac(S.sonSure||1,"oku"),hikaye:()=>minikHikaye(),bahce:()=>bahce(),aile:()=>aileHalkasi()};
-  V.querySelectorAll("[data-mk]").forEach(b=>b.onclick=()=>{const d=MINIK_DUGME.find(x=>x[0]===b.dataset.mk);if(trSesVar())soyle(d[2]);GIT[d[0]]();});
+  V.querySelectorAll("[data-mk]").forEach(b=>b.onclick=()=>{const d=MINIK_DUGME.find(x=>x[0]===b.dataset.mk);yonerge("minik-"+d[0],d[2]);GIT[d[0]]();});
   $("minikBuyuk").onclick=()=>{const git=()=>{anaSayfa.buyuk=PROF.aktif;anaSayfa();};if(kapiAcik())git();else ebeveynKapisi(git);};
   {const kd=$("kisiDeg");if(kd)kd.onclick=()=>kisiSec();}}
 /* İlk giriş: henüz hiç yıldızı olmayan kişiye tek bir yol gösterilir */

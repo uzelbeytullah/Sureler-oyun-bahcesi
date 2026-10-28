@@ -8,11 +8,15 @@
    - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-d2f471a9";
-const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=038e19a7", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./simge-192.png", "./data/tecvid_kurallar.json"];
+const SURUM = "sob-c4f7987a";
+const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=cef30bf8", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./simge-192.png", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
+  /* Kabuğun yanında index.html'nin yüklediği bütün kod ve stil dosyaları da (?v= ekleriyle) alınır; ilk ziyaretten sonra çevrimdışı tam açılsın */
+  e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK).then(() => fetch("./index.html").then(y => y.text()).then(h => {
+    const L = [...new Set([...h.matchAll(/(?:src|href)="((?:js|css)\/[^"?]+\?v=[0-9a-f]+)"/g)].map(m => "./" + m[1]))];
+    return Promise.all(L.map(u => c.add(u).catch(() => {})));
+  }))).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
   e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x.startsWith("sob-") && x !== SURUM && x !== SES).map(x => caches.delete(x)))).then(() => self.clients.claim()));
@@ -42,10 +46,12 @@ function sesYanit(r) {
 const DIS = ["www.gstatic.com"];   // yazı tipleri artık siteden geliyor
 const iyi = y => y && (y.ok || y.type === "opaque");
 
-/* Aynı dosyanın eski ?v= kopyalarını silip yenisini kaydeder (önbellek büyümesin) */
+/* Aynı dosyanın eski ?v= kopyalarını silip yenisini kaydeder (önbellek büyümesin).
+   Sure verileri (data/) sürümle silinmeyen kalıcı önbelleğe gider: kabuk güncellenince baştan inmesin */
+const veriMi = u => u.pathname.includes("/data/");
 function kaydet(r, y) {
   const u = new URL(r.url);
-  return caches.open(SURUM).then(c => c.keys().then(L => Promise.all(L.filter(q => {
+  return caches.open(veriMi(u) ? SES : SURUM).then(c => c.keys().then(L => Promise.all(L.filter(q => {
     const a = new URL(q.url);
     return a.origin === u.origin && a.pathname === u.pathname && a.search !== u.search;
   }).map(q => c.delete(q)))).then(() => c.put(r, y)));
@@ -62,10 +68,13 @@ self.addEventListener("fetch", e => {
   if (/\.mp3$/i.test(u.pathname) || r.headers.has("range")) return;
 
   if (r.mode === "navigate") {                             // sayfa: önce ağ
-    e.respondWith(fetch(r).then(y => {
+    /* zayıf bağlantıda 4 sn içinde yanıt gelmezse kayıtlı kopya açılır (kopya yoksa ağ beklenir) */
+    const ag = fetch(r).then(y => {
       if (y.ok && y.type === "basic" && /\/(index\.html)?$/.test(u.pathname)) { const k = y.clone(); caches.open(SURUM).then(c => c.put("./index.html", k)); }
       return y;
-    }).catch(() => caches.match("./index.html")));
+    });
+    const yedek = new Promise(ok => setTimeout(ok, 4000)).then(() => caches.match("./index.html")).then(v => v || ag);
+    e.respondWith(Promise.race([ag, yedek]).catch(() => caches.match("./index.html")));
     return;
   }
   if (!ayni) {                                             // yazı tipleri, Firebase kütüphanesi
@@ -84,7 +93,7 @@ self.addEventListener("fetch", e => {
       .catch(() => caches.match(r)));
     return;
   }
-  e.respondWith(caches.match(r).then(v => v || fetch(r).then(y => {   // sürüm ekli veri ve kod: önce kayıtlı kopya
+  e.respondWith(caches.match(r).then(v => v || fetch(r).then(y => {   /* sürüm ekli veri ve kod: önce kayıtlı kopya (caches.match bütün önbelleklere bakar) */
     if (y.ok) { const k = y.clone(); kaydet(r, k); }
     return y;
   })));
