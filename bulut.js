@@ -23,7 +23,22 @@
     });
     return hazir;
   }
-  function temiz(v) { return JSON.parse(JSON.stringify(v === undefined ? null : v)); }
+  /* Firestore iç içe listeleri ([[a,b],[c,d]]) kabul etmez: içteki listeleri {__d:[...]} ile sarıp geri açıyoruz */
+  function sar(v) {
+    if (Array.isArray(v)) return v.map(function (x) { return Array.isArray(x) ? { __d: sar(x) } : sar(x); });
+    if (v && typeof v === "object") { var o = {}; Object.keys(v).forEach(function (k) { o[k] = sar(v[k]); }); return o; }
+    return v;
+  }
+  function ac(v) {
+    if (Array.isArray(v)) return v.map(ac);
+    if (v && typeof v === "object") {
+      var k = Object.keys(v);
+      if (k.length === 1 && k[0] === "__d" && Array.isArray(v.__d)) return ac(v.__d);
+      var o = {}; k.forEach(function (x) { o[x] = ac(v[x]); }); return o;
+    }
+    return v;
+  }
+  function temiz(v) { return sar(JSON.parse(JSON.stringify(v === undefined ? null : v))); }
 
   /* ---------- db ---------- */
   function belge(ref) {
@@ -31,7 +46,7 @@
       id: ref.id,
       get: function () {
         return ref.get().then(function (s) {
-          return { id: s.id, exists: s.exists, data: function () { return s.data() || {}; } };
+          return { id: s.id, exists: s.exists, data: function () { return ac(s.data() || {}); } };
         });
       },
       set: function (v) { return ref.set(temiz(v)); }
@@ -43,7 +58,7 @@
       doc: function (id) { return belge(ref.doc(String(id))); },
       get: function () {
         return ref.get().then(function (s) {
-          return { docs: s.docs.map(function (d) { return { id: d.id, data: function () { return d.data() || {}; } }; }) };
+          return { docs: s.docs.map(function (d) { return { id: d.id, data: function () { return ac(d.data() || {}); } }; }) };
         });
       }
     };
@@ -75,7 +90,7 @@
         kapat.push(esler.onSnapshot(function (s) {
           var sinir = Date.now() - 45000;
           liste = s.docs.filter(function (d) { return (d.data().t || 0) > sinir || d.id === u.uid; })
-            .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: d.data().presence || {} }; });
+            .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: ac(d.data().presence || {}) }; });
           peerCb.forEach(function (f) { try { f(liste); } catch (e) {} });
         }, function () {}));
 
@@ -85,7 +100,7 @@
             var d = c.doc.data() || {};
             if ((d.t || 0) < simdi - 60000) return;   // eski yarışmalardan kalan
             (olayCb[c.doc.id] || []).forEach(function (f) {
-              try { f({ data: d.data, peer: d.kimden, isMe: d.kimden === u.uid }); } catch (e) {}
+              try { f({ data: ac(d.data), peer: d.kimden, isMe: d.kimden === u.uid }); } catch (e) {}
             });
           });
         }, function () {}));
