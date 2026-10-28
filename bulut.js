@@ -81,15 +81,21 @@
         var kok = fs.collection("odalar").doc(String(ad).replace(/[^\w-]/g, "_"));
         var esler = kok.collection("esler"), olaylar = kok.collection("olaylar");
         var benim = esler.doc(u.uid);
-        var liste = [], peerCb = [], olayCb = {}, sonYayin = {}, kapat = [], acik = true, simdi = Date.now();
-        var benimDurum = {};
+        var liste = [], peerCb = [], olayCb = {}, sonYayin = {}, kapat = [], acik = true, sahibim = false;
+        var benimDurum = {}, fark = 0;   // fark: sunucu saati - cihaz saati (cihaz saati yanlış olabilir)
+        var SUNUCU = firebase.firestore.FieldValue.serverTimestamp;
+        function ms(t) { return t && t.toMillis ? t.toMillis() : (typeof t === "number" ? t : 0); }
+        function simdi() { return Date.now() + fark; }
 
-        function nabiz() { return benim.set({ presence: temiz(benimDurum), t: Date.now() }); }
+        function nabiz() { return benim.set({ presence: temiz(benimDurum), t: SUNUCU() }); }
         var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 15000);
 
         kapat.push(esler.onSnapshot(function (s) {
-          var sinir = Date.now() - 45000;
-          liste = s.docs.filter(function (d) { return (d.data().t || 0) > sinir || d.id === u.uid; })
+          var ben = s.docs.find(function (d) { return d.id === u.uid; });
+          var bt = ben && ms(ben.data({ serverTimestamps: "estimate" }).t);
+          if (ben && !ben.metadata.hasPendingWrites && bt) fark = bt - Date.now();
+          var sinir = simdi() - 45000;
+          liste = s.docs.filter(function (d) { return ms(d.data({ serverTimestamps: "estimate" }).t) > sinir || d.id === u.uid; })
             .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: ac(d.data().presence || {}) }; });
           peerCb.forEach(function (f) { try { f(liste); } catch (e) {} });
         }, function () {}));
@@ -97,13 +103,19 @@
         kapat.push(olaylar.onSnapshot(function (s) {
           s.docChanges().forEach(function (c) {
             if (c.type === "removed") return;
-            var d = c.doc.data() || {};
-            if ((d.t || 0) < simdi - 60000) return;   // eski yarışmalardan kalan
+            var d = c.doc.data({ serverTimestamps: "estimate" }) || {};
+            if (ms(d.t) < simdi() - 60000) return;   // eski yarışmalardan kalan
             (olayCb[c.doc.id] || []).forEach(function (f) {
               try { f({ data: ac(d.data), peer: d.kimden, isMe: d.kimden === u.uid }); } catch (e) {}
             });
           });
         }, function () {}));
+
+        /* Odaya ilk yayın yapan oda sahibi olur; olaylara yalnız sahibi yazabilir (kurallar da bunu denetler) */
+        function sahiplen() {
+          if (sahibim) return Promise.resolve();
+          return kok.set({ sahip: u.uid, t: SUNUCU() }).then(function () { sahibim = true; });
+        }
 
         return nabiz().then(function () {
           return {
@@ -116,11 +128,17 @@
               var o = sonYayin[olay];
               if (o && o.j === j && Date.now() - o.t < 20000) return Promise.resolve();   // değişmeyeni sık yazma
               sonYayin[olay] = { j: j, t: Date.now() };
-              return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: Date.now() });
+              return sahiplen().then(function () {
+                return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: SUNUCU() });
+              }).catch(function (e) { delete sonYayin[olay]; throw e; });
             },
             leave: function () {
               acik = false; clearInterval(nabizT);
               kapat.forEach(function (f) { try { f(); } catch (e) {} });
+              /* Oda sahibi çıkınca, oyuncular son durumu görebilsin diye biraz bekleyip olayları siler */
+              if (sahibim) setTimeout(function () {
+                Object.keys(sonYayin).forEach(function (o) { olaylar.doc(o).delete().catch(function () {}); });
+              }, 8000);
               return benim.delete().catch(function () {});
             }
           };

@@ -1,41 +1,63 @@
 rules_version = '2';
-// Sureler Oyun Bahçesi · Firestore güvenlik kuralları
-// Firebase konsolu > Firestore Database > Rules sekmesine olduğu gibi yapıştırın.
+// Sureler Oyun Bahcesi - Firestore guvenlik kurallari
+// Firebase konsolu > Firestore Database > Rules sekmesine oldugu gibi yapistirin.
 service cloud.firestore {
   match /databases/{database}/documents {
     function girisli() { return request.auth != null; }
     function ben(uid) { return girisli() && request.auth.uid == uid; }
+    function yeni() { return request.resource.data; }
 
-    // Kişisel ilerleme ve profiller: yalnız sahibi okur/yazar
+    // Kisisel ilerleme ve profiller: yalniz sahibi okur/yazar; belge adlari sinirli
     match /data/users/{uid}/{belge} {
-      allow read, write: if ben(uid);
+      allow read: if ben(uid);
+      allow write: if ben(uid) && belge.matches('profiller|fatiha(-[A-Za-z0-9_]{1,24})?');
     }
 
-    // Ortak hedefler: herkes görür, herkes yeni hedef koyabilir; koyulan hedef değiştirilemez/silinemez
+    // Ortak hedefler: herkes gorur, herkes yeni hedef koyabilir; konan hedef degistirilemez
     match /hedef/{kod} {
       allow read: if girisli();
-      allow create: if girisli() && request.resource.data.keys().hasOnly(['ad', 'hedef', 'tur', 't'])
-                    && request.resource.data.hedef is int && request.resource.data.hedef <= 10000;
+      allow create: if girisli() && kod.matches('[A-Z0-9]{4,8}')
+                    && yeni().keys().hasOnly(['ad', 'hedef', 'tur', 't'])
+                    && yeni().ad is string && yeni().ad.size() > 0 && yeni().ad.size() <= 40
+                    && yeni().hedef is int && yeni().hedef >= 10 && yeni().hedef <= 10000
+                    && yeni().tur in ['tekrar', 'soru']
+                    && yeni().t is string && yeni().t.size() <= 10;
     }
 
-    // Hedef katkıları: herkes görür, herkes yalnız kendi katkısını yazar
+    // Hedef katkilari: herkes gorur, herkes yalniz kendi katkisini yazar
     match /hedefk/{uid} {
       allow read: if girisli();
-      allow write: if ben(uid);
+      allow write: if ben(uid) && yeni().keys().hasOnly(['k']) && yeni().k is map && yeni().k.size() <= 30;
     }
 
-    // Kullanım sayacı: herkes yalnız kendininkini yazar; okumak yalnız Firebase konsolundan
+    // Kullanim sayaci: herkes yalniz kendininkini yazar; okumak yalniz konsoldan
     match /kullanim/{uid} {
-      allow write: if ben(uid);
+      allow write: if ben(uid) && yeni().keys().hasOnly(['g', 's']);
     }
 
-    // Aile yarışması canlı odaları
+    // Aile yarismasi canli odalari
+    // Odaya ilk yayin yapan sahip olur; 3 saatten eski bir odayi baskasi devralabilir
+    match /odalar/{oda} {
+      allow get: if girisli();
+      allow create: if girisli() && yeni().keys().hasOnly(['sahip', 't'])
+                    && yeni().sahip == request.auth.uid && yeni().t == request.time;
+      allow update: if girisli() && yeni().keys().hasOnly(['sahip', 't'])
+                    && yeni().sahip == request.auth.uid && yeni().t == request.time
+                    && (resource.data.sahip == request.auth.uid || resource.data.t < request.time - duration.value(3, 'h'));
+    }
     match /odalar/{oda}/esler/{uid} {
       allow read: if girisli();
-      allow write: if ben(uid);
+      allow create, update: if ben(uid) && yeni().keys().hasOnly(['presence', 't']) && yeni().t == request.time;
+      allow delete: if ben(uid);
     }
     match /odalar/{oda}/olaylar/{olay} {
-      allow read, write: if girisli();
+      allow read: if girisli();
+      allow create, update: if girisli()
+                    && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid
+                    && yeni().keys().hasOnly(['data', 'kimden', 't'])
+                    && yeni().kimden == request.auth.uid && yeni().t == request.time;
+      allow delete: if girisli()
+                    && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid;
     }
   }
 }
