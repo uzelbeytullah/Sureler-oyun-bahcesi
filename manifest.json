@@ -1,0 +1,14 @@
+{
+  "name": "Sureler Oyun Bahçesi",
+  "short_name": "Sureler",
+  "description": "Fâtiha, son cüz, Yâsîn ve Âyetü'l-Kürsî için aile boyu oyunlu öğrenme bahçesi",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F3F5FA",
+  "theme_color": "#1D4AA0",
+  "icons": [
+    { "src": "simge.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

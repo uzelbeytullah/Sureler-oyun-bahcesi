@@ -7,7 +7,7 @@
 /* Düzen: tek sütun; üstte puan şeridi, altında oyun kartları; tezhip havası lacivert ve altın */
 :root{
   --bg:#F3F5FA; --surface:#FFFFFF; --ink:#101A33; --soft:#2A3656;
-  --lapis:#1D4AA0; --gold:#A87708; --gold-bg:#FFF4D6;
+  --lapis:#1D4AA0; --gold:#8A6200; --gold-bg:#FFF4D6;
   --ok:#11734A; --ok-bg:#DDF5E8; --bad:#B3261E; --bad-bg:#FCE3E1; --line:#C9D2E6;
   --c0:#B3261E; --c1:#1D4AA0; --c2:#11734A; --c3:#8A4B00; --c4:#7A1FA2; --c5:#00727A; --c6:#A0275C; --c7:#4A5A00; --c8:#5B3FA8; --c9:#8C2F00; --c10:#2F6B1F; --c11:#0B5E8A;
   --t-sessiz:#7A5A1E; --t-medd1:#B3261E; --t-medd2:#C2410C; --t-medd3:#7F1D1D; --t-medd4:#A0136B; --t-gunne:#11734A; --t-ihfa:#6D28D9; --t-iklab:#1D4AA0; --t-idgam:#0B6E6E; --t-kalkale:#1F5FB8;
@@ -244,17 +244,20 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
     <p class="sync" id="sync">İlerleme bu cihazda saklanıyor</p>
     <nav class="tabs" id="tabs" aria-label="Bölümler"></nav>
   </header>
-  <section class="panel" id="view" aria-live="polite"></section>
+  <section class="panel" id="view"></section>
 </main>
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <!-- Bulut köprüsü: Claude dışında (GitHub Pages) aile yarışması ve ortak hedef için -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="bulut-ayar.js?v=3"></script>
-<script src="bulut.js?v=3"></script>
+<script src="bulut-ayar.js?v=4"></script>
+<script src="bulut.js?v=4"></script>
+<script>/* GitHub Pages sürümü: ana ekrana eklenebilir uygulama ve çevrimdışı çalışma */
+(function(){try{var l=document.createElement("link");l.rel="manifest";l.href="manifest.json";document.head.appendChild(l);
+var m=document.createElement("meta");m.name="theme-color";m.content="#1D4AA0";document.head.appendChild(m);
+if("serviceWorker" in navigator&&location.protocol==="https:")window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}catch(e){}})();</script>
+<!-- /Bulut köprüsü -->
 <script>
+document.documentElement.lang="tr";
 const KATALOG=[{"no": 1, "ad": "Fâtiha", "adAr": "الفاتحة", "ayet": 7, "inis": "Mekke", "anlam": "Açılış, kitabın açılışı", "ek": true, "ilke": true}, {"no": 2255, "ad": "Âyetü’l-Kürsî", "adAr": "آية الكرسي", "ayet": 1, "inis": "Medine", "anlam": "Kürsî ayeti", "etiket": "Bakara 255", "ek": true}, {"no": 36, "ad": "Yâsîn", "adAr": "يس", "ayet": 83, "inis": "Mekke", "anlam": "Yâ Sîn harfleri", "gruplar": [{"id": 36001, "bas": 1, "son": 4, "tema": "Vahyin Onayı"}, {"id": 36005, "bas": 5, "son": 7, "tema": "Gaflet ve İnat"}, {"id": 36008, "bas": 8, "son": 10, "tema": "Kibrin Körlüğü"}, {"id": 36011, "bas": 11, "son": 12, "tema": "İlahi Kayıt ve Gerçek Muhataplar"}, {"id": 36013, "bas": 13, "son": 15, "tema": "Elçilerin Reddedilişi"}, {"id": 36016, "bas": 16, "son": 19, "tema": "Tehditlere Karşı Durmak"}, {"id": 36020, "bas": 20, "son": 22, "tema": "Şehirden Gelen Adamın Çağrısı"}, {"id": 36023, "bas": 23, "son": 25, "tema": "Şirkin Reddi ve İmanın İlanı"}, {"id": 36026, "bas": 26, "son": 27, "tema": "Şehadet ve Erdem"}, {"id": 36028, "bas": 28, "son": 30, "tema": "Sayha ile Gelen Helak"}, {"id": 36031, "bas": 31, "son": 32, "tema": "İbretsizlik ve Toplanma"}, {"id": 36033, "bas": 33, "son": 36, "tema": "Botanik Deliller ve Çiftler Kuralı"}, {"id": 36037, "bas": 37, "son": 38, "tema": "Astronomik Döngü"}, {"id": 36039, "bas": 39, "son": 40, "tema": "Evrensel Nizam"}, {"id": 36041, "bas": 41, "son": 44, "tema": "Denizcilik Nimeti"}, {"id": 36045, "bas": 45, "son": 47, "tema": "Bencil Bahaneler"}, {"id": 36048, "bas": 48, "son": 50, "tema": "Birinci Sûr (Yakalanış)"}, {"id": 36051, "bas": 51, "son": 52, "tema": "İkinci Sûr (Kabirlerden Uyanış)"}, {"id": 36053, "bas": 53, "son": 54, "tema": "Mutlak Adalet Mahkemesi"}, {"id": 36055, "bas": 55, "son": 58, "tema": "Cennetliklerin Neşesi"}, {"id": 36059, "bas": 59, "son": 62, "tema": "Ayrışma ve Şeytanın Düşmanlığı"}, {"id": 36063, "bas": 63, "son": 65, "tema": "Organların İtirafı"}, {"id": 36066, "bas": 66, "son": 68, "tema": "İnsanın Fiziksel Sınırları"}, {"id": 36069, "bas": 69, "son": 70, "tema": "Vahyin Mahiyeti"}, {"id": 36071, "bas": 71, "son": 73, "tema": "Hayvansal Nimetler"}, {"id": 36074, "bas": 74, "son": 76, "tema": "Sahte İlahların Acizliği"}, {"id": 36077, "bas": 77, "son": 79, "tema": "Yeniden Yaratılışın Mantığı"}, {"id": 36080, "bas": 80, "son": 81, "tema": "Evrensel Kudret"}, {"id": 36082, "bas": 82, "son": 83, "tema": "“Ol” (Kün) Emri ve Dönüş"}], "ek": true}, {"no": 78, "ad": "Nebe’", "adAr": "النبأ", "ayet": 40, "inis": "Mekke", "anlam": "Haber", "ek": true}, {"no": 79, "ad": "Nâziât", "adAr": "النازعات", "ayet": 46, "inis": "Mekke", "anlam": "Söküp çıkaranlar", "ek": true}, {"no": 80, "ad": "Abese", "adAr": "عبس", "ayet": 42, "inis": "Mekke", "anlam": "Yüzünü ekşitti", "ek": true}, {"no": 81, "ad": "Tekvîr", "adAr": "التكوير", "ayet": 29, "inis": "Mekke", "anlam": "Dürme ve sarma", "ek": true}, {"no": 82, "ad": "İnfitâr", "adAr": "الانفطار", "ayet": 19, "inis": "Mekke", "anlam": "Yarılma ve çatlama", "ek": true}, {"no": 83, "ad": "Mutaffifîn", "adAr": "المطففين", "ayet": 36, "inis": "Mekke", "anlam": "Ölçü ve tartıda eksiltme yapanlar", "ek": true}, {"no": 84, "ad": "İnşikāk", "adAr": "الانشقاق", "ayet": 25, "inis": "Mekke", "anlam": "Yarılma", "ek": true}, {"no": 85, "ad": "Bürûc", "adAr": "البروج", "ayet": 22, "inis": "Mekke", "anlam": "Burçlar", "ek": true}, {"no": 86, "ad": "Târık", "adAr": "الطارق", "ayet": 17, "inis": "Mekke", "anlam": "Gece gelen", "ek": true}, {"no": 87, "ad": "A‘lâ", "adAr": "الأعلى", "ayet": 19, "inis": "Mekke", "anlam": "En yüce", "ek": true}, {"no": 88, "ad": "Gāşiye", "adAr": "الغاشية", "ayet": 26, "inis": "Mekke", "anlam": "Örten, bürüyen, kuşatan", "ek": true}, {"no": 89, "ad": "Fecr", "adAr": "الفجر", "ayet": 30, "inis": "Mekke", "anlam": "Şafak, tan yerinin ağarması", "ek": true}, {"no": 90, "ad": "Beled", "adAr": "البلد", "ayet": 20, "inis": "Mekke", "anlam": "Belde, şehir (burada Mekke)", "ek": true}, {"no": 91, "ad": "Şems", "adAr": "الشمس", "ayet": 15, "inis": "Mekke", "anlam": "Güneş", "ek": true}, {"no": 92, "ad": "Leyl", "adAr": "الليل", "ayet": 21, "inis": "Mekke", "anlam": "Gece", "ek": true}, {"no": 93, "ad": "Duhâ", "adAr": "الضحى", "ayet": 11, "inis": "Mekke", "anlam": "Kuşluk vakti", "ek": true}, {"no": 94, "ad": "İnşirâh", "adAr": "الشرح", "ayet": 8, "inis": "Mekke", "anlam": "Açılma, genişleme, ferahlama", "ek": true}, {"no": 95, "ad": "Tîn", "adAr": "التين", "ayet": 8, "inis": "Mekke", "anlam": "İncir", "ek": true}, {"no": 96, "ad": "Alak", "adAr": "العلق", "ayet": 19, "inis": "Mekke", "anlam": "Tutunan, asılı duran; kan pıhtısı", "ek": true}, {"no": 97, "ad": "Kadr", "adAr": "القدر", "ayet": 5, "inis": "Mekke ya da Medine", "anlam": "Değer, şeref, takdir ve ölçü", "ek": true}, {"no": 98, "ad": "Beyyine", "adAr": "البينة", "ayet": 8, "inis": "Mekke ya da Medine", "anlam": "Apaçık delil", "ek": true}, {"no": 99, "ad": "Zilzâl", "adAr": "الزلزلة", "ayet": 8, "inis": "Mekke ya da Medine", "anlam": "Şiddetli sarsıntı", "ek": true}, {"no": 100, "ad": "Âdiyât", "adAr": "العاديات", "ayet": 11, "inis": "Mekke", "anlam": "Koşanlar", "ek": true}, {"no": 101, "ad": "Kāria", "adAr": "القارعة", "ayet": 11, "inis": "Mekke", "anlam": "Çarpan, kapıyı çalan (kıyamet)", "ek": true}, {"no": 102, "ad": "Tekâsür", "adAr": "التكاثر", "ayet": 8, "inis": "Mekke", "anlam": "Çoklukta yarışmak", "ek": true}, {"no": 103, "ad": "Asr", "adAr": "العصر", "ayet": 3, "inis": "Mekke", "anlam": "Zaman; gündüzün sonu, ikindi vakti; çağ", "ek": true}, {"no": 104, "ad": "Hümeze", "adAr": "الهمزة", "ayet": 9, "inis": "Mekke", "anlam": "Arkadan çekiştiren, insanları kıran", "ek": true}, {"no": 105, "ad": "Fîl", "adAr": "الفيل", "ayet": 5, "inis": "Mekke", "anlam": "Fil", "ek": true}, {"no": 106, "ad": "Kureyş", "adAr": "قريش", "ayet": 4, "inis": "Mekke", "anlam": "Hz. Peygamber’in mensup olduğu kabilenin adı", "ek": true}, {"no": 107, "ad": "Mâûn", "adAr": "الماعون", "ayet": 7, "inis": "Mekke", "anlam": "En küçük yardım", "ek": true}, {"no": 108, "ad": "Kevser", "adAr": "الكوثر", "ayet": 3, "inis": "Mekke", "anlam": "Pek çok hayır", "ek": true}, {"no": 109, "ad": "Kâfirûn", "adAr": "الكافرون", "ayet": 6, "inis": "Mekke", "anlam": "Kâfirler, inkâr edenler", "ek": true}, {"no": 110, "ad": "Nasr", "adAr": "النصر", "ayet": 3, "inis": "Medine", "anlam": "Yardım, zafer", "ek": true}, {"no": 111, "ad": "Tebbet", "adAr": "المسد", "ayet": 5, "inis": "Mekke", "anlam": "Kurudu, kaybetti, helak oldu", "ek": true}, {"no": 112, "ad": "İhlâs", "adAr": "الإخلاص", "ayet": 4, "inis": "Mekke", "anlam": "Katışıksızlık, arılık", "ek": true}, {"no": 113, "ad": "Felak", "adAr": "الفلق", "ayet": 5, "inis": "Mekke", "anlam": "Tan yeri, yarılan sabah", "ek": true}, {"no": 114, "ad": "Nâs", "adAr": "الناس", "ayet": 6, "inis": "Mekke", "anlam": "İnsanlar", "ek": true}];
 const SURUM="29";
 const SURUMLER={"anim/hk/001_0.mp3":"9a28035b","anim/hk/001_1.mp3":"d98815d2","anim/hk/001_2.mp3":"b199fbe1","anim/hk/078_0.mp3":"d06ecb1b","anim/hk/078_1.mp3":"0b556f07","anim/hk/078_2.mp3":"5c060f54","anim/hk/079_0.mp3":"c18cd2e2","anim/hk/079_1.mp3":"cfb82694","anim/hk/079_2.mp3":"a2402431","anim/hk/080_0.mp3":"83cf7358","anim/hk/080_1.mp3":"7f603bee","anim/hk/080_2.mp3":"f58ac97e","anim/hk/081_0.mp3":"c9bc6746","anim/hk/081_1.mp3":"bec3ad7d","anim/hk/081_2.mp3":"70f03d44","anim/hk/082_0.mp3":"bc1ad372","anim/hk/082_1.mp3":"cb984a08","anim/hk/082_2.mp3":"92151d0a","anim/hk/083_0.mp3":"79920ef0","anim/hk/083_1.mp3":"5d7105a2","anim/hk/083_2.mp3":"0c64cfb0","anim/hk/084_0.mp3":"306e4984","anim/hk/084_1.mp3":"93deb789","anim/hk/084_2.mp3":"75723a9c","anim/hk/085_0.mp3":"78c5aadf","anim/hk/085_1.mp3":"7b59c95e","anim/hk/085_2.mp3":"2d66a33a","anim/hk/086_0.mp3":"22604e4b","anim/hk/086_1.mp3":"001e107b","anim/hk/086_2.mp3":"2717a512","anim/hk/087_0.mp3":"80599979","anim/hk/087_1.mp3":"422b39b3","anim/hk/087_2.mp3":"e67b62ba","anim/hk/088_0.mp3":"1ac98d8d","anim/hk/088_1.mp3":"c15a0a61","anim/hk/088_2.mp3":"34657715","anim/hk/089_0.mp3":"d7bb0697","anim/hk/089_1.mp3":"95469571","anim/hk/089_2.mp3":"f07cbdbf","anim/hk/090_0.mp3":"d1bc2779","anim/hk/090_1.mp3":"e6e156d0","anim/hk/090_2.mp3":"515a4413","anim/hk/091_0.mp3":"64952efd","anim/hk/091_1.mp3":"d9ccdc4e","anim/hk/092_0.mp3":"0951cf6d","anim/hk/092_1.mp3":"87ceedc9","anim/hk/092_2.mp3":"dec01d64","anim/hk/093_0.mp3":"265736c4","anim/hk/093_1.mp3":"652ea844","anim/hk/093_2.mp3":"0e948f18","anim/hk/094_0.mp3":"6dbe646b","anim/hk/094_1.mp3":"6c7a0c4a","anim/hk/094_2.mp3":"02e037ee","anim/hk/095_0.mp3":"f351dd17","anim/hk/095_1.mp3":"5c0ae221","anim/hk/096_0.mp3":"911a2874","anim/hk/096_1.mp3":"820e2b1b","anim/hk/096_2.mp3":"588ce774","anim/hk/097_0.mp3":"955c4b9b","anim/hk/097_1.mp3":"b057b58e","anim/hk/097_2.mp3":"1b369c6d","anim/hk/098_0.mp3":"06233d8d","anim/hk/098_1.mp3":"3c356d16","anim/hk/099_0.mp3":"13ddc759","anim/hk/099_1.mp3":"fb2b2bc8","anim/hk/100_0.mp3":"40c27653","anim/hk/100_1.mp3":"5c52162e","anim/hk/101_0.mp3":"0bbe0f0c","anim/hk/101_1.mp3":"2a3dbed9","anim/hk/101_2.mp3":"9cf0d01f","anim/hk/102_0.mp3":"862e5631","anim/hk/102_1.mp3":"c2e3a13f","anim/hk/102_2.mp3":"9438d8eb","anim/hk/103_0.mp3":"bd7025ef","anim/hk/103_1.mp3":"2b942e89","anim/hk/103_2.mp3":"a1294e68","anim/hk/104_0.mp3":"4bc788dd","anim/hk/104_1.mp3":"c82c8b26","anim/hk/104_2.mp3":"23670f09","anim/hk/105_0.mp3":"53bbce25","anim/hk/105_1.mp3":"f6311c18","anim/hk/105_2.mp3":"2c5abae4","anim/hk/106_0.mp3":"6a35f1f5","anim/hk/106_1.mp3":"34a8c2c2","anim/hk/106_2.mp3":"f3822f7d","anim/hk/107_0.mp3":"0095d9b6","anim/hk/107_1.mp3":"14b812c6","anim/hk/107_2.mp3":"dcf169cb","anim/hk/108_0.mp3":"e443e5b3","anim/hk/108_1.mp3":"9f6c8da2","anim/hk/108_2.mp3":"7ed0e807","anim/hk/109_0.mp3":"6726ebd2","anim/hk/109_1.mp3":"0db37c78","anim/hk/109_2.mp3":"76e77124","anim/hk/110_0.mp3":"67d72a84","anim/hk/110_1.mp3":"11d21f01","anim/hk/110_2.mp3":"a11cd635","anim/hk/111_0.mp3":"f2059d74","anim/hk/111_1.mp3":"11982f60","anim/hk/111_2.mp3":"026a4746","anim/hk/112_0.mp3":"65f7f34a","anim/hk/112_1.mp3":"5fc36086","anim/hk/112_2.mp3":"ef696123","anim/hk/113_0.mp3":"2618832a","anim/hk/113_1.mp3":"df35a4d8","anim/hk/113_2.mp3":"8bdecf25","anim/hk/114_0.mp3":"958e47aa","anim/hk/114_1.mp3":"d9547219","anim/hk/114_2.mp3":"6d1540e2","anim/hk/2255_0.mp3":"a375f856","anim/hk/2255_1.mp3":"10eb1b35","anim/hk/2255_2.mp3":"acbb5df3","anim/hk/36001_0.mp3":"376efbe3","anim/hk/36001_1.mp3":"dd050c06","anim/hk/36001_2.mp3":"c4d94443","anim/hk/36005_0.mp3":"e63b66eb","anim/hk/36005_1.mp3":"127f2999","anim/hk/36005_2.mp3":"793ce904","anim/hk/36008_0.mp3":"bb285fa0","anim/hk/36008_1.mp3":"c970427f","anim/hk/36008_2.mp3":"26f8581c","anim/hk/36011_0.mp3":"c0a64496","anim/hk/36011_1.mp3":"678bef45","anim/hk/36011_2.mp3":"dbb6eaa0","anim/hk/36013_0.mp3":"97f33549","anim/hk/36013_1.mp3":"d6956135","anim/hk/36013_2.mp3":"53c96c21","anim/hk/36016_0.mp3":"143bf4f1","anim/hk/36016_1.mp3":"5c08ef21","anim/hk/36016_2.mp3":"eadf8122","anim/hk/36020_0.mp3":"b35098e2","anim/hk/36020_1.mp3":"35da3928","anim/hk/36020_2.mp3":"43975b25","anim/hk/36023_0.mp3":"a44579a3","anim/hk/36023_1.mp3":"aeec2464","anim/hk/36023_2.mp3":"5bd144f6","anim/hk/36026_0.mp3":"70f2d438","anim/hk/36026_1.mp3":"3c8e5aa5","anim/hk/36026_2.mp3":"154cdf51","anim/hk/36028_0.mp3":"c4967b78","anim/hk/36028_1.mp3":"02546c80","anim/hk/36028_2.mp3":"247ffdf0","anim/hk/36031_0.mp3":"68609e2a","anim/hk/36031_1.mp3":"7124b7fc","anim/hk/36031_2.mp3":"5dea70d9","anim/hk/36033_0.mp3":"794a0c46","anim/hk/36033_1.mp3":"e9199ee3","anim/hk/36033_2.mp3":"eeed75b0","anim/hk/36037_0.mp3":"a8a7d5ed","anim/hk/36037_1.mp3":"0379f994","anim/hk/36037_2.mp3":"921d319d","anim/hk/36039_0.mp3":"716081a3","anim/hk/36039_1.mp3":"5280d3e3","anim/hk/36039_2.mp3":"edfbdbc5","anim/hk/36041_0.mp3":"7f4ca5a1","anim/hk/36041_1.mp3":"8a6777bf","anim/hk/36041_2.mp3":"dfdd2908","anim/hk/36045_0.mp3":"e6cd2214","anim/hk/36045_1.mp3":"5a08b03e","anim/hk/36045_2.mp3":"42fc1923","anim/hk/36048_0.mp3":"eff18ce6","anim/hk/36048_1.mp3":"690bcaa2","anim/hk/36048_2.mp3":"7978cb2f","anim/hk/36051_0.mp3":"05ccb1db","anim/hk/36051_1.mp3":"829c65fd","anim/hk/36051_2.mp3":"d643eca0","anim/hk/36053_0.mp3":"d240fb4c","anim/hk/36053_1.mp3":"2bf78f1f","anim/hk/36053_2.mp3":"4750b1de","anim/hk/36055_0.mp3":"eaa6d597","anim/hk/36055_1.mp3":"6d8b3ce2","anim/hk/36055_2.mp3":"6cd7e575","anim/hk/36059_0.mp3":"bd28abb5","anim/hk/36059_1.mp3":"9e5659aa","anim/hk/36059_2.mp3":"699bf854","anim/hk/36063_0.mp3":"51c5f544","anim/hk/36063_1.mp3":"2c6de3a0","anim/hk/36063_2.mp3":"3b9a9637","anim/hk/36066_0.mp3":"220d4503","anim/hk/36066_1.mp3":"3e5fda19","anim/hk/36066_2.mp3":"a1cd545a","anim/hk/36069_0.mp3":"4656b554","anim/hk/36069_1.mp3":"3d691f22","anim/hk/36069_2.mp3":"a67c0383","anim/hk/36071_0.mp3":"8a17c057","anim/hk/36071_1.mp3":"82cbb3d3","anim/hk/36071_2.mp3":"612e064c","anim/hk/36074_0.mp3":"93f9ac60","anim/hk/36074_1.mp3":"01a990f9","anim/hk/36074_2.mp3":"e86af02f","anim/hk/36077_0.mp3":"4994b162","anim/hk/36077_1.mp3":"f89204cd","anim/hk/36077_2.mp3":"8f2aff8e","anim/hk/36080_0.mp3":"034586d9","anim/hk/36080_1.mp3":"4c9a2e2f","anim/hk/36080_2.mp3":"b04f418a","anim/hk/36082_0.mp3":"3334241c","anim/hk/36082_1.mp3":"60dc1b82","anim/hk/36082_2.mp3":"88786251","data/001.json":"bb3f8fc9","data/001_eka.json":"216fe3fd","data/001_ekb.json":"a61f808b","data/078.json":"51638116","data/078_eka.json":"bdc60106","data/078_ekb.json":"3f2b72b8","data/079.json":"d36fa478","data/079_eka.json":"d21617dc","data/079_ekb.json":"d712a379","data/080.json":"6530f05b","data/080_eka.json":"e96409c4","data/080_ekb.json":"de19d23f","data/081.json":"795893ae","data/081_eka.json":"6ed021fc","data/081_ekb.json":"49f75083","data/082.json":"21a4cce2","data/082_eka.json":"85481711","data/082_ekb.json":"f08eb8ff","data/083.json":"0f42e274","data/083_eka.json":"85b32410","data/083_ekb.json":"398861f8","data/084.json":"d2f59b43","data/084_eka.json":"76ed8306","data/084_ekb.json":"13163c96","data/085.json":"9e564187","data/085_eka.json":"b48104ad","data/085_ekb.json":"2bb30835","data/086.json":"13620d56","data/086_eka.json":"ede6b2a8","data/086_ekb.json":"a046b40e","data/087.json":"529ea7ad","data/087_eka.json":"2ec64ac5","data/087_ekb.json":"0996ff04","data/088.json":"123cbf2b","data/088_eka.json":"85d6cfdf","data/088_ekb.json":"8e67691a","data/089.json":"8c305cdb","data/089_eka.json":"8fda7fb6","data/089_ekb.json":"46156b55","data/090.json":"32f03c62","data/090_eka.json":"a0e83d06","data/090_ekb.json":"6a727d57","data/091.json":"32cf139c","data/091_eka.json":"a790b80b","data/091_ekb.json":"5d386187","data/092.json":"7b32d5e8","data/092_eka.json":"facecff3","data/092_ekb.json":"1c14b85b","data/093.json":"141d31e2","data/093_eka.json":"52d71f26","data/093_ekb.json":"b3a2ccdb","data/094.json":"8ea03d82","data/094_eka.json":"95282e1a","data/094_ekb.json":"ef87ec2b","data/095.json":"a37b9a0b","data/095_eka.json":"6b5f4f06","data/095_ekb.json":"433856ee","data/096.json":"e6948486","data/096_eka.json":"60cd517e","data/096_ekb.json":"8a2d4bb7","data/097.json":"1e361cd1","data/097_eka.json":"642b80d3","data/097_ekb.json":"cfd3c37e","data/098.json":"0a3c13f3","data/098_eka.json":"976434d1","data/098_ekb.json":"5e85c211","data/099.json":"0ef49511","data/099_eka.json":"41ed284c","data/099_ekb.json":"218ff08b","data/100.json":"54bdc891","data/100_eka.json":"61615773","data/100_ekb.json":"39820dd3","data/101.json":"48e38974","data/101_eka.json":"df9b04d0","data/101_ekb.json":"ff5ebe68","data/102.json":"ebff9dad","data/102_eka.json":"785a5b71","data/102_ekb.json":"715949ce","data/103.json":"c171d8a0","data/103_eka.json":"fe74b0dd","data/103_ekb.json":"e908e374","data/104.json":"f59052ea","data/104_eka.json":"04531892","data/104_ekb.json":"4b4959bc","data/105.json":"695c907a","data/105_eka.json":"1a9f9d90","data/105_ekb.json":"e15a7ae3","data/106.json":"9fd163f0","data/106_eka.json":"5aada99d","data/106_ekb.json":"c118d627","data/107.json":"183ff47e","data/107_eka.json":"de5d6eb3","data/107_ekb.json":"5293842e","data/108.json":"92ad80ae","data/108_eka.json":"660d8fba","data/108_ekb.json":"df628a73","data/109.json":"f83ed28d","data/109_eka.json":"e5c63ecc","data/109_ekb.json":"b95d98e2","data/110.json":"78e6f0ae","data/110_eka.json":"332ca18f","data/110_ekb.json":"516729b5","data/111.json":"54152a0f","data/111_eka.json":"facbd55f","data/111_ekb.json":"d3bf7e6c","data/112.json":"12798298","data/112_eka.json":"49cdb5c7","data/112_ekb.json":"61eda1fd","data/113.json":"c4190031","data/113_eka.json":"aae153c8","data/113_ekb.json":"767a4fca","data/114.json":"f0b65329","data/114_eka.json":"319eba3f","data/114_ekb.json":"7315fa52","data/2255.json":"6881cf7e","data/2255_eka.json":"beabfd67","data/2255_ekb.json":"b361c484","data/36000_ortak.json":"d8b9997b","data/36001.json":"ca49d9ff","data/36001_eka.json":"19ace670","data/36001_ekb.json":"ba1aa70a","data/36005.json":"01abc25c","data/36005_eka.json":"b96eb4b7","data/36005_ekb.json":"2146a237","data/36008.json":"a5782da0","data/36008_eka.json":"773c22a9","data/36008_ekb.json":"0e35b03b","data/36011.json":"4f67ff5c","data/36011_eka.json":"60d09675","data/36011_ekb.json":"e5bf54b1","data/36013.json":"5e86a564","data/36013_eka.json":"e25217ec","data/36013_ekb.json":"d4703285","data/36016.json":"e1c2b15c","data/36016_eka.json":"41320044","data/36016_ekb.json":"9ec8daf0","data/36020.json":"79818ab8","data/36020_eka.json":"a4596f94","data/36020_ekb.json":"6b6458fb","data/36023.json":"66ad35f2","data/36023_eka.json":"cd022e77","data/36023_ekb.json":"812ee381","data/36026.json":"3e0a9a42","data/36026_eka.json":"de299ae4","data/36026_ekb.json":"5e9f203d","data/36028.json":"e754e1f5","data/36028_eka.json":"41651e8b","data/36028_ekb.json":"ffca1446","data/36031.json":"526cae66","data/36031_eka.json":"33c113bf","data/36031_ekb.json":"f44a5ffc","data/36033.json":"63f0acac","data/36033_eka.json":"9ac48553","data/36033_ekb.json":"1655529e","data/36037.json":"6f63c613","data/36037_eka.json":"273f92c3","data/36037_ekb.json":"d95dfa52","data/36039.json":"e45341ac","data/36039_eka.json":"982f7939","data/36039_ekb.json":"b94620fa","data/36041.json":"ed06e240","data/36041_eka.json":"af6c5d38","data/36041_ekb.json":"7b94e3bc","data/36045.json":"3688534e","data/36045_eka.json":"780f1b11","data/36045_ekb.json":"be3f935c","data/36048.json":"a2b21daa","data/36048_eka.json":"67e3f465","data/36048_ekb.json":"047605fc","data/36051.json":"f98e35cb","data/36051_eka.json":"ef128481","data/36051_ekb.json":"888bebeb","data/36053.json":"a5ceb8d4","data/36053_eka.json":"2fe9809f","data/36053_ekb.json":"383e93d1","data/36055.json":"d325ce0c","data/36055_eka.json":"727824cd","data/36055_ekb.json":"93b3ecaf","data/36059.json":"d7575f35","data/36059_eka.json":"e2dc29ae","data/36059_ekb.json":"b762fc34","data/36063.json":"0d79b862","data/36063_eka.json":"1de1f684","data/36063_ekb.json":"42f6e4ab","data/36066.json":"37355b8a","data/36066_eka.json":"ba93c8c3","data/36066_ekb.json":"bc194c3d","data/36069.json":"993da096","data/36069_eka.json":"eed64309","data/36069_ekb.json":"226ca88a","data/36071.json":"308d7d5f","data/36071_eka.json":"b9d5a142","data/36071_ekb.json":"0bc0ce65","data/36074.json":"10f436a1","data/36074_eka.json":"5785b848","data/36074_ekb.json":"d7f8346b","data/36077.json":"5100cdd4","data/36077_eka.json":"674db494","data/36077_ekb.json":"90a30ce3","data/36080.json":"50580cff","data/36080_eka.json":"84a3c54e","data/36080_ekb.json":"7fe7a6da","data/36082.json":"19f56500","data/36082_eka.json":"a5bd9529","data/36082_ekb.json":"c6ab8933","data/atlas.json":"d30d94e2","data/tecvid_kurallar.json":"5533ace9","kelime/k0.mp3":"8b9c67f2","kelime/k1.mp3":"b5e389bd","kelime/k10.mp3":"f738b079","kelime/k11.mp3":"d5e25cc0","kelime/k12.mp3":"0567c60b","kelime/k13.mp3":"6e5ac7c2","kelime/k14.mp3":"fbc082e7","kelime/k15.mp3":"decc26d9","kelime/k16.mp3":"7d5df4a9","kelime/k17.mp3":"15e17c0b","kelime/k18.mp3":"068a72db","kelime/k19.mp3":"b3bedd07","kelime/k2.mp3":"c72d9da9","kelime/k3.mp3":"542771a8","kelime/k4.mp3":"6bd42c41","kelime/k5.mp3":"1170e8b2","kelime/k6.mp3":"2d1eef25","kelime/k7.mp3":"250a449e","kelime/k8.mp3":"3b207079","kelime/k9.mp3":"0c01900c","ses/001.mp3":"06836ba7","ses/078.mp3":"e9fcd79c","ses/079.mp3":"ca9e73f5","ses/080.mp3":"09389bb3","ses/081.mp3":"6279f2e3","ses/082.mp3":"04285c46","ses/083.mp3":"76a7e828","ses/084.mp3":"e6a9dc4e","ses/085.mp3":"dbb0336e","ses/086.mp3":"9def22ef","ses/087.mp3":"554b4984","ses/088.mp3":"88c0a0fb","ses/089.mp3":"88f32d54","ses/090.mp3":"038be227","ses/091.mp3":"d2c9bb6a","ses/092.mp3":"e6ece001","ses/093.mp3":"9dae1e77","ses/094.mp3":"c2c9efc6","ses/095.mp3":"9d9a2f15","ses/096.mp3":"842c5bfe","ses/097.mp3":"7498fd81","ses/098.mp3":"987d7006","ses/099.mp3":"f1c1ba87","ses/100.mp3":"8bac0dbf","ses/101.mp3":"c6804d48","ses/102.mp3":"cbfbf513","ses/103.mp3":"262e4ebf","ses/104.mp3":"07fa8bd9","ses/105.mp3":"a7f7825a","ses/106.mp3":"a33dde9e","ses/107.mp3":"2da21d25","ses/108.mp3":"3fa70c7f","ses/109.mp3":"03bd2049","ses/110.mp3":"a5e0f745","ses/111.mp3":"0352a6a0","ses/112.mp3":"54821e9e","ses/113.mp3":"330e2c36","ses/114.mp3":"9b75d2e8","ses/2255.mp3":"d6a55996","ses/36001.mp3":"9c17645b","ses/36005.mp3":"cc9eb3c9","ses/36008.mp3":"003c711f","ses/36011.mp3":"8fb54489","ses/36013.mp3":"89b0e073","ses/36016.mp3":"742275f6","ses/36020.mp3":"2f2f36fe","ses/36023.mp3":"53ba7de3","ses/36026.mp3":"eef36a47","ses/36028.mp3":"f84feb2d","ses/36031.mp3":"13fe3435","ses/36033.mp3":"484aa7fd","ses/36037.mp3":"48553ad8","ses/36039.mp3":"6d895d25","ses/36041.mp3":"22172501","ses/36045.mp3":"947c738e","ses/36048.mp3":"1e68e692","ses/36051.mp3":"f3c898fa","ses/36053.mp3":"8830f197","ses/36055.mp3":"078cc3c3","ses/36059.mp3":"2badf6f1","ses/36063.mp3":"bf3be1a3","ses/36066.mp3":"60bfb6a7","ses/36069.mp3":"cad6d3e3","ses/36071.mp3":"7ab9a961","ses/36074.mp3":"a7f09e25","ses/36077.mp3":"c264631c","ses/36080.mp3":"c4181779","ses/36082.mp3":"8b7c3002"};/*SURUMLER*/
@@ -292,6 +295,9 @@ const BADGES=[
 ];
 
 BADGES.push(...OYUN_ROZET);
+BADGES.push(["emek7","Yedi ayrı gün ayet tekrarı yaptı",s=>Object.values(s.log||{}).filter(g=>(g.tekrar||0)>0).length>=7],
+ ["emek30","Otuz ayrı gün ayet tekrarı yaptı",s=>Object.values(s.log||{}).filter(g=>(g.tekrar||0)>0).length>=30],
+ ["cicek10","Küçük iyiliklerle bahçesinde on çiçek açtı",s=>(s.cicek||0)>=10]);
 let S={puan:0,dogru:0,ardarda:0,rekor:0,seri:0,sonGun:"",rozet:[],sure:{}};
 let docRef=null,saveTimer=null;
 const LS="fatiha-oyun-v1";
@@ -330,14 +336,44 @@ const arNum=n=>String(n).replace(/\d/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]);
 let sonPuan=S.puan;
 function gunlukIsle(){if(typeof sonPuan==="number"&&S.puan>sonPuan){S.gunluk=S.gunluk||{};const d=today();S.gunluk[d]=(S.gunluk[d]||0)+(S.puan-sonPuan);
   const k=Object.keys(S.gunluk).sort();while(k.length>91)delete S.gunluk[k.shift()];}sonPuan=S.puan;}
+/* Buluta yazma seyrek yapılır: en çok 30 sn'de bir, sayfa gizlenince ya da kapanınca hemen; değişmeyen durum yazılmaz */
+let sonYazilan="";
+function bulutGonder(){clearTimeout(saveTimer);saveTimer=null;if(!docRef)return;const j=JSON.stringify(S);if(j===sonYazilan)return;sonYazilan=j;docRef.set(JSON.parse(j)).catch(()=>{sonYazilan="";});}
 function save(){
   gunlukIsle();
-  try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){}
-  if(docRef){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{docRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{});},700);}
+  try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){if(!save.uyari){save.uyari=1;setTimeout(()=>toast("Bu tarayıcı ilerlemeyi saklayamıyor (gizli pencere olabilir)"),500);}}
+  if(docRef&&!saveTimer)saveTimer=setTimeout(bulutGonder,30000);
 }
-function toast(t){if(!/daha gerekiyor/.test(t))t=String(t).replace(/,?\s*(\d+) (ek )?puan/," · emeğin bahçeni büyüttü (+$1)");const el=$("toast");el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2400);}
-function gun(){const t=today();if(S.sonGun===t)return;const d=new Date();d.setDate(d.getDate()-1);
-  S.seri=(S.sonGun===d.toLocaleDateString("sv-SE"))?S.seri+1:1;S.sonGun=t;}
+/* İki kaydı alan alan birleştirir: hiçbir cihazdaki emek kaybolmaz */
+const BIR_YEREL=new Set(["seviye","hiz","tekrar","hedef","efekt","molaDk","renkModu","basaDon","tumBolum","dtAyar","eylem","eylemSor","gorev","ardarda","oturumDk","gizliT","sonSure","gunDogru"]);
+function birlestir(a,b){
+  if(!b||typeof b!=="object")return a;if(!a||typeof a!=="object")return b;
+  const sonGunA=a.sonGun||"",sonGunB=b.sonGun||"";
+  const bir=(x,y,ust)=>{
+    if(x===undefined)return y;if(y===undefined)return x;
+    if(typeof x==="number"&&typeof y==="number")return Math.max(x,y);
+    if(typeof x==="boolean"&&typeof y==="boolean")return x||y;
+    if(typeof x==="string"&&typeof y==="string")return /^\d{4}-\d\d-\d\d$/.test(x)&&/^\d{4}-\d\d-\d\d$/.test(y)?(x>y?x:y):x;
+    if(Array.isArray(x)&&Array.isArray(y)){if(x.every(v=>typeof v!=="object")&&y.every(v=>typeof v!=="object"))return [...new Set([...x,...y])];return x.length>=y.length?x:y;}
+    if(x&&y&&typeof x==="object"&&typeof y==="object"&&!Array.isArray(x)&&!Array.isArray(y)){
+      if("kutu" in x&&"kutu" in y&&("sonraki" in x||"sonraki" in y)){return (y.kutu>x.kutu||(y.kutu===x.kutu&&(y.sonraki||"")>(x.sonraki||"")))?y:x;}
+      const o={};new Set([...Object.keys(x),...Object.keys(y)]).forEach(k=>{o[k]=(ust&&BIR_YEREL.has(k))?(x[k]!==undefined?x[k]:y[k]):bir(x[k],y[k],false);});return o;}
+    return x;};
+  const o=bir(a,b,true);
+  /* seri ile son gün birlikte gider: hangisi daha yeniyse onunki */
+  if(sonGunB>sonGunA){o.seri=b.seri;o.sonGun=b.sonGun;}else{o.seri=a.seri;o.sonGun=a.sonGun;}
+  return o;}
+function toast(t){if(!/daha gerekiyor/.test(t))t=String(t).replace(/,?\s*(\d+) (ek )?puan/," · emeğin bahçeni büyüttü (+$1)");
+  toast.q=toast.q||[];if(toast.q[toast.q.length-1]===t||(toast.su===t&&!toast.q.length))return;toast.q.push(t);if(toast.q.length>4)toast.q.splice(1,toast.q.length-4);if(!toast.su)toastSonraki();}
+function toastSonraki(){const el=$("toast");const t=toast.q.shift();if(t===undefined){toast.su=null;el.hidden=true;return;}toast.su=t;el.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(toastSonraki,toast.q.length?1700:2400);}
+/* Günlük seri: bir ya da iki gün kaçırılırsa ayda 2 telafi hakkıyla seri korunur (hastalık, yolculuk, bayram) */
+function gun(){const t=today();if(S.sonGun===t)return;
+  const fark=S.sonGun?Math.round((new Date(t+"T12:00")-new Date(S.sonGun+"T12:00"))/864e5):99;
+  const ay=t.slice(0,7);if(!S.telafi||S.telafi.ay!==ay)S.telafi={ay,n:0};const kalan=2-S.telafi.n;
+  if(fark===1)S.seri=S.seri+1;
+  else if(fark>=2&&fark-1<=kalan&&S.seri>0){S.telafi.n+=fark-1;S.seri=S.seri+1;setTimeout(()=>toast(`Serin korundu: ${fark-1} telafi hakkı kullanıldı (bu ay ${2-S.telafi.n} hakkın kaldı)`),800);}
+  else S.seri=1;
+  S.sonGun=t;}
 function checkBadges(){BADGES.forEach(([id,ad,f])=>{if(!S.rozet.includes(id)&&f(S)){S.rozet.push(id);toast("Yeni rozet: "+ad);efekt("yildiz");kutla(true);}});}
 /* Aynı gün çok sayıda doğru cevaptan sonra puan azalır: emek puanı emekten kopmasın */
 function gunlukCarpan(){const t=today();if(!S.gunDogru||S.gunDogru.g!==t)S.gunDogru={g:t,n:0};S.gunDogru.n++;const n=S.gunDogru.n;return n<=60?1:n<=120?0.5:0.2;}
@@ -350,12 +386,16 @@ function giveStar(k){const t=SS(CUR.no);if(!t.yildiz[k]){t.yildiz[k]=true;toast(
   checkBadges();save();renderStats();}}
 function renderStats(){
   $("sPuan").textContent=S.puan;$("sSeri").textContent=S.seri;$("sRekor").textContent=S.rekor;
+  {const rk=$("sRekor").closest(".stat");if(rk)rk.hidden=S.seviye==="kucuk";}
   if(CUR){$("sYildiz").textContent=yildizSay(CUR.no)+"/4";$("sYildizAd").textContent="Bu surede yıldız";}
   else{$("sYildiz").textContent=KATALOG.reduce((a,k)=>a+(k.gruplar?grupYildiz(k):yildizSay(k.no)),0);$("sYildizAd").textContent="Toplam yıldız";}
 }
 
 /* ---------- ses ---------- */
-const ses=new Audio(),ses2=new Audio();ses.preload="auto";ses2.preload="auto";
+/* Sık denetim döngüsü yalnız ses çalarken çalışır; durunca kendini kapatır (pil dostu) */
+const SIK=new Set();let sikT=null;
+function sikCalistir(){if(sikT)return;sikT=setInterval(()=>{let aktif=false;SIK.forEach(f=>{try{if(f())aktif=true;}catch(e){}});if(!aktif){clearInterval(sikT);sikT=null;}},15);}
+const ses=new Audio(),ses2=new Audio();ses.preload="auto";ses2.preload="auto";ses.addEventListener("play",sikCalistir);ses2.addEventListener("play",sikCalistir);
 let sesBitis=null,sesSonra=null,izle=null,ses2Bitis=null,ses2Sonra=null;
 const HIZLAR=[0.5,0.75,1,1.25,1.5];
 function hiz(){return HIZLAR.includes(S.hiz)?S.hiz:1;}
@@ -367,11 +407,12 @@ ses2.addEventListener("timeupdate",()=>{if(ses2Bitis!==null&&ses2.currentTime>=s
 ses.addEventListener("timeupdate",()=>{if(sesBitis!==null&&ses.currentTime>=sesBitis-0.05){const f=sesSonra;sesBitis=null;sesSonra=null;ses.pause();if(f)f();}});
 ses.addEventListener("ended",()=>{const f=sesSonra;sesBitis=null;sesSonra=null;if(f)f();});
 /* sık denetim: timeupdate saniyede yalnız ~4 kez gelir; çalarken her 15 ms'de bir bakılır */
-setInterval(()=>{
+SIK.add(()=>{
   if(!ses.paused){const t=ses.currentTime;if(izle)izle(t);
     if(sesBitis!==null&&t>=sesBitis-0.02){const f=sesSonra;sesBitis=null;sesSonra=null;ses.pause();if(f)f();}}
   if(!ses2.paused&&ses2Bitis!==null&&ses2.currentTime>=ses2Bitis-0.02){const f=ses2Sonra;ses2Bitis=null;ses2Sonra=null;if(f)f();setTimeout(()=>ses2.pause(),40);}
-},15);
+  return !ses.paused||!ses2.paused;
+});
 function calParca(no,bas,son,sonra){
   const src=surumle("ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM);
   sesSonra=sonra||null;sesBitis=son;
@@ -394,7 +435,7 @@ function setTabs(){
   T.innerHTML=`<div class="sira">${CUR.ust?`<button data-v="gruplar" class="geri">← Yâsîn grupları</button>`:""}<button data-v="sureler" class="geri">← Sureler</button>${kucuk()?`<button data-sade="1">Sade görünüm</button>`:""}${one}${GAMES.filter(g=>ust.includes(g[0])&&(g[0]!=="ilkeler"||CUR.ilke)).map(b).join("")}</div>
   <div class="sira">${GAMES.filter(g=>alt.includes(g[0])).map(b).join("")}</div>${CUR.ek?`<div class="sira" aria-label="Kitaptan"><b style="align-self:center;font-size:13px;color:var(--gold)">KİTAPTAN</b>${EK_SEKME.map(b).join("")}</div>`:""}`;
 }
-$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.tum){S.tumBolum=true;save();setTabs();return;}if(b.dataset.sade){S.tumBolum=false;save();setTabs();return;}aracDur();animDur();ezberArac=null;
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;TEKRAR_AKIS=false;if(b.dataset.tum){S.tumBolum=true;save();setTabs();return;}if(b.dataset.sade){S.tumBolum=false;save();setTabs();return;}aracDur();animDur();ezberArac=null;
   if(b.dataset.v==="sureler"){CUR=null;anaSayfa();return;}
   if(b.dataset.v==="gruplar"){CUR=null;grupMenu(YASIN());return;}show(b.dataset.v);});
 async function animHazirla(){if(!CUR||CUR.anim!==undefined)return;const no=CUR.no,a=await animYukle(no);if(!CUR||CUR.no!==no)return;CUR.anim=null;CUR.animEk={};
@@ -408,7 +449,7 @@ function baslik(){
   else{$("baslik").textContent="Sureler Oyun Bahçesi";$("altbaslik").textContent="Fâtiha ve son cüz · oyna, öğren, yıldızları topla";$("baslikAr").textContent="القرآن";}
 }
 let araMetin="";
-function anaSayfa(){yarBirak();
+function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
   CUR=null;baslik();setTabs();renderStats();
   const V=$("view");if(!aktifKisi()){kisiSec();return;}if(!S.seviye){seviyeSor(anaSayfa);return;}
   V.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:6px">${kisiDugme()}</div>${gorevKart()}<div id="eylemKart"></div>${bugunPaneli()}<h2>Bir sure seç</h2><p>Her surede dört yıldız var: okudum, kelimeleri bildim, ayetleri tamamladım, sırayı bildim.</p>
@@ -725,7 +766,7 @@ function ekRozet(){
 function tecvidKelime(ai,wi){
   const k=CUR.tecvid&&CUR.tecvid[ai]&&CUR.tecvid[ai][wi];
   if(!k)return esc(CUR.ayetler[ai].w[wi].a);
-  return k.map(([t,c])=>c?`<span class="tc-${TC[c]||"sessiz"}" data-c="${c}">${t}</span>`:t).join("");
+  return k.map(([t,c])=>c?`<span class="tc-${TC[c]||"sessiz"}" data-c="${c}" tabindex="0" role="button" aria-label="Tecvid kuralı">${t}</span>`:t).join("");
 }
 function tecvidLejant(){
   const K=TKUR.kurallar,var_=new Set();
@@ -778,6 +819,7 @@ function ezber(){
   V.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{const h=E.hikayeler[+b.dataset.h];const an=CUR.animEk&&Object.values(CUR.animEk).find(a=>h.baslik.startsWith(a.baslik));ac2("eh"+b.dataset.h,`${an?`<button class="primary" id="animEz" style="font-size:20px;min-height:56px">🎬 Hikâyeyi canlandır</button>`:""}${h.metin.split("\n").filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join("")}${h.not?`<p style="font-size:14px"><b>Nasıl kullanılır:</b> ${esc(h.not)}</p>`:""}`);const ae=$("animEz");if(ae)ae.onclick=()=>{animAc(an,()=>ezber());window.scrollTo({top:0});};});
   V.querySelectorAll("[data-arac]").forEach(b=>b.onclick=()=>{ezberArac=b.dataset.arac;ezber();window.scrollTo({top:0});});
   const tb=$("tekrarBasla");if(tb)tb.onclick=()=>{ezberAyet=due[0];ezberSeviye=Math.min(4,(D[due[0]].kutu||0)+1);ezber();};
+  if(TEKRAR_AKIS){if(tb)tb.click();else tekrarAkisi(CUR.no);}
 }
 function ezberCalis(i){
   const V=$("view"),E=ezberVeri(),D=ekS("ezberDurum"),a=CUR.ayetler[i],ilk=CUR.ilkAyet||1,AR=E.takvim.araliklar_gun;
@@ -794,7 +836,7 @@ function ezberCalis(i){
   <div class="detay" style="border-color:#2E7D5B"><button id="benOkuB" class="primary" style="background:#2E7D5B;border-color:#2E7D5B;font-size:18px">🎙 Ben okuyayım</button><p id="benOkuD" style="font-size:15px;margin:6px 0 0">Ayeti kendin sesli oku; sonra kendi sesini ve Alafasy'yi art arda dinle.</p></div>
   <div class="odak"><b>Bu ayeti ne kadar hatırladın?</b>
    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="primary" data-d="2">Hatırladım</button><button data-d="1">Zorlandım</button><button data-d="0">Hatırlamadım</button></div></div>`;
-  $("ezGeri").onclick=()=>{ezberAyet=null;durSes();ezber();};$("benOkuB").onclick=()=>benOku(i,$("benOkuB"),$("benOkuD"));
+  $("ezGeri").onclick=()=>{TEKRAR_AKIS=false;ezberAyet=null;durSes();ezber();};$("benOkuB").onclick=()=>benOku(i,$("benOkuB"),$("benOkuD"));
   $("ezDinle").onclick=()=>{const b=CUR.ses.bas,e=i+1<b.length?b[i+1]:CUR.ses.son;hizUygula();calParca(CUR.no,b[i],e);};
   V.querySelectorAll("[data-sv]").forEach(b=>b.onclick=()=>{ezberSeviye=+b.dataset.sv;ezberCalis(i);});
   V.querySelectorAll(".gizli").forEach(b=>b.onclick=()=>{const w=a.w[+b.dataset.j];const s=document.createElement("span");s.className="k"+(+b.dataset.j%12);s.textContent=w.a;b.replaceWith(s);});
@@ -814,6 +856,7 @@ function ezberCalis(i){
       toast(not===2?`Güzel! ${AR[k]} gün sonra yeniden sorulacak`:not===1?"Yarın yine çalışalım; bir basamak geri aldık":"Yarın yeniden sorulacak");}
     const due=CUR.ayetler.map((_,x)=>x).filter(x=>x!==i&&D[x]&&D[x].sonraki<=today());
     if(due.length){ezberAyet=due[0];ezberSeviye=Math.min(4,(D[due[0]].kutu||0)+1);}else ezberAyet=null;
+    if(!due.length&&TEKRAR_AKIS){tekrarAkisi(CUR.no);return;}
     ezber();
   });
 }
@@ -956,6 +999,10 @@ const VARSAYILAN_EZBER={takvim:{aciklama:"Ayetleri aralıklı tekrarla ezberle: 
 function ezberVeri(){return (CUR.ek&&CUR.ek.ezber)||VARSAYILAN_EZBER;}
 function adBul(id){id=+id;if(id>36000){const g=YASIN().gruplar.find(x=>x.id===id);return g?`Yâsîn ${g.bas}-${g.son}`:"Yâsîn";}const k=KATALOG.find(x=>x.no===id);return k?k.ad:String(id);}
 function ilkAyetBul(id){id=+id;if(id>36000){const g=YASIN().gruplar.find(x=>x.id===id);return g?g.bas:1;}return 1;}
+/* Bugünün tekrarı: bütün surelerden günü gelen ayetler tek akışta */
+let TEKRAR_AKIS=false;
+function tekrarAkisi(haric){const L=tumTekrarlar().filter(x=>x.id!==haric);if(!L.length){TEKRAR_AKIS=false;toast("Bugünün bütün tekrarları bitti, maşallah!");kutla(true);anaSayfa();return;}
+  TEKRAR_AKIS=true;ac(L[0].id,"ezber");}
 function tumTekrarlar(){const t=today(),r=[];Object.entries(S.sure).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.sonraki<=t)r.push({id:+id,i:+i});}));return r;}
 function bugunPaneli(){
   const hedef=S.hedef||50,bugun=(S.gunluk||{})[today()]||0,yuzde=Math.min(100,Math.round(bugun/hedef*100));
@@ -969,7 +1016,7 @@ function bugunPaneli(){
   <div class="bar" style="height:14px"><i style="width:${yuzde}%"></i></div>
   <p><b>${bugun} / ${hedef} puan</b>${bugun>=hedef?" · Bugünün hedefi tamam, maşallah!":""} · Günlük seri: <b>${S.seri} gün</b></p>
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:90px" aria-label="Son yedi günün puanları">${gunler.map(x=>`<div style="display:grid;gap:2px;justify-items:center;align-self:end"><b style="font-size:12px">${x.p}</b><span style="display:block;width:70%;height:${Math.max(3,Math.round(x.p/enCok*56))}px;background:${x.p>=hedef?"var(--gold)":"var(--lapis)"};border-radius:4px"></span><b style="font-size:12px">${x.g}</b></div>`).join("")}</div>
-  <p><b>Ezber tekrarları:</b> ${tk.length?Object.entries(gruplu).map(([id,l])=>`<button class="tkr-git" data-id="${id}" style="min-height:36px;padding:4px 10px;margin:2px">${esc(adBul(id))} · ${l.length} ayet</button>`).join(""):"Bugün tekrar edilecek ayet yok."}</p>
+  <p><b>Ezber tekrarları:</b> ${tk.length?`<button class="primary" id="tekrarHepsi" style="min-height:36px;padding:4px 12px;margin:2px">▶ Bugünün tekrarı (${tk.length} ayet)</button> `:""}${tk.length?Object.entries(gruplu).map(([id,l])=>`<button class="tkr-git" data-id="${id}" style="min-height:36px;padding:4px 10px;margin:2px">${esc(adBul(id))} · ${l.length} ayet</button>`).join(""):"Bugün tekrar edilecek ayet yok."}</p>
   ${ezberOzet()}
   <p><b>Yanlışlarım:</b> ${(()=>{const n=Object.keys(S.yanlis||{}).length,b=yanlisSirada().length;return n?`${n} soru, bugün ${b} tanesi sırada ${b?`<button class="primary" id="yanlisOyna" style="min-height:36px;padding:4px 12px">Tekrar et</button>`:""}`:"Oyunlarda yanlış yaptığın sorular burada toplanır; 1, 3 ve 7 gün sonra yeniden sorulur.";})()}</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>Seviye:</b>${Object.entries(SEVIYE).map(([k,v])=>`<button class="svb ${S.seviye===k?"on":""}" data-sv="${k}" style="min-height:36px;padding:4px 10px">${v.ad}</button>`).join("")}<button id="efektAc" style="min-height:36px;padding:4px 10px">${S.efekt===false?"🔈 Oyun sesleri: kapalı":"🔊 Oyun sesleri: açık"}</button></p>
@@ -978,6 +1025,7 @@ function bugunPaneli(){
 function bugunBagla(){
   document.querySelectorAll(".hdf").forEach(b=>b.onclick=()=>{S.hedef=+b.dataset.h;save();anaSayfa();});
   document.querySelectorAll(".tkr-git").forEach(b=>b.onclick=()=>ac(+b.dataset.id,"ezber"));
+  {const th=$("tekrarHepsi");if(th)th.onclick=()=>tekrarAkisi();}
   const d=$("defterOyna");if(d)d.onclick=()=>kelimeDefteri();
   const y=$("yanlisOyna");if(y)y.onclick=()=>yanlisCalis();
   document.querySelectorAll(".svb").forEach(b=>b.onclick=()=>{S.seviye=b.dataset.sv;save();anaSayfa();});
@@ -1073,7 +1121,7 @@ function iGun(el){
   const L=CUR.ilke,T=ekS("ilke");T.gun=T.gun||{};const bugun=today();
   const x=L.ilkeler[gunSirasi()%L.ilkeler.length];const kayit=T.gun[bugun];
   const son7=[...Array(7)].map((_,k)=>{const d=new Date();d.setDate(d.getDate()-6+k);const key=d.toLocaleDateString("sv-SE");return {g:d.toLocaleDateString("tr-TR",{weekday:"short",day:"numeric"}),r:T.gun[key]};});
-  const D={2:["Uyguladım","var(--ok)","✓"],1:["Kısmen","var(--gold)","½"],0:["Uygulayamadım","var(--bad)","✗"]};
+  const D={2:["Uyguladım","var(--ok)","✓"],1:["Kısmen","var(--gold)","½"],0:["Yarın yeniden","var(--lapis)","🌱"]};
   el.innerHTML=`<div class="odak"><p style="font-size:14px"><b>Günün ilkesi</b></p><p style="font-size:21px;font-weight:800">${esc(x.ad)}</p><p>${esc(x.tanim)}</p>${x.ayetler.length?`<p style="font-size:14px">${x.ayetler.join(", ")}. ayet</p>`:""}</div>
   <p><b>Akşam: Bugün bu ilkeyi ne kadar uyguladın?</b></p>
   <div style="display:flex;gap:8px;flex-wrap:wrap">${[2,1,0].map(d=>`<button data-d="${d}" class="${kayit&&kayit.d===d?"on":""}">${D[d][0]}</button>`).join("")}</div>
@@ -1081,7 +1129,7 @@ function iGun(el){
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">${son7.map(g=>`<div style="border:2px solid ${g.r?D[g.r.d][1]:"var(--line)"};border-radius:10px;padding:6px 2px;text-align:center"><b style="font-size:12px">${g.g}</b><br><b style="font-size:20px;color:${g.r?D[g.r.d][1]:"var(--line)"}">${g.r?D[g.r.d][2]:"·"}</b></div>`).join("")}</div>
   ${L.dongu&&L.dongu.adimlar&&L.dongu.adimlar.length?`<h3 style="margin:0">Günlük tekrar ve geri bildirim döngüsü</h3><p>${esc(L.dongu.aciklama)}</p>
   <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">${L.dongu.adimlar.map((a,i)=>`${i?'<b style="color:var(--gold)">→</b>':""}<span style="border:2px solid var(--lapis);border-radius:10px;padding:6px 10px"><b>${esc(a.ad)}</b><br><span style="font-size:13px;font-weight:700">${esc(a.metin)}</span></span>`).join("")}</div>`:""}`;
-  el.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const d=+b.dataset.d,yeni=!T.gun[bugun];T.gun[bugun]={no:x.no,d};gun();if(yeni&&d>0){S.puan+=d===2?10:5;toast(d===2?"Maşallah, 10 puan":"5 puan; yarın daha iyisi");}checkBadges();save();renderStats();iGun(el);});
+  el.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{const d=+b.dataset.d,yeni=!T.gun[bugun];T.gun[bugun]={no:x.no,d};gun();if(yeni&&d>0){S.puan+=d===2?10:5;toast(d===2?"Maşallah, 10 puan":"5 puan; yarın daha iyisi");}else if(d===0)toast("Olsun, yarın yeniden deneriz 🌱");checkBadges();save();renderStats();iGun(el);});
 }
 function iTasi(el){
   const L=CUR.ilke,T=ekS("ilke");T.tasima=T.tasima||{};
@@ -1436,7 +1484,7 @@ function animKonus(metin,bitti){
     u.onend=()=>bitti&&bitti();u.onerror=()=>bitti&&bitti();speechSynthesis.speak(u);}catch(e){bitti&&bitti();}
 }
 function animAc(A,geri){sayacIsle("hikaye");
-  animDurum={A,i:0,oto:false,sesli:!!A.ses,zaman:null,ses:new Audio(),sa:new Audio(),geri:geri||cocuk};animDurum.ses.preload="metadata";animDurum.sa.preload="metadata";
+  animDurum={A,i:0,oto:false,sesli:!!A.ses,zaman:null,ses:new Audio(),sa:new Audio(),geri:geri||cocuk};animDurum.ses.preload="metadata";animDurum.sa.preload="metadata";animDurum.ses.addEventListener("play",sikCalistir);animDurum.sa.addEventListener("play",sikCalistir);
   const V=$("view");
   V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="anGeri">← ${geri?"Geri":"Çocuklar için"}</button></div>
   <h2 style="font-size:24px">${esc(A.kisa||A.baslik)}${A.alt?` <span style="font-size:17px">(${esc(A.alt)})</span>`:""}</h2>
@@ -1471,9 +1519,9 @@ function animKlipBasla(){const D=animDurum;if(!D||!D.kl)return;const k=D.kl[D.ki
   if(a.readyState>=1)bas();else{a.addEventListener("loadedmetadata",bas,{once:true});a.load();}
   a.onerror=()=>animKlipAtla();}
 function animKlipAtla(){const D=animDurum;if(!D||!D.kl)return;const k=D.kl[D.ki];try{D.kAud.pause();}catch(e){}D.kBas+=k.e-k.b;D.ki++;animKlipBasla();}
-setInterval(()=>{const D=animDurum;if(!D||!D.kl||!D.klCal)return;const k=D.kl[D.ki],a=D.kAud;if(!k||!a||a.paused)return;const t=a.currentTime;
+SIK.add(()=>{const D=animDurum;if(!D||!D.kl||!D.klCal)return false;const k=D.kl[D.ki],a=D.kAud;if(!k||!a||a.paused)return true;const t=a.currentTime;
   if(k.f)a.volume=Math.max(0,Math.min(1,(t-k.b)/0.06,(k.e-t)/0.06));
-  if(t>=k.e-0.02)animKlipAtla();},15);
+  if(t>=k.e-0.02)animKlipAtla();return true;});
 function animIzlendi(i){const D=animDurum;if(!D)return;D.izlenen=D.izlenen||new Set();D.izlenen.add(i);const A=D.A,n=A.sahneler.length;
   if(i===n-1&&D.izlenen.size>=Math.ceil(n*0.7)){const key=(A.no||"")+"|"+A.baslik;S.hikIzle=S.hikIzle||{};if(!S.hikIzle[key]){S.hikIzle[key]=today();gun();S.puan+=15;gorevIsle("hikaye");logIsle("hikaye");efekt("gorev");kutla(true);toast("Hikâyeyi izledin, 15 puan");checkBadges();save();renderStats();}}}
 function animSesCal(i,bitti){const D=animDurum;if(!D.A.ses){animKonus(D.A.sahneler[i].metin,bitti);return;}
@@ -1517,8 +1565,8 @@ function animGit(i,devam){
 
 async function animYukle(no){const E=await ekParca(no,"a");return E._anim||null;}
 /* ========== KÜÇÜKLER: kelime sesi, sesli sorular, sade yol ========== */
-const KEL=new Audio();KEL.preload="metadata";let kelBit=null;
-setInterval(()=>{if(kelBit!==null&&!KEL.paused&&KEL.currentTime>=kelBit-0.02){KEL.pause();kelBit=null;}},15);
+const KEL=new Audio();KEL.preload="metadata";let kelBit=null;KEL.addEventListener("play",sikCalistir);
+SIK.add(()=>{if(kelBit!==null&&!KEL.paused&&KEL.currentTime>=kelBit-0.02){KEL.pause();kelBit=null;}return kelBit!==null&&!KEL.paused;});
 function kelimeSes(w){if(!w||!w.k)return false;const [g,b,e]=w.k,src=surumle(`kelime/k${g}.mp3?v=${SURUM}`);
   try{speechSynthesis.cancel();}catch(x){}
   const go=()=>{try{KEL.currentTime=b;}catch(x){}kelBit=e;KEL.play().catch(()=>{});};
@@ -1555,10 +1603,11 @@ setInterval(()=>{if(document.hidden||Date.now()-sonDokunus>60000||!PROF.aktif)re
   const m=molaDk();if(m&&S.oturumDk>=m+molaSonra&&!document.querySelector(".mola"))molaGoster();},15000);
 function molaGoster(){const p=aktifKisi();const d=document.createElement("div");d.className="mola";d.setAttribute("role","dialog");d.setAttribute("aria-label","Mola zamanı");
   d.innerHTML=`<div class="mola-kutu pop"><div style="font-size:54px">🌿</div><h2>${p&&p.ad?esc(p.ad)+", b":"B"}ugün çok güzel çalıştın!</h2><p style="font-size:19px">Şimdi biraz mola verelim. Öğrendiğin ayeti annene ya da babana okur musun?</p>
-  <div style="display:grid;gap:8px"><button class="primary" id="molaTamam" style="font-size:20px;min-height:56px">Mola veriyorum</button><button id="molaBes">5 dakika daha</button></div></div>`;
+  <div style="display:grid;gap:8px"><button class="primary" id="molaTamam" style="font-size:20px;min-height:56px">Mola veriyorum</button>${molaSonra>0?`<p style="font-size:15px">Bir kez uzattık. Daha fazla süre için annen ya da baban <b>Ebeveyn özeti</b>nden mola ayarını değiştirebilir.</p>`:`<button id="molaBes">5 dakika daha</button>`}</div></div>`;
   document.body.appendChild(d);efekt("gorev");
   $("molaTamam").onclick=()=>{S.oturumDk=0;molaSonra=0;save();d.remove();durSes();animDur&&animDur();anaSayfa();};
-  $("molaBes").onclick=()=>{molaSonra+=5;d.remove();};}
+  const mb=$("molaBes");if(mb)mb.onclick=()=>{molaSonra+=5;d.remove();};
+  d.setAttribute("aria-modal","true");setTimeout(()=>{const t=$("molaTamam");if(t)t.focus();},50);}
 document.addEventListener("visibilitychange",()=>{if(document.hidden){S.gizliT=Date.now();save();}else if(S.gizliT&&Date.now()-S.gizliT>15*60000){S.oturumDk=0;molaSonra=0;}});
 
 /* aile etkinliği kartı */
@@ -1637,16 +1686,16 @@ function kisiSec(){CUR=null;baslik();setTabs();const V=$("view");$("baslik").tex
   V.querySelectorAll("[data-sil]").forEach(b=>b.onclick=()=>{const p=PROF.liste.find(x=>x.id===b.dataset.sil);if(!confirmSil(p))return;PROF.liste=PROF.liste.filter(x=>x.id!==p.id);if(PROF.aktif===p.id)PROF.aktif=null;profKaydet();kisiSec();});
   window.scrollTo({top:0});}
 function confirmSil(p){const b=document.querySelector(`[data-sil="${p.id}"]`);if(b.dataset.onay)return true;b.dataset.onay="1";b.textContent="Emin misin? Bir daha bas";return false;}
-async function kisiGec(id,yeni){if(PROF.aktif&&PROF.aktif!==id)save();PROF.aktif=id;profKaydet();profYukle(id);const p=aktifKisi();if(p&&p.yas)S.seviye=yasSeviye(p.yas);sonPuan=S.puan;
-  if(DB&&UID){docRef=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await docRef.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem&&rem.puan>=S.puan){S=rem;if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;}catch(e){}}
+async function kisiGec(id,yeni){if(PROF.aktif&&PROF.aktif!==id){save();bulutGonder();}PROF.aktif=id;profKaydet();profYukle(id);const p=aktifKisi();if(p&&p.yas)S.seviye=yasSeviye(p.yas);sonPuan=S.puan;
+  if(DB&&UID){docRef=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await docRef.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;}catch(e){}}
   save();toast(yeni?`Hoş geldin ${p.ad}!`:`${p.ad||"Kişi"} seçildi`);anaSayfa();}
 function kisiDugme(){const p=aktifKisi();return p?`<button id="kisiDeg" style="min-height:40px">👤 ${esc(p.ad||"Adsız")}${p.yas?" · "+p.yas:""} · Değiştir</button>`:"";}
 /* ========== OYUN EKLERİ: ses efektleri, kutlama, günün görevi, seviye, bahçe, yanlışlar defteri ========== */
 let EFX=null;
 function efekt(tur){if(S.efekt===false)return;try{EFX=EFX||new (window.AudioContext||window.webkitAudioContext)();const c=EFX;if(c.state==="suspended")c.resume();
-  const N={dogru:[[660,0,.09],[880,.09,.14]],yanlis:[[220,0,.22]],seri:[[523,0,.08],[659,.08,.08],[784,.16,.08],[1047,.24,.18]],yildiz:[[784,0,.1],[988,.1,.1],[1175,.2,.1],[1568,.3,.3]],gorev:[[523,0,.12],[784,.12,.12],[1047,.24,.3]],satin:[[880,0,.06],[1320,.07,.12]]}[tur]||[];
-  N.forEach(([f,t,d])=>{const o=c.createOscillator(),g=c.createGain();o.type=tur==="yanlis"?"triangle":"sine";o.frequency.value=f;const s=c.currentTime+t;
-    g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(tur==="yanlis"?0.18:0.22,s+0.015);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.connect(g).connect(c.destination);o.start(s);o.stop(s+d+0.02);});}catch(e){}}
+  const N={dogru:[[660,0,.09],[880,.09,.14]],yanlis:S.seviye==="kucuk"?[[392,0,.12],[330,.1,.14]]:[[220,0,.22]],seri:[[523,0,.08],[659,.08,.08],[784,.16,.08],[1047,.24,.18]],yildiz:[[784,0,.1],[988,.1,.1],[1175,.2,.1],[1568,.3,.3]],gorev:[[523,0,.12],[784,.12,.12],[1047,.24,.3]],satin:[[880,0,.06],[1320,.07,.12]]}[tur]||[];
+  N.forEach(([f,t,d])=>{const o=c.createOscillator(),g=c.createGain();o.type=tur==="yanlis"&&S.seviye!=="kucuk"?"triangle":"sine";o.frequency.value=f;const s=c.currentTime+t;
+    g.gain.setValueAtTime(0.0001,s);g.gain.exponentialRampToValueAtTime(tur==="yanlis"?(S.seviye==="kucuk"?0.08:0.18):0.22,s+0.015);g.gain.exponentialRampToValueAtTime(0.0001,s+d);o.connect(g).connect(c.destination);o.start(s);o.stop(s+d+0.02);});}catch(e){}}
 function kutla(az){if(S.efekt===false)return;if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;const k=document.createElement("div");k.className="kutla";k.setAttribute("aria-hidden","true");
   const R=["#E4572E","#F7C548","#2E7D5B","#3B6EA8","#8E44AD","#F28AB2"];
   k.innerHTML=[...Array(az?18:44)].map((_,i)=>`<i style="left:${Math.random()*100}%;background:${R[i%R.length]};animation-delay:${(Math.random()*.4).toFixed(2)}s;animation-duration:${(1.6+Math.random()*1.2).toFixed(2)}s;transform:rotate(${Math.random()*360}deg)">${i%5===0?"★":""}</i>`).join("");
@@ -1744,7 +1793,7 @@ function yarBirak(){const Y=YAR;if(!Y)return;YAR=null;try{if(Y.host){clearInterv
 window.addEventListener("pagehide",()=>yarBirak());
 function yarSkor(){return Object.entries(YAR.puan).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<li><b>${esc(YAR.ad[p]||"Oyuncu")}</b> · ${Number(n)||0} puan</li>`).join("")||"<li>Henüz katılan yok</li>";}
 async function yarAc(){const V=$("view"),oda=await odaAl();
-  if(!oda){V.innerHTML=`<p>Canlı yarışma bu görünümde açılamıyor. Sayfayı claude.ai üzerinden açman gerekir.</p><button class="geri" id="yG">← Geri</button>`;$("yG").onclick=()=>show("harita");return;}
+  if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">← Geri</button>`;$("yG").onclick=()=>show("harita");return;}
   const kod=String(Math.floor(100000+Math.random()*900000));let R;try{R=await oda.join("yaris-"+kod);}catch(e){toast("Oda açılamadı");return;}
   YAR={kod,R,host:true,Q:yarSorular(),i:-1,durum:"bekle",puan:{},ad:{},cevap:{},sure:CUR.ad};
   R.onPeers(()=>{R.peers().forEach(p=>{if(p.isMe)return;const pr=p.presence||{};if(pr.ad){YAR.ad[p.peer]=pr.ad;if(YAR.puan[p.peer]===undefined)YAR.puan[p.peer]=0;}
@@ -1766,7 +1815,7 @@ function yarCiz(){const Y=YAR,V=$("view");if(!Y||!Y.host)return;const q=Y.Q[Y.i]
   const g=$("yGoster");if(g)g.onclick=()=>{Y.durum="sonuc";Object.entries(Y.cevap).forEach(([p,j])=>{if(q.opts[j]===q.dogru)Y.puan[p]=(Y.puan[p]||0)+10;});yarYay();yarCiz();efekt("dogru");};
   const s=$("ySonraki");if(s)s.onclick=()=>{if(Y.i+1<Y.Q.length){Y.i++;Y.durum="soru";Y.cevap={};}else{Y.durum="bitti";kutla();efekt("gorev");}yarYay();yarCiz();};}
 async function yarKatil(){const V=$("view");CUR=null;baslik();setTabs();$("baslik").textContent="Aile yarışması";
-  const oda=await odaAl();if(!oda){V.innerHTML=`<p>Canlı yarışma bu görünümde açılamıyor. Sayfayı claude.ai üzerinden açman gerekir.</p><button class="geri" id="yG">← Sureler</button>`;$("yG").onclick=()=>anaSayfa();return;}
+  const oda=await odaAl();if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">← Sureler</button>`;$("yG").onclick=()=>anaSayfa();return;}
   let ad="";try{ad=localStorage.getItem("yaris-ad")||"";}catch(e){}
   V.innerHTML=`<button class="geri" id="yG">← Sureler</button><h2>👪 Aile yarışmasına katıl</h2>
   <p><label><b>Adın</b><br><input id="yAd" class="ara" value="${esc(ad)}" maxlength="20" placeholder="Adını yaz"></label></p>
@@ -1790,41 +1839,55 @@ function yarOyuncuCiz(d){const Y=YAR,E=$("yEkran");if(!E||!d||typeof d!=="object
   if(d.durum==="sonuc"){const j=Y.secim[d.i],ok=j!==undefined&&d.opts[j]===d.dogru;efekt(ok?"dogru":"yanlis");if(ok)gorevIsle("soru");
     E.innerHTML=`${sh}<div class="opts ${ar?"ar-opts":""}">${d.opts.map((o,k)=>`<button disabled ${ar?'lang="ar"':""} class="${o===d.dogru?"ok":k===j?"bad":""}">${esc(o)}</button>`).join("")}</div><p class="feedback ${ok?"ok":"bad"}"><b>${ok?"Doğru! +10":j===undefined?"Cevap vermedin":"Doğrusu: "+esc(String(d.dogru||""))}</b></p>${tablo}`;}}
 
-/* --- ortak hedef --- */
-async function hedefOku(){if(!DB)return [];try{const s=await DB.collection("hedef").get();return s.docs.map(d=>({id:d.id,...d.data()}));}catch(e){return [];}}
-async function hedefKatkilar(){if(!DB)return [];try{const s=await DB.collection("hedefk").get();return s.docs.map(d=>d.data());}catch(e){return [];}}
-let hedefYazT=null;
-function hedefIsle(tur){const H=S.hedefler||{};let deg=false;Object.entries(H).forEach(([kod,h])=>{if(h.tur===tur){h.n=(h.n||0)+1;deg=true;}});
-  if(deg&&DB&&UID){clearTimeout(hedefYazT);hedefYazT=setTimeout(()=>{const v={};Object.entries(S.hedefler).forEach(([k,h])=>v[k]={n:h.n||0,ad:h.benimAd||""});DB.collection("hedefk").doc(UID).set({k:v}).catch(()=>{});},1500);}}
+/* --- ortak hedef ---
+   Her hedef tek belgedir: hedef/{kod} = {ad, hedef, tur, t, u_<kişi>: katkı}. Sayfa yalnız katıldığın hedeflerin belgelerini okur
+   (bütün koleksiyonu taramaz); her kişi yalnız kendi u_ alanını günceller. */
+const hSayi=v=>{v=Math.floor(Number(v));return isFinite(v)&&v>0?Math.min(v,100000):0;};
+async function hedefGetir(kod){if(!DB)return null;try{const s=await DB.collection("hedef").doc(kod).get();return s&&s.exists?{id:kod,...s.data()}:null;}catch(e){return null;}}
+function hedefToplam(h){let t=0,k=0;Object.keys(h||{}).forEach(x=>{if(x.startsWith("u_")){const n=hSayi(h[x]);t+=n;if(n>0||x==="u_"+UID)k++;}});return {t,k};}
+let hedefYazT=null,hedefDegisen=new Set();
+function hedefIsle(tur){const H=S.hedefler||{};Object.entries(H).forEach(([kod,h])=>{if(h.tur===tur){h.n=(h.n||0)+1;hedefDegisen.add(kod);}});
+  if(hedefDegisen.size&&DB&&UID&&!hedefYazT)hedefYazT=setTimeout(hedefGonder,20000);}
+function hedefGonder(){clearTimeout(hedefYazT);hedefYazT=null;if(!DB||!UID)return;const H=S.hedefler||{};
+  [...hedefDegisen].forEach(kod=>{const n=hSayi((H[kod]||{}).n),ref=DB.collection("hedef").doc(kod);if(typeof ref.update==="function")ref.update({["u_"+UID]:n}).catch(()=>{});});hedefDegisen.clear();}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&hedefDegisen.size)hedefGonder();});
+window.addEventListener("pagehide",()=>{if(hedefDegisen.size)hedefGonder();});
 async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent="Ortak hedef";$("altbaslik").textContent="Aile ya da sınıfça birlikte ulaşılan hedef";
   const V=$("view");V.innerHTML=`<p class="yukleniyor">Yükleniyor…</p>`;
-  if(!DB){V.innerHTML=`<button class="geri" id="hG">← Sureler</button><p>Ortak hedef için sayfanın claude.ai üzerinden açılması gerekir.</p>`;$("hG").onclick=()=>anaSayfa();return;}
-  const yaz=USR_YAZ;
-  const [L,K]=await Promise.all([hedefOku(),hedefKatkilar()]);const H=S.hedefler||{};
-  const sayi=v=>{v=Math.floor(Number(v));return isFinite(v)&&v>0?Math.min(v,100000):0;};
-  const top=kod=>K.reduce((a,x)=>a+sayi(((x.k||{})[kod]||{}).n),0),kisi=kod=>K.filter(x=>(x.k||{})[kod]).length;
-  const benim=L.filter(h=>H[h.id]);
+  if(!DB){V.innerHTML=`<button class="geri" id="hG">← Sureler</button><p>Ortak hedef için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p>`;$("hG").onclick=()=>anaSayfa();return;}
+  const yaz=USR_YAZ;const H=S.hedefler||{};
+  if(!hedefSayfa.ilk){hedefSayfa.ilk=1;Object.keys(H).forEach(k=>hedefDegisen.add(k));}  /* eski sürümden kalan katkıları bir kez taşı */
+  if(hedefDegisen.size)hedefGonder();
+  const L=(await Promise.all(Object.keys(H).map(hedefGetir))).filter(Boolean);
   V.innerHTML=`<button class="geri" id="hG">← Sureler</button><h2>🤝 Ortak hedef</h2>
   <p>Aile ya da sınıf birlikte bir hedef koyar: örneğin "Bu hafta hep birlikte 100 ayet tekrarı". Herkesin katkısı toplanır; sıralama yoktur, hedefe birlikte ulaşılır.</p>
   ${yaz===false?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
-  ${benim.map(h=>{const hd=Math.max(1,sayi(h.hedef)),t=top(h.id),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${kisi(h.id)} kişi katıldı · Benim katkım: <b>${sayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
-  <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="6" placeholder="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
+  ${L.map(h=>{const hd=Math.max(1,hSayi(h.hedef)),{t,k}=hedefToplam(h),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${k} kişi katıldı · Benim katkım: <b>${hSayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
+  <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
   <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)"></p>
   <p style="display:flex;gap:8px;flex-wrap:wrap"><select id="hTur" style="min-height:44px;font-size:17px"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
   $("hG").onclick=()=>anaSayfa();
-  $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();const h=L.find(x=>x.id===k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
-    S.hedefler=S.hedefler||{};S.hedefler[k]=S.hedefler[k]||{tur:h.tur,n:0};save();hedefIsle("-");toast("Hedefe katıldın");hedefSayfa();};
-  $("hKoy").onclick=async()=>{const ad=$("hAd").value.trim(),n=Math.max(10,Math.min(10000,+$("hSay").value||100)),tur=$("hTur").value;if(!ad){toast("Hedefe bir ad ver");return;}
-    const kod=Math.random().toString(36).slice(2,8).toUpperCase();
+  $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();if(!/^[A-Z0-9]{4,8}$/.test(k)){toast("Hedef kodunu denetle");return;}const h=await hedefGetir(k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
+    S.hedefler=S.hedefler||{};S.hedefler[k]=S.hedefler[k]||{tur:h.tur,n:0};save();hedefDegisen.add(k);hedefGonder();toast("Hedefe katıldın");hedefSayfa();};
+  $("hKoy").onclick=async()=>{const ad=$("hAd").value.trim(),n=Math.max(10,Math.min(10000,Math.round(+$("hSay").value)||100)),tur=$("hTur").value;if(!ad){toast("Hedefe bir ad ver");return;}
+    const kod=Math.random().toString(36).slice(2,8).toUpperCase().replace(/[^A-Z0-9]/g,"X").padEnd(6,"X");
     try{await DB.collection("hedef").doc(kod).set({ad,hedef:n,tur,t:today()});}catch(e){toast("Hedef kaydedilemedi: bu sayfada yazma iznin yok");return;}
-    S.hedefler=S.hedefler||{};S.hedefler[kod]={tur,n:0};save();toast("Hedef kondu. Kodu ailene ya da sınıfına ver: "+kod);hedefSayfa();};}
+    S.hedefler=S.hedefler||{};S.hedefler[kod]={tur,n:0};save();hedefDegisen.add(kod);hedefGonder();toast("Hedef kondu. Kodu ailene ya da sınıfına ver: "+kod);hedefSayfa();};}
 
 /* --- kullanım sayacı (adsız: yalnız bölüm adı ve sayı) --- */
 let sayacT=null;
 function sayacIsle(bolum){const t=today();S.kullanim=S.kullanim||{};const g=S.kullanim[t]=S.kullanim[t]||{};g[bolum]=(g[bolum]||0)+1;
   const ks=Object.keys(S.kullanim).sort();while(ks.length>91)delete S.kullanim[ks.shift()];
-  if(DB&&UID){clearTimeout(sayacT);sayacT=setTimeout(()=>{DB.collection("kullanim").doc(UID).set({g:S.kullanim,s:S.seviye||""}).catch(()=>{});},4000);}}
+  if(DB&&UID&&!sayacT)sayacT=setTimeout(sayacGonder,600000);}
+function sayacGonder(){clearTimeout(sayacT);sayacT=null;if(!DB||!UID||!S.kullanim)return;const j=JSON.stringify(S.kullanim);if(j===sayacGonder.son)return;sayacGonder.son=j;DB.collection("kullanim").doc(UID).set({g:S.kullanim,s:S.seviye||""}).catch(()=>{sayacGonder.son="";});}
+/* sayfa gizlenince ya da kapanınca bekleyen bulut yazmalarını hemen gönder */
+document.addEventListener("visibilitychange",()=>{if(document.hidden){bulutGonder();sayacGonder();}});
+window.addEventListener("pagehide",()=>{bulutGonder();sayacGonder();});
 
+/* ---------- erişilebilirlik: yeni ekranın başlığına odak, klavyeyle tecvid ---------- */
+{let sonBaslik="";new MutationObserver(()=>{const h=$("view").querySelector("h2");if(!h)return;const t=h.textContent;if(t===sonBaslik)return;sonBaslik=t;
+  if(document.activeElement&&document.activeElement.closest&&document.activeElement.closest("input,textarea,select"))return;h.tabIndex=-1;try{h.focus({preventScroll:true});}catch(e){}}).observe($("view"),{childList:true});}
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target&&e.target.matches&&e.target.matches(".kelimeler [data-c][role=button]")){e.preventDefault();e.target.click();}});
 /* ---------- başlangıç ---------- */
 anaSayfa();
 fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch(()=>{});
@@ -1842,9 +1905,9 @@ fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch((
     const snap=await docRef.get();
     const raw=snap&&snap.exists?snap.data():null;
     const remote=raw?normalize(JSON.parse(JSON.stringify(raw))):null;
-    if(remote&&remote.puan>=S.puan){S=remote;try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){}}
+    if(remote){S=normalize(birlestir(S,remote));try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){}}
     sonPuan=S.puan;
-    docRef.set(JSON.parse(JSON.stringify(S))).catch(()=>{});
+    bulutGonder();
     $("sync").textContent="İlerleme hesabına kaydediliyor; telefonda ve bilgisayarda aynı kalır";
     renderStats();if(!CUR)anaSayfa();else if(cur==="harita")harita();
   }catch(e){}

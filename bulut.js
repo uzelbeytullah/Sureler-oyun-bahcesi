@@ -7,12 +7,25 @@
   "use strict";
   if (window.claude && window.claude.use) return;          // Claude içindeyiz
   var AYAR = window.BULUT_AYAR;
-  if (!AYAR || !AYAR.apiKey || !AYAR.projectId || !window.firebase) return;
+  if (!AYAR || !AYAR.apiKey || !AYAR.projectId) return;
+
+  /* Firebase yalnız bulut ilk kez gerekince yüklenir; sayfanın ilk açılışını bekletmez */
+  var SDK = "https://www.gstatic.com/firebasejs/10.12.2/firebase-";
+  function yukle(ad) {
+    return new Promise(function (ok, hata) {
+      var e = document.createElement("script"); e.src = SDK + ad + "-compat.js"; e.async = false;
+      e.onload = ok; e.onerror = hata; document.head.appendChild(e);
+    });
+  }
+  function sdkHazir() {
+    if (window.firebase && window.firebase.firestore && window.firebase.auth) return Promise.resolve();
+    return yukle("app").then(function () { return Promise.all([yukle("auth"), yukle("firestore")]); });
+  }
 
   var app, fs, hazir = null;
   function baslat() {
     if (hazir) return hazir;
-    hazir = new Promise(function (ok, hata) {
+    hazir = sdkHazir().then(function () { return new Promise(function (ok, hata) {
       try {
         app = firebase.initializeApp(AYAR);
         fs = firebase.firestore();
@@ -20,7 +33,7 @@
         auth.onAuthStateChanged(function (u) { if (u) ok(u); });
         auth.signInAnonymously().catch(hata);
       } catch (e) { hata(e); }
-    });
+    }); });
     return hazir;
   }
   /* Firestore iç içe listeleri ([[a,b],[c,d]]) kabul etmez: içteki listeleri {__d:[...]} ile sarıp geri açıyoruz */
@@ -49,7 +62,8 @@
           return { id: s.id, exists: s.exists, data: function () { return ac(s.data() || {}); } };
         });
       },
-      set: function (v) { return ref.set(temiz(v)); }
+      set: function (v) { return ref.set(temiz(v)); },
+      update: function (v) { return ref.update(temiz(v)); }
     };
   }
   function koleksiyon(yol) {

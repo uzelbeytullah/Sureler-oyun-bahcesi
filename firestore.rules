@@ -15,19 +15,19 @@ service cloud.firestore {
 
     // Ortak hedefler: herkes gorur, herkes yeni hedef koyabilir; konan hedef degistirilemez
     match /hedef/{kod} {
-      allow read: if girisli();
+      allow get: if girisli();
       allow create: if girisli() && kod.matches('[A-Z0-9]{4,8}')
                     && yeni().keys().hasOnly(['ad', 'hedef', 'tur', 't'])
                     && yeni().ad is string && yeni().ad.size() > 0 && yeni().ad.size() <= 40
                     && yeni().hedef is int && yeni().hedef >= 10 && yeni().hedef <= 10000
                     && yeni().tur in ['tekrar', 'soru']
                     && yeni().t is string && yeni().t.size() <= 10;
-    }
-
-    // Hedef katkilari: herkes gorur, herkes yalniz kendi katkisini yazar
-    match /hedefk/{uid} {
-      allow read: if girisli();
-      allow write: if ben(uid) && yeni().keys().hasOnly(['k']) && yeni().k is map && yeni().k.size() <= 30;
+      // Katki: herkes yalniz kendi u_<kimlik> alanini (0-100000 arasi tam sayi) degistirebilir; liste okunamaz
+      allow update: if girisli()
+                    && yeni().diff(resource.data).affectedKeys().hasOnly(['u_' + request.auth.uid])
+                    && yeni()['u_' + request.auth.uid] is int
+                    && yeni()['u_' + request.auth.uid] >= 0 && yeni()['u_' + request.auth.uid] <= 100000
+                    && resource.data.keys().size() < 500;
     }
 
     // Kullanim sayaci: herkes yalniz kendininkini yazar; okumak yalniz konsoldan
