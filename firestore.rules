@@ -1,0 +1,41 @@
+rules_version = '2';
+// Sureler Oyun Bahçesi · Firestore güvenlik kuralları
+// Firebase konsolu > Firestore Database > Rules sekmesine olduğu gibi yapıştırın.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function girisli() { return request.auth != null; }
+    function ben(uid) { return girisli() && request.auth.uid == uid; }
+
+    // Kişisel ilerleme ve profiller: yalnız sahibi okur/yazar
+    match /data/users/{uid}/{belge} {
+      allow read, write: if ben(uid);
+    }
+
+    // Ortak hedefler: herkes görür, herkes yeni hedef koyabilir; koyulan hedef değiştirilemez/silinemez
+    match /hedef/{kod} {
+      allow read: if girisli();
+      allow create: if girisli() && request.resource.data.keys().hasOnly(['ad', 'hedef', 'tur', 't'])
+                    && request.resource.data.hedef is int && request.resource.data.hedef <= 10000;
+    }
+
+    // Hedef katkıları: herkes görür, herkes yalnız kendi katkısını yazar
+    match /hedefk/{uid} {
+      allow read: if girisli();
+      allow write: if ben(uid);
+    }
+
+    // Kullanım sayacı: herkes yalnız kendininkini yazar; okumak yalnız Firebase konsolundan
+    match /kullanim/{uid} {
+      allow write: if ben(uid);
+    }
+
+    // Aile yarışması canlı odaları
+    match /odalar/{oda}/esler/{uid} {
+      allow read: if girisli();
+      allow write: if ben(uid);
+    }
+    match /odalar/{oda}/olaylar/{olay} {
+      allow read, write: if girisli();
+    }
+  }
+}
