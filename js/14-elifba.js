@@ -52,7 +52,9 @@ function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="
     build:h=>({html:`<p style="font-size:20px;font-weight:800">Bu harfin adı ne?</p><div class="qbig ar" lang="ar" style="font-size:80px">${h[0]}</div>`,answer:h[1],opts:secenek(h[1],adlar),tek:false,buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
   if(elifAlt==="bul"){quiz({title:"Harfi bul",items:sec(10),geri,bitince:bitti,
     build:h=>({html:`<p style="font-size:20px;font-weight:800">Hangisi <b>${h[1]}</b>?</p>${harfSesHtml(h)}`,answer:h[0],opts:secenek(h[0],harf),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
-  if(elifAlt==="sekil"){const items=sec(10).map(h=>({h,y:["bas","orta","son"].filter(y=>harfSekil(h,y)!==h[0]||y==="son")[Math.floor(Math.random()*3)]||"son"}));
+  if(elifAlt==="sekil"){/* yalnız birbirinden (ve tek başına hâlinden) farklı görünen konumları sor; bağlanmayan harflerde orta = son olduğundan "son" sorulur */
+    const yerler=h=>{const g=new Set([harfSekil(h,"tek")]);return ["son","bas","orta"].filter(y=>{const s=harfSekil(h,y);if(g.has(s))return false;g.add(s);return true;});};
+    const items=sec(10).map(h=>{const L=yerler(h);return {h,y:L[Math.floor(Math.random()*L.length)]||"son"};});
     quiz({title:"Şekiller",items,geri,bitince:bitti,
       build:({h,y})=>({html:`<p style="font-size:20px;font-weight:800">Bu, hangi harfin ${YER_AD[y]} yazılışı?</p><div class="qbig ar" lang="ar" style="font-size:80px">${harfSekil(h,y)}</div>`,answer:h[1],opts:secenek(h[1],adlar),buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
   if(elifAlt==="kelime"){
@@ -60,7 +62,7 @@ function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="
     if(kel.length<5){el.innerHTML=`<p>Bu oyun için önce bir sure aç (örneğin Fâtiha); o surenin kelimeleriyle oynarız.</p><button class="primary" id="ebF">Fâtiha'yı aç</button>`;$("ebF").onclick=()=>ac(1,"oku");return;}
     const items=shuffle(kel).slice(0,10);
     quiz({title:"Kelimede harf",items,geri,bitince:bitti,
-      build:({w,H})=>{const c=H[Math.floor(Math.random()*H.length)],yok=harf.filter(x=>!H.includes(x));const h=harfBul(c);
+      build:({w,H})=>{const c=H[Math.floor(Math.random()*H.length)],yok=harf.filter(x=>!H.includes(x));
         return {html:`<p style="font-size:20px;font-weight:800">Bu kelimede hangi harf var?</p><div class="qbig ar" lang="ar">${esc(w.a)}</div><p class="okunus">${esc(w.ok||"")}</p>`,answer:c,opts:shuffle([c,...shuffle(yok).slice(0,kucuk()?1:3)]),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(c,ok)};}});return;}
 }
 BADGES.push(["elif10","Elif-ba'da on harfi öğrendi",()=>elifBilinen()>=10],["elif28","Elif-ba'da bütün harfleri öğrendi",()=>elifBilinen()>=28]);

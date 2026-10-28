@@ -8,6 +8,7 @@ KOK = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 s = open(os.path.join(KOK, "index.html"), encoding="utf-8", newline="").read()
 a = s.index("<!-- Bulut köprüsü"); b = s.index("<!-- /Bulut köprüsü -->") + len("<!-- /Bulut köprüsü -->")
 c = s[:a] + s[b:].lstrip("\r\n")
+c = re.sub(r"<!-- GitHub CSP.*?<!-- /GitHub CSP -->", "", c, flags=re.S)   # Claude kendi güvenlik kurallarını uygular
 c = re.sub(r'<link rel="stylesheet" href="(css/[^"?]+)\?v=[0-9a-f]+">',
            lambda m: "<style>\n" + open(os.path.join(KOK, m.group(1)), encoding="utf-8").read() + "</style>", c)
 parcalar = []

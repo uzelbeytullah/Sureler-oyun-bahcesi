@@ -43,18 +43,20 @@ service cloud.firestore {
     // Odaya ilk yayin yapan sahip olur; sahip her nabizda zamani tazeler, 3 saat sessiz kalan odayi baskasi devralabilir
     // Oda adi: yaris- + 8 harf/rakam (tahmin edilemeyen kod)
     function odaAdi(oda) { return oda.matches('yaris-[A-Z2-9]{8}'); }
+    // son: TTL politikasinin silme zamani (en cok 8 gun sonrasi)
+    function sonIyi() { return !('son' in yeni()) || (yeni().son is timestamp && yeni().son < request.time + duration.value(8, 'd')); }
     match /odalar/{oda} {
       allow get: if girisli();
-      allow create: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't'])
+      allow create: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't', 'son']) && sonIyi()
                     && yeni().sahip == request.auth.uid && yeni().t == request.time;
-      allow update: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't'])
+      allow update: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't', 'son']) && sonIyi()
                     && yeni().sahip == request.auth.uid && yeni().t == request.time
                     && (resource.data.sahip == request.auth.uid || resource.data.t < request.time - duration.value(3, 'h'));
     }
     match /odalar/{oda}/esler/{uid} {
       allow read: if girisli();
       // Oyuncu kaydi: yalniz ad (en cok 20 harf) ve secilen cevap
-      allow create, update: if ben(uid) && odaAdi(oda) && yeni().keys().hasOnly(['presence', 't']) && yeni().t == request.time
+      allow create, update: if ben(uid) && odaAdi(oda) && yeni().keys().hasOnly(['presence', 't', 'son']) && sonIyi() && yeni().t == request.time
                     && yeni().presence is map && yeni().presence.keys().hasOnly(['ad', 'c'])
                     && (!('ad' in yeni().presence) || (yeni().presence.ad is string && yeni().presence.ad.size() <= 20))
                     && (!('c' in yeni().presence) || (yeni().presence.c is map && yeni().presence.c.keys().hasOnly(['q', 'j'])));
@@ -64,7 +66,7 @@ service cloud.firestore {
       allow read: if girisli();
       allow create, update: if girisli()
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid
-                    && odaAdi(oda) && yeni().keys().hasOnly(['data', 'kimden', 't'])
+                    && odaAdi(oda) && yeni().keys().hasOnly(['data', 'kimden', 't', 'son']) && sonIyi()
                     && yeni().kimden == request.auth.uid && yeni().t == request.time;
       allow delete: if girisli()
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid;

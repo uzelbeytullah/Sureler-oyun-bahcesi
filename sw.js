@@ -6,15 +6,36 @@
    - Ses dosyaları (mp3) tarayıcının kendi önbelleğine bırakılır (kısmi isteklerle çalıştıkları için)
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-4c86da36";
-const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=17d08092", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
+const SURUM = "sob-3ae0cf29";
+const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=227aefad", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== SURUM).map(x => caches.delete(x)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== SURUM && x !== SES).map(x => caches.delete(x)))).then(() => self.clients.claim()));
 });
+
+const SES = "sob-ses";   // "çevrimdışı için indir" ile kaydedilen sure sesleri; sürüm değişince silinmez
+
+/* İndirilmiş sure sesi: tarayıcı sesi parça parça (Range) ister; kayıtlı dosyadan o parçayı keserek veririz */
+function sesYanit(r) {
+  return caches.open(SES).then(c => c.match(r.url)).then(v => {
+    if (!v) return fetch(r);
+    const aralik = r.headers.get("range");
+    if (!aralik) return v;
+    return v.blob().then(b => {
+      const m = /bytes=(\d*)-(\d*)/.exec(aralik) || [];
+      let bas = m[1] ? +m[1] : 0, son = m[2] ? +m[2] : b.size - 1;
+      if (!m[1] && m[2]) { bas = Math.max(0, b.size - +m[2]); son = b.size - 1; }
+      son = Math.min(son, b.size - 1);
+      if (bas > son) return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + b.size } });
+      return new Response(b.slice(bas, son + 1), { status: 206, headers: {
+        "Content-Type": "audio/mpeg", "Accept-Ranges": "bytes",
+        "Content-Range": "bytes " + bas + "-" + son + "/" + b.size, "Content-Length": String(son - bas + 1) } });
+    });
+  }).catch(() => fetch(r));
+}
 
 const DIS = ["fonts.googleapis.com", "fonts.gstatic.com", "www.gstatic.com"];
 const iyi = y => y && (y.ok || y.type === "opaque");
@@ -35,6 +56,7 @@ self.addEventListener("fetch", e => {
   const ayni = u.origin === self.location.origin;
   if (!ayni && !DIS.includes(u.hostname)) return;          // Firestore vb. dokunma
   if (u.hostname === "www.gstatic.com" && !u.pathname.startsWith("/firebasejs/")) return;  // reCAPTCHA (App Check) dosyalarına dokunma
+  if (ayni && /\/ses\/[^/]+\.mp3$/i.test(u.pathname)) { e.respondWith(sesYanit(r)); return; }
   if (/\.mp3$/i.test(u.pathname) || r.headers.has("range")) return;
 
   if (r.mode === "navigate") {                             // sayfa: önce ağ

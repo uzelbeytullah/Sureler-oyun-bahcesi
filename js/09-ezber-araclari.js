@@ -1,6 +1,5 @@
 /* Sureler Oyun Bahçesi · Ezber araçları ve Yâsîn ortak bilgiler */
 /* ---------- ezber araçları (önce Fâtiha) ---------- */
-const EZBER_ARAC_SURELER=[1];
 const ezberAracVar=()=>!!CUR;
 let ezberArac=null,aracJeton=0;
 function ilkHarf(w){const t=w.match(/[\u0621-\u064A\u0671]/g)||[];if(!t.length)return w;const son=h=>"\u0627\u062F\u0630\u0631\u0632\u0648\u0624\u0621\u0629\u0623\u0625\u0622\u0671".includes(h)?"…":"\u0640";if(t.length>2&&(t[0]==="\u0671"||t[0]==="\u0627")&&t[1]==="\u0644")return "\u0671\u0644"+t[2]+son(t[2]);return t[0]+son(t[0]);}

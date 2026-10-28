@@ -23,7 +23,7 @@ function oku(){
   <p><b>Arapça bir kelimeye dokununca okunuşunu dinlersin.</b> Her kelime anlam alanının rengiyle yazıldı; altındaki aynı renkli kutu o kelimenin anlamıdır. Aynı alandan iki kelime yan yana gelince, ayırt edilsin diye ikincisi başka renkle yazılır. Her ayeti okuyunca işaretle; hepsi bitince yıldızı alırsın.</p>
   ${CUR.tecvid&&TKUR?`<div class="subtabs" role="group" aria-label="Renklendirme"><b style="align-self:center;font-size:14px">Renkler:</b><button data-rm="alan" class="${S.renkModu!=="tecvid"?"on":""}" aria-pressed="${S.renkModu!=="tecvid"}">Anlam alanları</button><button data-rm="tecvid" class="${S.renkModu==="tecvid"?"on":""}" aria-pressed="${S.renkModu==="tecvid"}">Tecvid kuralları</button></div>`:""}
   ${tecvidMod?tecvidLejant():`<div class="lejant">${CUR.alanlar.map((a,i)=>`<span class="k${i%12}">${esc(a.ad)}</span>`).join("")}</div>`}
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="primary" id="hepsi">▶ Baştan sona dinle</button><span style="font-size:14px;font-weight:700">Okuyan: Mişari Râşid el-Afasi</span></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button class="primary" id="hepsi">▶ Baştan sona dinle</button><span style="font-size:14px;font-weight:700">Okuyan: Mişari Râşid el-Afasi</span>${indirVar()?`<button id="indir" style="min-height:44px">⬇ İnternetsiz dinlemek için indir</button>`:""}</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" role="group" aria-label="Okuma hızı"><b style="font-size:14px">Hız:</b>${HIZLAR.map(h=>`<button class="hz ${hiz()===h?"on":""}" data-h="${h}" aria-pressed="${hiz()===h}" style="min-height:44px;padding:6px 10px">${h.toFixed(2).replace(".",",")}</button>`).join("")}</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center" role="group" aria-label="Ayet tekrar sayısı"><b style="font-size:14px">Her ayeti tekrarla:</b>${[1,2,3,7].map(t=>`<button class="tk ${tekrar()===t?"on":""}" data-t="${t}" aria-pressed="${tekrar()===t}" style="min-height:44px;padding:6px 12px">${t} kez</button>`).join("")}</div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button id="basaDon" class="${S.basaDon?"on":""}" aria-pressed="${!!S.basaDon}" style="min-height:44px">${S.basaDon?"↻ Bitince başa dön: açık":"↻ Bitince başa dön: kapalı"}</button><b id="tkr" style="font-size:14px;color:var(--lapis)"></b></div>
@@ -60,6 +60,10 @@ function oku(){
   V.querySelectorAll(".kelimeler[data-ai] [data-c]").forEach(sp=>{sp.style.cursor="pointer";sp.onclick=()=>tecvidAc(V,+sp.closest(".kelimeler").dataset.ai,sp.dataset.c);});
   V.querySelectorAll(".hz").forEach(b=>b.onclick=()=>{S.hiz=+b.dataset.h;hizUygula();save();V.querySelectorAll(".hz").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",String(x===b));});});
   const sureSrc="ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM;
+  {const ib=$("indir");if(ib){const no=CUR.no,yaz=v=>{ib.textContent=v?"✓ İnternetsiz dinlenebilir · kaldır":"⬇ İnternetsiz dinlemek için indir";ib.dataset.var=v?"1":"";ib.setAttribute("aria-pressed",String(!!v));};
+    sesIndirildi(no).then(yaz);
+    ib.onclick=async()=>{if(ib.dataset.var){await sesSil(no);yaz(false);toast("İndirilen ses kaldırıldı");return;}
+      ib.disabled=true;ib.textContent="İndiriliyor…";try{await sesIndir(no);yaz(true);toast("Bu sure artık internetsiz de dinlenebilir");}catch(e){yaz(false);toast("İndirilemedi; bağlantıyı denetle");}ib.disabled=false;};}}
   $("hepsi").onclick=async()=>{
     if(sira){durSes();bitir();return;}
     durSes();sira=true;calan=besmeleVar?"b":0;guncelle();
@@ -128,7 +132,7 @@ function quiz({title,items,build,star,need=0.8,bitince,geri}){
 function secenek(dogru,havuz,adet){if(adet===undefined)adet=sv().sik;const h=shuffle([...new Set(havuz.filter(x=>x&&x!==dogru))]).slice(0,adet);return shuffle([dogru,...h]);}
 function kelime(){
   const seen=new Set(),all=[];
-  CUR.ayetler.forEach(a=>a.w.forEach(w=>{const k=w.a+"|"+w.tr;if(!seen.has(w.a)){seen.add(w.a);all.push(w);}}));
+  CUR.ayetler.forEach(a=>a.w.forEach(w=>{if(!seen.has(w.a)){seen.add(w.a);all.push(w);}}));
   const anlamlar=all.map(w=>w.tr);
   quiz({title:kucuk()?"Dinle ve seç":"Kelime eşleştir",star:"kelime",items:shuffle(all).slice(0,10),
     build:w=>{const o=secenek(w.tr,anlamlar);return {html:`<p>Bu kelimenin anlamı nedir?</p><div class="qbig ar" lang="ar" dir="rtl">${w.a}</div><p class="okunus">${esc(w.ok)}</p>`,answer:w.tr,opts:o,sonuc:ok=>defterIsle(CUR.no,w,o,ok)};}});

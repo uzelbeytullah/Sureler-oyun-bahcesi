@@ -111,11 +111,13 @@
         var SUNUCU = firebase.firestore.FieldValue.serverTimestamp;
         function ms(t) { return t && t.toMillis ? t.toMillis() : (typeof t === "number" ? t : 0); }
         function simdi() { return Date.now() + fark; }
+        /* son: Firestore TTL politikası bu zamandan sonra belgeyi kendiliğinden siler (çocuk adları kalıcı kalmasın) */
+        function son() { return firebase.firestore.Timestamp.fromMillis(simdi() + 864e5); }
 
         function nabiz() {
           // Oda sahibi her nabızda sahipliğini tazeler; böylece süren yarışmayı başkası devralamaz
-          if (sahibim) kok.set({ sahip: u.uid, t: SUNUCU() }).catch(function () {});
-          return benim.set({ presence: temiz(benimDurum), t: SUNUCU() });
+          if (sahibim) kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).catch(function () {});
+          return benim.set({ presence: temiz(benimDurum), t: SUNUCU(), son: son() });
         }
         var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 15000);
 
@@ -143,7 +145,7 @@
         /* Odaya ilk yayın yapan oda sahibi olur; olaylara yalnız sahibi yazabilir (kurallar da bunu denetler) */
         function sahiplen() {
           if (sahibim) return Promise.resolve();
-          return kok.set({ sahip: u.uid, t: SUNUCU() }).then(function () { sahibim = true; });
+          return kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).then(function () { sahibim = true; });
         }
 
         return nabiz().then(function () {
@@ -158,16 +160,18 @@
               if (o && o.j === j && Date.now() - o.t < 20000) return Promise.resolve();   // değişmeyeni sık yazma
               sonYayin[olay] = { j: j, t: Date.now() };
               return sahiplen().then(function () {
-                return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: SUNUCU() });
+                return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: SUNUCU(), son: son() });
               }).catch(function (e) { delete sonYayin[olay]; throw e; });
             },
             leave: function () {
               acik = false; clearInterval(nabizT);
               kapat.forEach(function (f) { try { f(); } catch (e) {} });
               /* Oda sahibi çıkınca, oyuncular son durumu görebilsin diye biraz bekleyip olayları siler */
-              if (sahibim) setTimeout(function () {
-                Object.keys(sonYayin).forEach(function (o) { olaylar.doc(o).delete().catch(function () {}); });
-              }, 8000);
+              /* "durum" dışındaki olaylar hemen silinir (sayfa kapanırken bekleme çalışmayabilir) */
+              if (sahibim) {
+                Object.keys(sonYayin).forEach(function (o) { if (o !== "durum") olaylar.doc(o).delete().catch(function () {}); });
+                setTimeout(function () { olaylar.doc("durum").delete().catch(function () {}); }, 8000);
+              }
               return benim.delete().catch(function () {});
             }
           };

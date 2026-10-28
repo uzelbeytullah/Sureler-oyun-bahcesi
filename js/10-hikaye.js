@@ -156,9 +156,8 @@ SIK.add(()=>{const D=animDurum;if(!D||!D.kl||!D.klCal)return false;const k=D.kl[
   if(t>=k.e-0.02)animKlipAtla();return true;});
 function animIzlendi(i){const D=animDurum;if(!D)return;D.izlenen=D.izlenen||new Set();D.izlenen.add(i);const A=D.A,n=A.sahneler.length;
   if(i===n-1&&D.izlenen.size>=Math.ceil(n*0.7)){const key=(A.no||"")+"|"+A.baslik;S.hikIzle=S.hikIzle||{};if(!S.hikIzle[key]){S.hikIzle[key]=today();gun();S.puan+=15;gorevIsle("hikaye");logIsle("hikaye");efekt("gorev");kutla(true);toast("Hikâyeyi izledin, 15 puan");checkBadges();save();renderStats();}}}
-function animSesCal(i,bitti){const D=animDurum;if(!D.A.ses){animKonus(D.A.sahneler[i].metin,bitti);return;}
-  if(D.A.dosya){animKlipDur();D.kl=D.A.sahneler[i].klip;D.ki=0;D.kBas=0;D.klBitti=bitti;animKlipBasla();return;}
-  D.ses.onended=()=>bitti&&bitti();D.ses.onerror=()=>bitti&&bitti();D.ses.src=`anim/${D.A.klasor||String(D.A.no).padStart(3,"0")}/${i}.mp3?v=${SURUM}`;hizUygula&&0;D.ses.play().catch(()=>bitti&&bitti());}
+function animSesCal(i,bitti){const D=animDurum;if(!D.A.ses||!D.A.dosya){animKonus(D.A.sahneler[i].metin,bitti);return;}
+  animKlipDur();D.kl=D.A.sahneler[i].klip;D.ki=0;D.kBas=0;D.klBitti=bitti;animKlipBasla();}
 // ses çalarken balon gizli kalırsa (ses hatası) güvenlik: 4 sn sonra göster
 
 function animDur(){if(!animDurum)return;animDurum.oto=false;const bb=document.querySelector('.an-balon.bekle');if(bb)bb.classList.remove('bekle');document.querySelectorAll('.an-ip.bekle').forEach(e=>e.classList.remove('bekle'));clearTimeout(animDurum.zaman);animDurum.ses.pause();animKlipDur();try{speechSynthesis.cancel();}catch(e){}const b=$("anOyna");if(b)b.textContent="▶ Oynat";}
@@ -184,8 +183,7 @@ function animGit(i,devam){
     if(blT!==null&&cal&&t>=blT-0.15){bl.classList.remove("bekle");blT=null;}
     if(ipBek.length&&cal){ipBek=ipBek.filter(q=>{if(t>=q.t-0.1){const e=ipK.querySelector(`[data-i="${q.i}"]`);if(e){e.classList.remove("bekle");e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1800);}return false;}return true;});}
     if(ok&&cal){let k=-1;ok.forEach((o,j)=>{if(t>=o.t-0.05)k=j;});if(k>=0&&ok[k].bit&&t>ok[k].bit+0.3&&k===ok.length-1)k=-1;if(sh.okuma)ipK.querySelectorAll(".an-ip").forEach(e=>e.classList.toggle("on",k>=0&&A.ipuclari[+e.dataset.i].ayet===ok[k].ayet));kt.querySelectorAll(".an-ayet").forEach((e,j)=>{e.classList.toggle("on",j===k);if(j===k&&e.dataset.g!=="1"){e.dataset.g="1";e.scrollIntoView({block:"nearest",behavior:"smooth"});}});}},30);
-  // bir sonraki sahnenin sesini önceden yükle
-  if(A.ses&&!A.dosya&&i+1<A.sahneler.length){D.on=new Audio();D.on.preload="auto";D.on.src=`anim/${A.klasor||String(A.no).padStart(3,"0")}/${i+1}.mp3?v=${SURUM}`;}$("anBar").style.width=((i+1)/A.sahneler.length*100)+"%";
+  $("anBar").style.width=((i+1)/A.sahneler.length*100)+"%";
   D.izlenen=D.izlenen||new Set();clearTimeout(D.izSure);{const sc=A.sahneler[i];D.izSure=setTimeout(()=>{if(D.i===i&&animDurum===D&&$("anOyna"))animIzlendi(i);},Math.max(3000,Math.min(((sc.sure||0)*1000)*0.8,(sc.metin||"").length*45+2000)));}
   D.ses.pause();animKlipDur();
   if(!D.oto){if(D.sesli&&D.A.ses&&D.elle)animSesCal(i);return;}

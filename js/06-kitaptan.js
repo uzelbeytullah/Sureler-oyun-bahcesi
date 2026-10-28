@@ -184,7 +184,7 @@ function sayilar(){
 /* ---------- düşünme ---------- */
 let dusunKart=null,dusunAlt="kart";
 function dusun(){
-  const V=$("view"),Y=CUR.ek.dusun,T=ekS("dusun"),DT=ekS("durumTablo");
+  const V=$("view"),Y=CUR.ek.dusun,T=ekS("dusun");
   const gunNo=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/864e5);
   if(dusunKart===null)dusunKart=gunNo%Y.kartlar.length;
   const alt=[["kart","Günün kartı"],["yazdiklarim","Yazdıklarım"],["yontem","Düşünme yöntemleri"],["durum","Durum çözümlemesi"]];

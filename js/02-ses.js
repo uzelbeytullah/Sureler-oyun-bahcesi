@@ -30,4 +30,14 @@ function calParca(no,bas,son,sonra){const j=++sesJeton;
   const hata=()=>{if(j!==sesJeton)return;sesBitis=null;sesSonra=null;toast("Ses yüklenemedi; bağlantıyı denetle");if(sonra)sonra(true);};
   if(!ses.src.endsWith(src)){ses.src=src;ses.addEventListener("loadedmetadata",go,{once:true});ses.addEventListener("error",hata,{once:true});ses.load();}else go();
 }
+/* ---------- çevrimdışı için sure sesi indirme (yalnız GitHub sürümü; service worker gerekir) ---------- */
+const SES_ONBELLEK="sob-ses";
+function indirVar(){try{return !!(window.claude&&claude.bulut&&"caches" in window&&navigator.serviceWorker&&navigator.serviceWorker.controller);}catch(e){return false;}}
+const sesAdres=no=>new URL(surumle("ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM),location.href);
+async function sesIndirildi(no){try{const c=await caches.open(SES_ONBELLEK);return !!(await c.match(sesAdres(no).href));}catch(e){return false;}}
+async function sesTemizle(c,u){for(const q of await c.keys())if(new URL(q.url).pathname===u.pathname)await c.delete(q);}
+async function sesIndir(no){const u=sesAdres(no),r=await fetch(u.href,{cache:"no-store"});if(!r.ok)throw new Error("indirilemedi");
+  const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,u);await c.put(u.href,r);
+  try{await fetch("data/"+String(no).padStart(3,"0")+".json?v="+SURUM);}catch(e){}}   // sure metni de kayda girsin
+async function sesSil(no){try{const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,sesAdres(no));}catch(e){}}
 function durSes(){sesJeton++;sesBitis=null;sesSonra=null;izle=null;ses2Bitis=null;ses2Sonra=null;ses.pause();ses2.pause();}

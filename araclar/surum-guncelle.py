@@ -33,7 +33,7 @@ for yol in sorted(glob.glob("js/*.js")) + sorted(glob.glob("css/*.css")):
     k = yol.replace("\\", "/")
     h, n = re.subn(re.escape(k) + r"\?v=[0-9a-f]{8}", k + "?v=" + oz(yol), h)
     deg += n
-for yol in ("bulut-ayar.js", "bulut.js"):
+for yol in ("bulut-ayar.js", "bulut.js", "kabuk.js"):
     h = re.sub(r'src="' + re.escape(yol) + r'\?v=[0-9a-z]+"', 'src="' + yol + "?v=" + oz(yol) + '"', h)
 for yol in sorted(glob.glob("js/*.js")):
     if yol.replace("\\", "/") not in h:
@@ -42,9 +42,9 @@ open("index.html", "w", encoding="utf-8", newline="").write(h)
 
 # 3) service worker: kabuk dosyalarının ekleri ve önbellek adı (kabuk değişince eski önbellek silinsin)
 w = open("sw.js", encoding="utf-8", newline="").read()
-for yol in ("bulut-ayar.js", "bulut.js"):
+for yol in ("bulut-ayar.js", "bulut.js", "kabuk.js"):
     w = re.sub(r'"\./' + re.escape(yol) + r'\?v=[0-9a-z]+"', '"./' + yol + "?v=" + oz(yol) + '"', w)
-kabuk = hashlib.sha1("".join(oz(y) for y in ("index.html", "bulut-ayar.js", "bulut.js", "manifest.json")).encode()).hexdigest()[:8]
+kabuk = hashlib.sha1("".join(oz(y) for y in ("index.html", "bulut-ayar.js", "bulut.js", "kabuk.js", "manifest.json")).encode()).hexdigest()[:8]
 w = re.sub(r'const SURUM = "[^"]*";', 'const SURUM = "sob-' + kabuk + '";', w)
 open("sw.js", "w", encoding="utf-8", newline="").write(w)
 print("Sürüm ekleri güncellendi.")

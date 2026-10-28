@@ -5,7 +5,6 @@ fetch("data/tecvid_kurallar.json?v="+SURUM).then(r=>r.json()).then(d=>{TKUR=d;if
 const VARSAYILAN_EZBER={takvim:{aciklama:"Ayetleri aralıklı tekrarla ezberle: hatırladıkça tekrarlar seyrekleşir, unuttuğunda sık sorulur. Bu takvim Fâtiha kitabınızdaki tekrar takviminden alındı.",araliklar_gun:[1,2,4,7,14,30,60]},yontemler:[],ayet_ipuclari:[],siirler:[],hikayeler:[],uyari:""};
 function ezberVeri(){return (CUR.ek&&CUR.ek.ezber)||VARSAYILAN_EZBER;}
 function adBul(id){id=+id;if(id>36000){const g=YASIN().gruplar.find(x=>x.id===id);return g?`Yâsîn ${g.bas}-${g.son}`:"Yâsîn";}const k=KATALOG.find(x=>x.no===id);return k?k.ad:String(id);}
-function ilkAyetBul(id){id=+id;if(id>36000){const g=YASIN().gruplar.find(x=>x.id===id);return g?g.bas:1;}return 1;}
 /* Bugünün tekrarı: bütün surelerden günü gelen ayetler tek akışta */
 let TEKRAR_AKIS=false;
 function tekrarAkisi(haric){const L=tumTekrarlar().filter(x=>x.id!==haric);if(!L.length){TEKRAR_AKIS=false;toast("Bugünün bütün tekrarları bitti, maşallah!");kutla(true);anaSayfa();return;}
