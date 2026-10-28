@@ -2,14 +2,14 @@
    - Sayfa: önce ağ, yoksa kayıtlı kopya
    - Sürüm ekli (?v=) veri ve kod: önce kayıtlı kopya, yoksa ağ; yeni sürüm kaydedilince eskisi silinir
    - Sürüm eki olmayan kendi dosyalarımız: önce ağ, yoksa kayıtlı kopya
-   - Yazı tipleri ve Firebase kütüphanesi: kayıtlı kopya varsa o, arkada tazelenir
+   - Firebase kütüphanesi: kayıtlı kopya varsa o, arkada tazelenir (yazı tipleri siteden, fonts/ klasöründen)
    - İndirilmiş sure sesleri (ses/*.mp3, sob-ses önbelleği) kısmi isteklere parça parça verilir; ötekiler tarayıcıya bırakılır
    - Kabuk her değişince sürüm önbelleği yenilenir; indirilen sesler ve sure metinleri sob-ses'te kalır
    - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-4b82c136";
-const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=e17d7ded", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
+const SURUM = "sob-5ef38c02";
+const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=973bff2f", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
@@ -39,7 +39,7 @@ function sesYanit(r) {
   }).catch(() => fetch(r));
 }
 
-const DIS = ["fonts.googleapis.com", "fonts.gstatic.com", "www.gstatic.com"];
+const DIS = ["www.gstatic.com"];   // yazı tipleri artık siteden geliyor
 const iyi = y => y && (y.ok || y.type === "opaque");
 
 /* Aynı dosyanın eski ?v= kopyalarını silip yenisini kaydeder (önbellek büyümesin) */

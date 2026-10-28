@@ -60,7 +60,7 @@ function aileKarti(){const C=CUR&&CUR.ek&&CUR.ek.cocuk;if(!C)return "";const E=(
   return `<section class="detay aile-kart" aria-label="Bugün ailenle"><h3>👨‍👩‍👧 Bugün ailenle şunu dene</h3>${e?`<p style="font-size:19px"><b>${esc(e.ad||"")}</b>${e.nasil?": "+esc(e.nasil):""}</p>`:""}${q?`<p style="font-size:18px"><b>Sofrada sor:</b> ${esc(q.soru)}</p>`:""}<p style="font-size:14px">Ekranda öğrenilen, ailece yapılınca kalıcı olur.</p></section>`;}
 
 /* haftalık özet (bu cihazdaki bütün kişiler) */
-async function ebeveynOzet(){CUR=null;baslik();setTabs();$("baslik").textContent="Ebeveyn özeti";$("altbaslik").textContent="Son 7 gün · bu cihazdaki kişiler";
+async function ebeveynOzet(){if(!kapiAcik()){ebeveynKapisi(ebeveynOzet);return;}CUR=null;baslik();setTabs();$("baslik").textContent="Ebeveyn özeti";$("altbaslik").textContent="Son 7 gün · bu cihazdaki kişiler";
   const V=$("view");V.innerHTML=`<p class="yukleniyor">Hazırlanıyor…</p>`;save();
   const gunler=[...Array(7)].map((_,k)=>{const d=new Date();d.setDate(d.getDate()-6+k);return d.toLocaleDateString("sv-SE");});
   const bolum=[];

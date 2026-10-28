@@ -6,6 +6,16 @@ const PIN_KEY="bahce-ebeveyn-pin";
 const pinOz=p=>{let h=7;for(const c of "sob:"+p)h=(h*31+c.charCodeAt(0))>>>0;return String(h);};
 function pinVar(){try{return !!localStorage.getItem(PIN_KEY);}catch(e){return false;}}
 function pinDogru(p){try{return localStorage.getItem(PIN_KEY)===pinOz(p);}catch(e){return false;}}
+/* Yetişkin kapısı: ebeveyn bölümüne girmeden önce küçük çocuğun çözemeyeceği bir çarpma sorusu (10 dakika geçerli) */
+let KAPI_ZAMAN=0;
+const kapiAcik=()=>Date.now()-KAPI_ZAMAN<6e5;
+function ebeveynKapisi(sonra){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="Ebeveyn bölümü";$("altbaslik").textContent="Yetişkinler için";
+  const a=6+Math.floor(Math.random()*4),b=6+Math.floor(Math.random()*4);
+  $("view").innerHTML=`<button class="geri" id="kG">← Sureler</button><h2>Bu bölüm yetişkinler için</h2><p>Devam etmek için soruyu cevaplayın:</p>
+  <p style="font-size:24px;font-weight:800"><label for="kCvp">${a} × ${b} kaç eder?</label></p><p><input id="kCvp" class="ara" inputmode="numeric" maxlength="3" autocomplete="off" style="max-width:140px"> <button class="primary" id="kTamam" style="min-height:44px">Devam</button></p>`;
+  $("kG").onclick=()=>anaSayfa();
+  const dene=()=>{if(+$("kCvp").value.trim()===a*b){KAPI_ZAMAN=Date.now();sonra();}else{toast("Cevap yanlış");ebeveynKapisi(sonra);}};
+  $("kTamam").onclick=dene;$("kCvp").onkeydown=e=>{if(e.key==="Enter")dene();};try{$("kCvp").focus();}catch(e){}}
 function pinKoy(p){try{localStorage.setItem(PIN_KEY,pinOz(p));return true;}catch(e){return false;}}
 function onayBekleyenler(){const r=[];Object.entries(S.sure||{}).forEach(([id,x])=>Object.entries(x.ezberDurum||{}).forEach(([i,d])=>{if(d&&d.onayBekle)r.push({id:+id,i:+i});}));return r;}
 async function sureVeri(no){if(!CACHE[no]){const r=await fetch("data/"+String(no).padStart(3,"0")+".json?v="+SURUM);if(!r.ok)throw 0;CACHE[no]=await r.json();}return CACHE[no];}
@@ -17,14 +27,15 @@ async function onayEkrani(){CUR=null;baslik();setTabs();durSes();$("baslik").tex
   V.innerHTML=`<button class="geri" id="oG">← Sureler</button><h2>👨‍👩‍👧 ${esc(adBul(x.id))} · ${ilk+x.i}. ayet</h2>
   <p style="font-size:19px"><b>Çocuk:</b> Ayeti ezberden, sesli oku. <b>Ebeveyn:</b> Metne bakarak dinle.</p>
   <details class="detay"><summary><b>Ebeveyn için: ayetin metni ve kâri okuyuşu</b></summary><div class="kelimeler" lang="ar" style="justify-content:center">${a.w.map((w,j)=>`<span class="k${j%12}">${esc(w.a)}</span>`).join("")}</div><p class="okunus">${esc(a.ok||"")}</p><button class="dn" id="oDinle">▶ Kâriden dinle</button></details>
-  <div class="odak" style="display:grid;gap:8px"><b>Ebeveyn şifresi</b>${pinVar()?`<input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" aria-label="Ebeveyn şifresi (4 rakam)" style="max-width:200px">`:`<p>Henüz ebeveyn şifresi yok. Şimdi 4 haneli bir şifre belirleyin (çocuğunuz görmesin):</p><input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni şifre" aria-label="Yeni ebeveyn şifresi (4 rakam)" style="max-width:200px"><input id="oPin2" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeniden yazın" aria-label="Yeni ebeveyn şifresini yeniden yazın" style="max-width:200px">`}
+  <div class="odak" style="display:grid;gap:8px"><b>Ebeveyn şifresi</b>${pinVar()?`<input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" aria-label="Ebeveyn şifresi (4 rakam)" style="max-width:200px">`:`<p>Onay için önce bir ebeveyn şifresi gerekir. Şifreyi ebeveyn bölümünden belirleyin (çocuğunuz görmesin).</p><button id="oSifreGit" class="primary" style="min-height:44px">Ebeveyn bölümüne git</button>`}
    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" data-on="1" style="font-size:19px">✓ Doğru okudu</button><button data-on="0">Biraz daha çalışsın</button></div></div>
   <p style="font-size:14px">Sırada ${L.length} ayet var. Onaylanan ayet "ezberde" sayılır; namaz hazırlığı yolunda ilerler.</p>`;
   $("oG").onclick=()=>anaSayfa();
   $("oDinle").onclick=()=>{const b=d.ses.bas,e=x.i+1<b.length?b[x.i+1]:d.ses.son;hizUygula();calParca(x.id,b[x.i],e);};
-  V.querySelectorAll("[data-on]").forEach(b=>b.onclick=()=>{const p=$("oPin").value.trim();
-    if(!pinVar()){const p2=$("oPin2").value.trim();if(!/^\d{4}$/.test(p)||p!==p2){toast("Şifre 4 rakam olmalı ve iki kez aynı yazılmalı");return;}pinKoy(p);toast("Ebeveyn şifresi kaydedildi");}
-    else if(!pinDogru(p)){toast("Şifre yanlış");efekt("yanlis");return;}
+  {const sg=$("oSifreGit");if(sg)sg.onclick=()=>ebeveynOzet();}
+  V.querySelectorAll("[data-on]").forEach(b=>b.onclick=()=>{if(!pinVar()){toast("Önce ebeveyn bölümünden şifre belirleyin");return;}const p=$("oPin").value.trim();
+    if(!pinVar()){toast("Önce ebeveyn bölümünden şifre belirleyin");return;}
+    if(!pinDogru(p)){toast("Şifre yanlış");efekt("yanlis");return;}
     const D=((S.sure[x.id]||{}).ezberDurum)||{},r=D[x.i];if(!r){onayEkrani();return;}
     if(b.dataset.on==="1"){delete r.onayBekle;r.onaylandi=today();gun();S.puan+=20;efekt("yildiz");kutla();toast("Maşallah! Ayet ezberde, 20 puan");logIsle("onay");}
     else{delete r.onayBekle;delete r.tam;r.kutu=Math.max(0,(r.kutu||0)-1);r.sonraki=gunEkle(1);toast("Olsun, yarın yeniden çalışalım 🌱");}
@@ -59,17 +70,24 @@ function ebeveynAyarHtml(){const L=KATALOG.filter(k=>!k.gruplar&&k.no>=78&&k.aye
   return `<section class="detay"><h3>Ebeveyn onayı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3>
   <p>Açıkken ezberde son basamağa gelen ayet, siz dinleyip şifrenizle onaylayınca "ezberde" sayılır.</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap"><button data-onay="1" class="${onayGerek()?"on":""}">Açık</button><button data-onay="0" class="${onayGerek()?"":"on"}">Kapalı</button></p>
-  <p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" aria-label="Yeni 4 haneli ebeveyn şifresi" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
+  ${pinVar()?"":`<p class="odak" role="note"><b>Önemli:</b> Onayın işe yaraması için önce bir ebeveyn şifresi belirleyin. Şifre yokken onay ekranı çalışmaz.</p>`}<p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" aria-label="Yeni 4 haneli ebeveyn şifresi" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
   <section class="detay"><h3>Namaz hazırlığı yolu</h3><p>Fâtiha'nın yanında ezberlenecek üç kısa sureyi seçin:</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap">${L.map(k=>`<button data-nzs="${k.no}" class="${sec.includes(k.no)?"on":""}" style="min-height:44px">${esc(k.ad)}</button>`).join("")}</p>
-  ${S.seviye==="yetiskin"?`<p><button data-nzac="1" class="${S.namazAcik?"on":""}">Ana sayfada göster</button></p>`:""}</section>`;}
+  ${S.seviye==="yetiskin"?`<p><button data-nzac="1" class="${S.namazAcik?"on":""}">Ana sayfada göster</button></p>`:""}</section>
+  ${window.claude&&claude.bulut?`<section class="detay"><h3>Bulut kaydı ve gizlilik</h3>
+  <p>İlerleme, telefonda ve bilgisayarda aynı kalsın diye Google Firebase'de adsız bir hesapla saklanır. Kayıtta kişi adları, yaşları ve ilerleme bulunur; başka kimse okuyamaz. Kötüye kullanımı önlemek için Google reCAPTCHA kullanılır.</p>
+  ${bulutKapali()?`<p><b>Bulut kaydı kapalı.</b> İlerleme yalnız bu cihazda.</p><button id="bulutAcB" style="min-height:44px">Bulut kaydını yeniden aç</button>`
+   :`<button id="bulutSilB" style="min-height:44px">Buluttaki kaydımızı sil</button><p style="font-size:14px">Bu cihazdaki ilerleme kalır; yalnız buluttaki kopya silinir ve eşitleme kapanır.</p>`}</section>`:""}`;}
 function ebeveynAyarBagla(){const V=$("view");
   V.querySelectorAll("[data-onay]").forEach(b=>b.onclick=()=>{const ac=b.dataset.onay==="1";
     if(!ac&&pinVar()){const e=$("ePinEski");if(!pinDogru(e?e.value.trim():"")){toast("Kapatmak için mevcut şifreyi \"Mevcut şifre\" kutusuna yazın");if(e)e.focus();return;}}
     S.ebeveynOnay=ac;save();ebeveynOzet();});
   const pk=$("ePinKaydet");if(pk)pk.onclick=()=>{const y=$("ePin").value.trim(),e=$("ePinEski");if(!/^\d{4}$/.test(y)){toast("Şifre 4 rakam olmalı");return;}if(pinVar()&&!pinDogru(e?e.value.trim():"")){toast("Mevcut şifre yanlış");return;}pinKoy(y);toast("Ebeveyn şifresi kaydedildi");ebeveynOzet();};
   V.querySelectorAll("[data-nzs]").forEach(b=>b.onclick=()=>{let sec=namazSureler().slice(1);const n=+b.dataset.nzs;if(sec.includes(n))sec=sec.filter(x=>x!==n);else{sec.push(n);if(sec.length>3)sec.shift();}S.namazSure=sec.length===3?sec:sec.concat(NAMAZ_VARSAYILAN.filter(x=>!sec.includes(x))).slice(0,3);save();ebeveynOzet();});
-  V.querySelectorAll("[data-nzac]").forEach(b=>b.onclick=()=>{S.namazAcik=!S.namazAcik;save();ebeveynOzet();});}
+  V.querySelectorAll("[data-nzac]").forEach(b=>b.onclick=()=>{S.namazAcik=!S.namazAcik;save();ebeveynOzet();});
+  const bs=$("bulutSilB");if(bs)bs.onclick=async()=>{if(!bs.dataset.onay){bs.dataset.onay="1";bs.textContent="Emin misiniz? Silmek için bir daha basın";return;}
+    bs.disabled=true;bs.textContent="Siliniyor…";try{const h=await bulutSil();toast(h?"Bazı kayıtlar silinemedi; bağlantıyı denetleyip yeniden deneyin":"Buluttaki kaydınız silindi");}catch(e){toast("Bulut bağlantısı yok; kayıt silinemedi");}ebeveynOzet();};
+  const ba=$("bulutAcB");if(ba)ba.onclick=()=>bulutAc();}
 
 /* ========== HAFTALIK AİLE HALKASI: haftada bir, 10 dakika, ailece ========== */
 function haftaAnahtar(){const d=new Date();const y=new Date(d.getFullYear(),0,1);return d.getFullYear()+"-H"+Math.ceil(((d-y)/864e5+y.getDay()+1)/7);}

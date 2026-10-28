@@ -26,8 +26,14 @@ const d0=ev('JSON.stringify(ekS("ezberDurum")[0])');ok('son basamakta onay bekli
 ev('anaSayfa()');ok('bugün panelinde onay düğmesi',!!w.document.getElementById('onayGit'));ok('namaz kartı görünüyor',/Namaz hazırlığı yolu/.test(w.document.getElementById('view').textContent));
 w.document.getElementById('onayGit').click();await new Promise(r=>setTimeout(r,400));
 const V=()=>w.document.getElementById('view');ok('onay ekranı',/İhlâs · 1\. ayet/.test(V().textContent));
-V().querySelector('#oPin').value='1234';V().querySelector('#oPin2').value='1234';V().querySelector('[data-on="1"]').click();await new Promise(r=>setTimeout(r,400));
-ok('onaylandı → ezberde',ev('ezbTam(S.sure["112"].ezberDurum[0])')&&!!ev('S.sure["112"].ezberDurum[0].onaylandi'));ok('şifre kaydedildi',ev('pinVar()'));
+ok('şifre yokken onay ekranı ebeveyn bölümüne yönlendirir',!!V().querySelector('#oSifreGit')&&!V().querySelector('#oPin2'));
+V().querySelector('#oSifreGit').click();await new Promise(r=>setTimeout(r,300));ok('yetişkin kapısı çıktı',!!V().querySelector('#kCvp'));
+V().querySelector('#kCvp').value='1';V().querySelector('#kTamam').click();await new Promise(r=>setTimeout(r,300));ok('yanlış cevapla kapı açılmadı',!!V().querySelector('#kCvp')&&!V().querySelector('[data-onay]'));
+{const t=V().querySelector('label[for=kCvp]').textContent.match(/(\d+) × (\d+)/);V().querySelector('#kCvp').value=String(t[1]*t[2]);V().querySelector('#kTamam').click();await new Promise(r=>setTimeout(r,400));ok('doğru cevapla ebeveyn bölümü açıldı',!!V().querySelector('[data-onay]'));}
+V().querySelector('#ePin').value='1234';V().querySelector('#ePinKaydet').click();await new Promise(r=>setTimeout(r,300));ok('şifre ebeveyn bölümünde kaydedildi',ev('pinVar()'));
+await ev('onayEkrani()');await new Promise(r=>setTimeout(r,300));
+V().querySelector('#oPin').value='1234';V().querySelector('[data-on="1"]').click();await new Promise(r=>setTimeout(r,400));
+ok('onaylandı → ezberde',ev('ezbTam(S.sure["112"].ezberDurum[0])')&&!!ev('S.sure["112"].ezberDurum[0].onaylandi'));
 // yanlış şifre
 ev('S.sure["112"].ezberDurum[1]={kutu:4,sonraki:"2026-12-01",tam:true,onayBekle:true}');await ev('onayEkrani()');await new Promise(r=>setTimeout(r,300));
 V().querySelector('#oPin').value='9999';V().querySelector('[data-on="1"]').click();ok('yanlış şifre reddedildi',!!ev('S.sure["112"].ezberDurum[1].onayBekle'));

@@ -38,7 +38,9 @@ function bugunBagla(){
   document.querySelectorAll("[data-nz]").forEach(b=>b.onclick=()=>ac(+b.dataset.nz,"ezber"));
   const d=$("defterOyna");if(d)d.onclick=()=>kelimeDefteri();
   const y=$("yanlisOyna");if(y)y.onclick=()=>yanlisCalis();
-  document.querySelectorAll(".svb").forEach(b=>b.onclick=()=>{S.seviye=b.dataset.sv;save();anaSayfa();});
+  document.querySelectorAll(".svb").forEach(b=>b.onclick=()=>{const sec=()=>{S.seviye=b.dataset.sv;save();anaSayfa();};
+    /* "yetişkin" seviyesi ebeveyn onayını kapatabileceği için yetişkin kapısından geçer */
+    if(b.dataset.sv==="yetiskin"&&S.seviye!=="yetiskin"&&!kapiAcik())ebeveynKapisi(sec);else sec();});
   const ef=$("efektAc");if(ef)ef.onclick=()=>{S.efekt=S.efekt===false;save();anaSayfa();if(S.efekt!==false)efekt("dogru");};
 }
 function defterIsle(id,w,o,ok){

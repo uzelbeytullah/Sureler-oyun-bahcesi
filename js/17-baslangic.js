@@ -9,6 +9,7 @@ fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch((
 async function bulutBasla(){
   try{
     if(!window.claude||!claude.use)return;
+    if(claude.bulut&&bulutKapali()){$("sync").textContent="Bulut kaydı kapalı; ilerleme yalnız bu cihazda";return;}
     const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
     if(!db||!user)return;
     const id=await user.id();if(!id)return;DB=db;USR=user;UID=id;try{USR_EDIT=!!(await user.canEdit());USR_YAZ=await user.can("data.write");}catch(e){}

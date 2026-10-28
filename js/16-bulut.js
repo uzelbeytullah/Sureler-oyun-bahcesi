@@ -115,7 +115,17 @@ let sayacT=null;
 function sayacIsle(bolum){const t=today();S.kullanim=S.kullanim||{};const g=S.kullanim[t]=S.kullanim[t]||{};g[bolum]=(g[bolum]||0)+1;
   const ks=Object.keys(S.kullanim).sort();while(ks.length>91)delete S.kullanim[ks.shift()];
   if(DB&&UID&&!sayacT)sayacT=setTimeout(sayacGonder,600000);}
-function sayacGonder(){clearTimeout(sayacT);sayacT=null;if(!DB||!UID||!S.kullanim)return;const j=JSON.stringify(S.kullanim);if(j===sayacGonder.son)return;sayacGonder.son=j;DB.collection("kullanim").doc(UID).set({g:S.kullanim,s:S.seviye||""}).catch(()=>{sayacGonder.son="";});}
+/* ---------- bulut kaydını silme (yalnız GitHub sürümü) ---------- */
+const BULUT_KAPALI_KEY="bahce-bulut-kapali";
+function bulutKapali(){try{return localStorage.getItem(BULUT_KAPALI_KEY)==="1";}catch(e){return false;}}
+async function bulutSil(){if(!DB||!UID)throw new Error("bulut yok");
+  const kol=DB.collection("data/users/"+UID),L=[...PROF.liste.map(p=>kol.doc(docAdi(p.id))),kol.doc("profiller"),DB.collection("kullanim").doc(UID)];
+  docRef=null;window.DBK=null;clearTimeout(saveTimer);saveTimer=null;clearTimeout(sayacT);sayacT=null;
+  try{localStorage.setItem(BULUT_KAPALI_KEY,"1");}catch(e){}
+  const r=await Promise.allSettled(L.map(d=>typeof d.delete==="function"?d.delete():Promise.resolve()));
+  return r.filter(x=>x.status==="rejected").length;}
+function bulutAc(){try{localStorage.removeItem(BULUT_KAPALI_KEY);}catch(e){}location.reload();}
+function sayacGonder(){clearTimeout(sayacT);sayacT=null;if(!DB||!UID||!S.kullanim||bulutKapali())return;const j=JSON.stringify(S.kullanim);if(j===sayacGonder.son)return;sayacGonder.son=j;DB.collection("kullanim").doc(UID).set({g:S.kullanim,s:S.seviye||""}).catch(()=>{sayacGonder.son="";});}
 /* sayfa gizlenince ya da kapanınca bekleyen bulut yazmalarını hemen gönder */
 document.addEventListener("visibilitychange",()=>{if(document.hidden){bulutGonder();sayacGonder();}});
 window.addEventListener("pagehide",()=>{bulutGonder();sayacGonder();});

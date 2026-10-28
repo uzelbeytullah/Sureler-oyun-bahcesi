@@ -34,7 +34,8 @@ service cloud.firestore {
 
     // Kullanim sayaci: herkes yalniz kendininkini yazar; okumak yalniz konsoldan
     match /kullanim/{uid} {
-      allow write: if ben(uid) && yeni().keys().hasOnly(['g', 's'])
+      allow delete: if ben(uid);
+      allow create, update: if ben(uid) && yeni().keys().hasOnly(['g', 's'])
                     && yeni().g is map && yeni().g.size() <= 92
                     && yeni().s is string && yeni().s.size() <= 12;
     }

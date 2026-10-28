@@ -74,7 +74,8 @@
         });
       },
       set: function (v) { return ref.set(temiz(v)); },
-      update: function (v) { return ref.update(temiz(v)); }
+      update: function (v) { return ref.update(temiz(v)); },
+      delete: function () { return ref.delete(); }
     };
   }
   function koleksiyon(yol) {
@@ -119,13 +120,14 @@
           if (sahibim) kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).catch(function () {});
           return benim.set({ presence: temiz(benimDurum), t: SUNUCU(), son: son() });
         }
-        var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 15000);
+        /* 30 saniyede bir "buradayım" (ücretsiz plandaki günlük yazma sınırını korumak için seyrek) */
+        var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 30000);
 
         kapat.push(esler.onSnapshot(function (s) {
           var ben = s.docs.find(function (d) { return d.id === u.uid; });
           var bt = ben && ms(ben.data({ serverTimestamps: "estimate" }).t);
           if (ben && !ben.metadata.hasPendingWrites && bt) fark = bt - Date.now();
-          var sinir = simdi() - 45000;
+          var sinir = simdi() - 75000;   // iki nabız kaçıran oyuncu listeden düşer
           liste = s.docs.filter(function (d) { return ms(d.data({ serverTimestamps: "estimate" }).t) > sinir || d.id === u.uid; })
             .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: ac(d.data().presence || {}) }; });
           peerCb.forEach(function (f) { try { f(liste); } catch (e) {} });
@@ -152,7 +154,12 @@
           return {
             peers: function () { return liste.slice(); },
             onPeers: function (f) { peerCb.push(f); return function () { peerCb = peerCb.filter(function (x) { return x !== f; }); }; },
-            presence: function (v) { benimDurum = v || {}; return nabiz(); },
+            presence: function (v) {
+              /* değişmeyen durumu yeniden yazma; nabız zaten tazeliyor */
+              var j = JSON.stringify(v || {});
+              if (j === JSON.stringify(benimDurum)) return Promise.resolve();
+              benimDurum = v || {}; return nabiz();
+            },
             on: function (olay, f) { (olayCb[olay] = olayCb[olay] || []).push(f); },
             emit: function (olay, veri) {
               var j = JSON.stringify(veri);
