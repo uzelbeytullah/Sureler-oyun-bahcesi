@@ -12,6 +12,8 @@
   - `05` … `15` bölümler (Kur'an insanı, kitaptan bölümler, ilkeler, ezber araçları, hikâye, ebeveyn, bahçe, Elif-ba, Hangi sure?)
   - `16-bulut.js` aile yarışması, ortak hedef, kullanım sayacı
   - `17-baslangic.js` erişilebilirlik ve başlangıç
+  - `18-hakkinda.js` Hakkında ve gizlilik sayfası
+  - `19-aile-sinif.js` aile kodu (cihaz bağlama) ve öğretmen paneli · yalnız GitHub sürümünde görünür (`claude.bulut`)
 - `bulut.js`, `bulut-ayar.js` · GitHub sürümünde Firebase köprüsü (Claude sürümünde kullanılmaz).
 - `firestore.rules` · veritabanı güvenlik kuralları (Firebase konsolunda da yayınlanmalı).
 - App Check · veritabanına yalnız bu siteden istek gelsin diye reCAPTCHA Enterprise kullanılır. Anahtar `bulut-ayar.js`
@@ -33,3 +35,14 @@
 GitHub sürümü ile claude.ai sürümü aynı kodu kullanır. Claude sürümü `python araclar/claude-surumu.py` ile
 tek dosya olarak üretilir (`claude-index.html`): kod ve stil satır içine alınır, "Bulut köprüsü" bölümü çıkarılır;
 aile yarışması ve ortak hedef orada Claude'un kendi altyapısıyla çalışır.
+
+## Aile kodu ve öğretmen paneli (yalnız GitHub sürümü)
+
+- Kayıt yolu tek yardımcıdan gelir: `kayitKoleksiyonu()` / `kayitYolu()` (js/16). Aile kodu (`bahce-aile-kodu`) varsa
+  `aileler/{kod}/kayit`, yoksa `data/users/{uid}`. Kayıt yolunu doğrudan yazmayın.
+- `aileler/{kod}` = {sahip, uyeler, t}; kodu bilen cihaz yalnız kendini `uyeler`e ekleyebilir (en çok 8). Ekleme/çıkarma
+  `bulut.js` içindeki `listeyeEkle` / `listedenCikar` (Firestore arrayUnion/arrayRemove) ile yapılır.
+- `siniflar/{kod}` = {ogretmen, ad, odev, t}; `siniflar/{kod}/ogrenciler/{uid | uid_kişi}` = {ad (takma), ozet, t}.
+  Öğrenciden yalnız özet sayılar gider (ezberde, yildiz, sonGun, odevDurum); günde en çok 6 yazma.
+- `bulutSil` aileyi (sahipse) ya da üyeliği, öğrenci ve öğretmen kayıtlarını da siler (`aileSinifSil`).
+- `firestore.rules` değişti: Firebase konsolunda yeniden yayınlayın.

@@ -5,10 +5,10 @@ const GUNCELLEME="28 Ekim 2026";
 function hakkindaHtml(sekme){
   const gh=!!(window.claude&&claude.bulut);
   const sek=[["hakkinda","Hakkında"],["gizlilik","Gizlilik"],["kaynaklar","Kaynaklar"]];
-  const ust=`<button class="geri" id="hkG">← Sureler</button>
+  const ust=`<button class="geri" id="hkG">${ikon("arrow-left")}Sureler</button>
   <div class="subtabs" role="tablist" aria-label="Bilgi sayfaları">${sek.map(([k,a])=>`<button role="tab" data-hk="${k}" class="${k===sekme?"on":""}" aria-selected="${k===sekme}">${a}</button>`).join("")}</div>`;
   if(sekme==="gizlilik")return ust+`<h2>Gizlilik</h2>
-  <p style="font-size:14px">Son güncelleme: ${GUNCELLEME}</p>
+  <p class="kucuk-yazi">Son güncelleme: ${GUNCELLEME}</p>
   <section class="detay"><h3>Kısaca (çocuklar için)</h3><p>Adın ve oyundaki ilerlemen bu cihazda durur. Annen ya da baban isterse buluta da kaydedilir. Sesini kaydedersen o ses telefonundan hiç çıkmaz. Aile yarışmasında yazdığın adı odadaki herkes görür; istersen takma ad yaz.</p></section>
   <section class="detay"><h3>Veri sorumlusu ve iletişim</h3><p>Sureler Oyun Bahçesi'ni hazırlayan geliştirici (GitHub: uzelbeytullah). Sorularınız ve talepleriniz için: <a href="${ILETISIM_URL}" target="_blank" rel="noopener">GitHub üzerinden yazın</a>.</p></section>
   <section class="detay"><h3>Hangi veriler, neden?</h3><ul>
@@ -18,6 +18,8 @@ function hakkindaHtml(sekme){
    <li><b>Ses kaydı</b> ("Ben okuyayım"): yalnız cihazın belleğinde tutulur, hiçbir yere gönderilmez, sayfadan çıkınca silinir.</li>
   </ul><p>Kur'an ezber ilerlemesi dinî bir etkinliğe işaret edebildiği için özenle korunması gereken veri olarak ele alınır.</p></section>
   ${gh?`<section class="detay"><h3>Bulut kaydı (isteğe bağlı)</h3><p>Varsayılan olarak her şey yalnız bu cihazdadır. Veli, ebeveyn bölümünden izin vererek bulut kaydını açarsa kişi adları, yaşları ve ilerleme, bu tarayıcıya bağlı adsız bir hesapla <b>Google Firebase</b>'de saklanır. Bu hizmetin sunucuları yurt dışındadır (Avrupa ve ABD); veriler bu nedenle yurt dışına aktarılmış olur. Bulut açıkken kötüye kullanımı önlemek için <b>Google reCAPTCHA</b> tarayıcıdan teknik bilgiler alır.</p>
+  <p>Aile kodu oluşturursanız ya da bir aile koduna katılırsanız, kişiler ve ilerleme aile kaydında saklanır ve o koda bağlı cihazların (en çok 8) hepsi bunları görür. Kodu yalnız ailenizle paylaşın.</p>
+  <p>Çocuğunuzu bir sınıfa katarsanız öğretmen yalnız seçtiğiniz takma adı ve özet sayıları görür: ezberdeki ayet sayısı, toplam yıldız, son çalışma günü ve ödev durumu. Ayrıntılı ilerleme gönderilmez. Sınıftan çıkınca ya da bulut kaydını silince bu kayıt silinir.</p>
   <p>Aile yarışması ve ortak hedef de bulutu kullanır. Yarışmada yazılan ad ve verilen cevaplar odadaki oyunculara görünür; oda kapanınca silinir. Ortak hedefte yalnız katkı sayısı tutulur.</p></section>
   <section class="detay"><h3>Ne kadar süre, nasıl silinir?</h3><p>Cihazdaki veriler siz silene kadar kalır (tarayıcı verilerini temizlemek hepsini siler). Bulut kaydı, ebeveyn bölümündeki <b>"Buluttaki kaydımızı sil"</b> düğmesine basana kadar kalır; bu düğme buluttaki kişi ve ilerleme kayıtlarını, ortak hedef katkısını ve adsız hesabı siler.</p></section>`:
   `<section class="detay"><h3>Bu sürümde veriler</h3><p>claude.ai sürümünde ilerleme, oyunu açan Claude hesabına bağlı olarak Claude'un depolamasında tutulur. Aile yarışması ve ortak hedef de Claude'un altyapısını kullanır.</p></section>`}
@@ -40,8 +42,11 @@ function hakkindaHtml(sekme){
    <li><b>Ailece:</b> haftada bir "Aile halkası", istediğiniz zaman aile yarışması.</li>
    <li><b>Ebeveyn bölümü:</b> ana sayfadaki ebeveyn özetinden; ayarlar, şifre, namaz hazırlığı yolu ve bulut kaydı oradadır.</li></ul></section>
   <section class="detay"><h3>İçerik</h3><p>Meal, Elmalılı Hamdi Yazır'ın sadeleştirilmiş mealidir. Çocuk anlatımları sade ve korkutmayan bir dille yazılmıştır; ayrıntısı büyüyünce öğrenilecek ayetler küçüklere bu notla gösterilir. Kaynakların listesi "Kaynaklar" sekmesindedir.</p>
-  <p>Bir hata görürseniz lütfen <a href="${ILETISIM_URL}" target="_blank" rel="noopener">bize yazın</a>.</p></section>`;}
+  <p>Bir hata görürseniz lütfen <a href="${ILETISIM_URL}" target="_blank" rel="noopener">bize yazın</a>.</p></section>
+  <section class="kart" aria-labelledby="temaBas"><h3 id="temaBas" class="m0">${ikon("sun-moon")} Görünüm</h3><p class="kucuk-yazi">Otomatik, cihazın açık ya da koyu ayarını izler.</p>
+  <div class="tema-sec" role="group" aria-labelledby="temaBas">${[["oto","Otomatik"],["acik","Açık"],["koyu","Koyu"]].map(([k,a])=>`<button data-tema="${k}" class="${temaOku()===k?"on":""}" aria-pressed="${temaOku()===k}">${a}</button>`).join("")}</div></section>`;}
 function hakkinda(sekme){sekme=sekme||"hakkinda";CUR=null;baslik();setTabs();durSes();$("baslik").textContent="Hakkında";$("altbaslik").textContent="Sureler Oyun Bahçesi";
   const V=$("view");V.innerHTML=hakkindaHtml(sekme);$("hkG").onclick=()=>anaSayfa();
-  V.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>hakkinda(b.dataset.hk));window.scrollTo({top:0});}
+  V.querySelectorAll("[data-hk]").forEach(b=>b.onclick=()=>hakkinda(b.dataset.hk));
+  V.querySelectorAll("[data-tema]").forEach(b=>b.onclick=()=>{temaAyarla(b.dataset.tema);V.querySelectorAll("[data-tema]").forEach(x=>{const on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-pressed",String(on));});});window.scrollTo({top:0});}
 {const a=document.getElementById("hakkindaAc");if(a)a.onclick=()=>hakkinda("hakkinda");}

@@ -13,13 +13,13 @@ async function bulutBasla(){
     const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
     if(!db||!user)return;
     const id=await user.id();if(!id)return;DB=db;USR=user;UID=id;try{USR_EDIT=!!(await user.canEdit());USR_YAZ=await user.can("data.write");}catch(e){}
-    window.DBK=db.collection("data/users/"+id).doc("profiller");
+    window.DBK=kayitKoleksiyonu().doc("profiller");   /* aile kodu varsa aileler/{kod}/kayit, yoksa data/users/{UID} */
     try{const ps=await DBK.get();const rl=(ps&&ps.exists?(ps.data().liste||[]):[]).filter(p=>p&&/^[A-Za-z0-9_]{1,24}$/.test(String(p.id))).map(p=>({...p,yas:Number(p.yas)||undefined}));   /* buluttan gelen kişi kaydını ekrana basmadan önce denetle; desen kurallardaki belge adıyla aynı */
       let deg=false;rl.forEach(p=>{if(!PROF.liste.some(x=>x.id===p.id)){PROF.liste.push(p);deg=true;}});
       try{localStorage.setItem("bahce-profil",JSON.stringify(PROF));}catch(e){}if(rl.length<PROF.liste.length||deg)DBK.set({liste:PROF.liste}).catch(()=>{});}catch(e){}
     if(!PROF.aktif){if(!CUR&&anaSayfa.no===EKRAN_NO)anaSayfa();bulutBasla.tamam=true;return;}
     /* docRef ancak buluttaki kayıt okunup birleştirildikten sonra atanır; okuma düşerse yerel durum buluttakinin üstüne yazılmaz */
-    const aktif=PROF.aktif,ref=db.collection("data/users/"+id).doc(docAdi(aktif));
+    const aktif=PROF.aktif,ref=kayitKoleksiyonu().doc(docAdi(aktif));
     const once=JSON.stringify(S);   /* bulut gelirken çocuk ilerleme yaptıysa açık ekranı yeni durumla yeniden çizeceğiz */
     const snap=await ref.get();
     if(PROF.aktif!==aktif)return;   /* bu arada kişi değiştiyse kisiGec kendi eşitlemesini yapar */

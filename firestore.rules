@@ -73,5 +73,77 @@ service cloud.firestore {
       allow delete: if girisli()
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid;
     }
+
+    // Aile kodu: ayni ailenin cihazlari kayitlari ortak yoldan esitler
+    // Kod 10 harf/rakam (tahmin edilemez); kodu bilen kisi yalniz kendini uyelere ekleyebilir (en cok 8 uye)
+    function aileKod(kod) { return kod.matches('[A-Z2-9]{10}'); }
+    function aileUyesi(kod) {
+      return girisli() && request.auth.uid in get(/databases/$(database)/documents/aileler/$(kod)).data.uyeler;
+    }
+    match /aileler/{kod} {
+      allow get: if girisli() && request.auth.uid in resource.data.uyeler;
+      allow create: if girisli() && aileKod(kod) && yeni().keys().hasOnly(['sahip', 'uyeler', 't'])
+                    && yeni().sahip == request.auth.uid && yeni().uyeler == [request.auth.uid]
+                    && yeni().t is string && yeni().t.size() <= 10;
+      allow update: if girisli() && yeni().diff(resource.data).affectedKeys().hasOnly(['uyeler']) && yeni().uyeler is list
+                    && (
+                      // (i) uye olmayan yalniz kendini sona ekler
+                      (!(request.auth.uid in resource.data.uyeler)
+                        && yeni().uyeler == resource.data.uyeler.concat([request.auth.uid]) && yeni().uyeler.size() <= 8)
+                      // (ii) sahip uyeleri cikarabilir (kendisi listede kalir)
+                      || (resource.data.sahip == request.auth.uid && resource.data.uyeler.hasAll(yeni().uyeler)
+                        && request.auth.uid in yeni().uyeler)
+                      // (iii) sahip olmayan uye kendini cikarabilir
+                      || (request.auth.uid in resource.data.uyeler && resource.data.sahip != request.auth.uid
+                        && yeni().uyeler == resource.data.uyeler.removeAll([request.auth.uid]))
+                    );
+      allow delete: if girisli() && resource.data.sahip == request.auth.uid;
+    }
+    match /aileler/{kod}/kayit/{belge} {
+      allow read, write: if aileKod(kod) && aileUyesi(kod) && belge.matches('profiller|fatiha(-[A-Za-z0-9_]{1,24})?');
+    }
+
+    // Ogretmen paneli: sinif belgesi herkese okunur (ogrenci katilirken sinif adini gorur); yalniz ogretmen degistirir
+    function sinifKod(kod) { return kod.matches('[A-Z2-9]{8}'); }
+    function sinifOgretmeni(kod) {
+      return girisli() && get(/databases/$(database)/documents/siniflar/$(kod)).data.ogretmen == request.auth.uid;
+    }
+    function odevIyi() {
+      return yeni().odev == null || (yeni().odev is map && yeni().odev.keys().hasOnly(['sure', 'tur', 'son'])
+        && yeni().odev.sure is int && yeni().odev.sure >= 1 && yeni().odev.sure <= 999999
+        && yeni().odev.tur in ['ezber', 'yildiz'] && yeni().odev.son is string && yeni().odev.son.size() <= 10);
+    }
+    function sinifIyi() {
+      return yeni().keys().hasOnly(['ogretmen', 'ad', 'odev', 't'])
+        && yeni().ad is string && yeni().ad.size() > 0 && yeni().ad.size() <= 40
+        && yeni().t is string && yeni().t.size() <= 10 && odevIyi();
+    }
+    match /siniflar/{kod} {
+      allow get: if girisli();
+      allow create: if girisli() && sinifKod(kod) && sinifIyi() && yeni().ogretmen == request.auth.uid;
+      allow update: if girisli() && resource.data.ogretmen == request.auth.uid && sinifIyi()
+                    && yeni().ogretmen == resource.data.ogretmen;
+      allow delete: if girisli() && resource.data.ogretmen == request.auth.uid;
+    }
+    // Ogrenci belgesi: kimlik ya da kimlik_<kisi> (ayni cihazda birden cok cocuk); yalniz takma ad ve ozet sayilar
+    function benimOgrenci(uid) {
+      return girisli() && (uid == request.auth.uid || uid.matches(request.auth.uid + '_[A-Za-z0-9_]{1,24}'));
+    }
+    match /siniflar/{kod}/ogrenciler/{uid} {
+      allow get: if benimOgrenci(uid) || sinifOgretmeni(kod);
+      allow list: if sinifOgretmeni(kod);
+      allow create, update: if benimOgrenci(uid) && sinifKod(kod)
+                    && exists(/databases/$(database)/documents/siniflar/$(kod))
+                    && yeni().keys().hasOnly(['ad', 'ozet', 't'])
+                    && yeni().ad is string && yeni().ad.size() > 0 && yeni().ad.size() <= 20
+                    && yeni().t is string && yeni().t.size() <= 10
+                    && yeni().ozet is map && yeni().ozet.keys().hasOnly(['ezberde', 'yildiz', 'sonGun', 'odevDurum'])
+                    && yeni().ozet.ezberde is int && yeni().ozet.ezberde >= 0 && yeni().ozet.ezberde <= 10000
+                    && yeni().ozet.yildiz is int && yeni().ozet.yildiz >= 0 && yeni().ozet.yildiz <= 10000
+                    && yeni().ozet.sonGun is string && yeni().ozet.sonGun.size() <= 10
+                    && yeni().ozet.odevDurum in ['yok', 'suruyor', 'tamam', 'gecikti'];
+      // ogrenci kendini cikarir; ogretmen sinifi silerken ogrenci kayitlarini da siler
+      allow delete: if benimOgrenci(uid) || sinifOgretmeni(kod);
+    }
   }
 }

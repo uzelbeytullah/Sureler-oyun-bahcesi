@@ -11,5 +11,6 @@
 | Kelime ve ayet zamanlama verisi | Doğrulanıyor | Doğrulanıyor | — |
 | Amiri yazı tipi | The Amiri Project Authors | SIL Open Font License 1.1 (`fonts/OFL-Amiri.txt`) | Uygun |
 | Rubik yazı tipi | The Rubik Project Authors | SIL Open Font License 1.1 (`fonts/OFL-Rubik.txt`) | Uygun |
+| Lucide ikonları (`js/00-ikonlar.js`, lucide-static 0.460.0) | Lucide Contributors; bir bölümü Cole Bemis / Feather (MIT) | ISC lisansı: telif ve izin bildirimi korunarak kullanılabilir, değiştirilebilir, dağıtılabilir ([lisans](https://lucide.dev/license)); bildirim dosyanın başındadır | Uygun |
 | Firebase JavaScript SDK | Google | Apache-2.0 (sayfa çalışırken gstatic.com'dan yüklenir, depoda yoktur) | Uygun |
 | reCAPTCHA Enterprise | Google | Google hizmet koşulları | Uygun |

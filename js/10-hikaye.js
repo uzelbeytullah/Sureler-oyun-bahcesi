@@ -118,25 +118,25 @@ function animKonus(metin,bitti){
 function animAc(A,geri){sayacIsle("hikaye");
   animDurum={A,i:0,oto:false,sesli:!!A.ses,zaman:null,ses:new Audio(),sa:new Audio(),geri:geri||cocuk};animDurum.ses.preload="metadata";animDurum.sa.preload="metadata";animDurum.ses.addEventListener("play",sikCalistir);animDurum.sa.addEventListener("play",sikCalistir);
   const V=$("view");
-  V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="anGeri">← ${geri?"Geri":"Çocuklar için"}</button></div>
-  <h2 style="font-size:24px">${esc(A.kisa||A.baslik)}${A.alt?` <span style="font-size:17px">(${esc(A.alt)})</span>`:""}</h2>
+  V.innerHTML=`<div class="esnek ara-2 sarmal"><button class="geri" id="anGeri">${ikon("arrow-left")}${geri?"Geri":"Çocuklar için"}</button></div>
+  <h2 class="yazi-5">${esc(A.kisa||A.baslik)}${A.alt?` <span class="yazi-3">(${esc(A.alt)})</span>`:""}</h2>
   <div id="anSahne" class="an-kutu"></div>
   <div id="anIpucu" class="an-ipucu" hidden></div>
   <p id="anMetin" class="an-metin" aria-live="polite"></p>
   <div id="anOkuma" class="an-okuma" hidden></div><div id="anAile"></div>
   <div class="bar"><i id="anBar"></i></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-   <button id="anOnce" aria-label="Önceki sahne" style="font-size:20px;min-width:56px">◀</button>
-   <button class="primary" id="anOyna" style="font-size:20px;min-width:150px">▶ Oynat</button>
-   <button id="anSonra" aria-label="Sonraki sahne" style="font-size:20px;min-width:56px">▶▶</button>
-   ${A.ses||animSesVar()?`<button id="anSes" class="${A.ses?"on":""}" style="font-size:18px">${A.ses?"🔊 Seslendirme: açık":"🔈 Sesli anlat: kapalı"}</button>`:""}</div>
-  ${A.not?`<p style="font-size:16px;text-align:center"><b>${esc(A.not)}</b></p>`:""}
-  <p style="font-size:14px;text-align:center">Karakterler bilerek yüzsüz çizildi. ${A.ses?"Türkçe anlatım yapay zekâ sesiyle (Microsoft Emel ve Ahmet) yapıldı; ayetleri Mişari Râşid el-Afasi okuyor.":"Sesli anlatım telefonun kendi Türkçe sesiyle yapılır."}</p>`;
+  <div class="esnek ara-2 sarmal yatay-orta">
+   <button id="anOnce" aria-label="Önceki sahne" class="yazi-4 gen56">◀</button>
+   <button class="primary" id="anOyna" style="font-size:var(--fs-4);min-width:150px">${ikon("play")} Oynat</button>
+   <button id="anSonra" aria-label="Sonraki sahne" class="yazi-4 gen56">▶▶</button>
+   ${A.ses||animSesVar()?`<button id="anSes" class="yazi-4 ${A.ses?"on":""}">${A.ses?ikon("volume-2")+" Seslendirme: açık":ikon("volume-x")+" Sesli anlat: kapalı"}</button>`:""}</div>
+  ${A.not?`<p class="kucuk-yazi ortali"><b>${esc(A.not)}</b></p>`:""}
+  <p class="kucuk-yazi ortali">Karakterler bilerek yüzsüz çizildi. ${A.ses?"Türkçe anlatım yapay zekâ sesiyle (Microsoft Emel ve Ahmet) yapıldı; ayetleri Mişari Râşid el-Afasi okuyor.":"Sesli anlatım telefonun kendi Türkçe sesiyle yapılır."}</p>`;
   $("anGeri").onclick=()=>{animDur();animDurum.geri();};
   $("anOnce").onclick=()=>{animDur();animDurum.elle=true;animGit(Math.max(0,animDurum.i-1));};
   $("anSonra").onclick=()=>{animDur();animDurum.elle=true;animGit(Math.min(A.sahneler.length-1,animDurum.i+1));};
-  $("anOyna").onclick=()=>{if(animDurum.oto){animDur();return;}if(A.dosya&&!animDurum.acildi){animDurum.acildi=true;[animDurum.ses,animDurum.sa].forEach(a=>{a.muted=true;a.play().then(()=>{a.pause();a.muted=false;}).catch(()=>{a.muted=false;});});}animDurum.oto=true;$("anOyna").textContent="❚❚ Durdur";if(animDurum.i>=A.sahneler.length-1)animDurum.i=0;animGit(animDurum.i,true);};
-  const s=$("anSes");if(s)s.onclick=()=>{animDurum.sesli=!animDurum.sesli;s.textContent=animDurum.sesli?(A.ses?"🔊 Seslendirme: açık":"🔊 Sesli anlat: açık"):(A.ses?"🔈 Seslendirme: kapalı":"🔈 Sesli anlat: kapalı");s.classList.toggle("on",animDurum.sesli);if(!animDurum.sesli){animDurum.ses.pause();animKlipDur();try{speechSynthesis.cancel();}catch(e){}}else if(!animDurum.oto)animSesCal(animDurum.i);};
+  $("anOyna").onclick=()=>{if(animDurum.oto){animDur();return;}if(A.dosya&&!animDurum.acildi){animDurum.acildi=true;[animDurum.ses,animDurum.sa].forEach(a=>{a.muted=true;a.play().then(()=>{a.pause();a.muted=false;}).catch(()=>{a.muted=false;});});}animDurum.oto=true;$("anOyna").innerHTML=ikon("pause")+" Durdur";if(animDurum.i>=A.sahneler.length-1)animDurum.i=0;animGit(animDurum.i,true);};
+  const s=$("anSes");if(s)s.onclick=()=>{animDurum.sesli=!animDurum.sesli;s.innerHTML=animDurum.sesli?ikon("volume-2")+(A.ses?" Seslendirme: açık":" Sesli anlat: açık"):ikon("volume-x")+(A.ses?" Seslendirme: kapalı":" Sesli anlat: kapalı");s.classList.toggle("on",animDurum.sesli);if(!animDurum.sesli){animDurum.ses.pause();animKlipDur();try{speechSynthesis.cancel();}catch(e){}}else if(!animDurum.oto)animSesCal(animDurum.i);};
   animGit(0);
 }
 function animZaman(){const D=animDurum;if(!D)return 0;if(D.A.dosya){const k=D.kl&&D.kl[D.ki];if(!k)return D.kBas||0;return D.kBas+Math.max(0,D.kAud.currentTime-k.b);}return D.ses.currentTime;}
@@ -155,19 +155,19 @@ SIK.add(()=>{const D=animDurum;if(!D||!D.kl||!D.klCal)return false;const k=D.kl[
   if(k.f)a.volume=Math.max(0,Math.min(1,(t-k.b)/0.06,(k.e-t)/0.06));
   if(t>=k.e-0.02)animKlipAtla();return true;});
 function animIzlendi(i){const D=animDurum;if(!D)return;D.izlenen=D.izlenen||new Set();D.izlenen.add(i);const A=D.A,n=A.sahneler.length;
-  if(i===n-1&&D.izlenen.size>=Math.ceil(n*0.7)){const key=(A.no||"")+"|"+A.baslik;S.hikIzle=S.hikIzle||{};if(!S.hikIzle[key]){S.hikIzle[key]=today();gun();S.puan+=15;gorevIsle("hikaye");logIsle("hikaye");efekt("gorev");kutla(true);toast("Hikâyeyi izledin, 15 puan");checkBadges();save();renderStats();}}}
+  if(i===n-1&&D.izlenen.size>=Math.ceil(n*0.7)){const key=(A.no||"")+"|"+A.baslik;S.hikIzle=S.hikIzle||{};if(!S.hikIzle[key]){S.hikIzle[key]=today();gun();S.puan+=15;gorevIsle("hikaye");logIsle("hikaye");efekt("gorev");kutla(true);toast(minik()?"⭐ Aferin! Hikâyeyi izledin":"Hikâyeyi izledin, 15 puan");checkBadges();save();renderStats();}}}
 function animSesCal(i,bitti){const D=animDurum;if(!D.A.ses||!D.A.dosya){animKonus(D.A.sahneler[i].metin,bitti);return;}
   animKlipDur();D.kl=D.A.sahneler[i].klip;D.ki=0;D.kBas=0;D.klBitti=bitti;animKlipBasla();}
 // ses çalarken balon gizli kalırsa (ses hatası) güvenlik: 4 sn sonra göster
 
-function animDur(){if(!animDurum)return;animDurum.oto=false;const bb=document.querySelector('.an-balon.bekle');if(bb)bb.classList.remove('bekle');document.querySelectorAll('.an-ip.bekle').forEach(e=>e.classList.remove('bekle'));clearTimeout(animDurum.zaman);animDurum.ses.pause();animKlipDur();try{speechSynthesis.cancel();}catch(e){}const b=$("anOyna");if(b)b.textContent="▶ Oynat";}
+function animDur(){if(!animDurum)return;animDurum.oto=false;const bb=document.querySelector('.an-balon.bekle');if(bb)bb.classList.remove('bekle');document.querySelectorAll('.an-ip.bekle').forEach(e=>e.classList.remove('bekle'));clearTimeout(animDurum.zaman);animDurum.ses.pause();animKlipDur();try{speechSynthesis.cancel();}catch(e){}const b=$("anOyna");if(b)b.innerHTML=ikon("play")+" Oynat";}
 function animGit(i,devam){
   const D=animDurum,A=D.A;D.i=i;clearTimeout(D.zaman);
   const kutu=$("anSahne");if(!kutu)return;
   kutu.innerHTML=animSahneCiz(A,i);kutu.classList.remove("an-gecis");void kutu.offsetWidth;kutu.classList.add("an-gecis");
-  $("anMetin").textContent=A.sahneler[i].metin;{const ak=$("anAile");if(ak)ak.innerHTML=(i===A.sahneler.length-1&&A.kaynak==="cocuk")?aileKarti():"";}
+  $("anMetin").textContent=A.sahneler[i].metin;{const ak=$("anAile");if(ak)ak.innerHTML=(i===A.sahneler.length-1&&A.kaynak==="cocuk")?(minik()?minikYildiz():"")+aileKarti():"";}
   const ok=A.sahneler[i].okuma,kt=$("anOkuma");
-  if(ok&&CUR&&CUR.ayetler){kt.hidden=false;kt.innerHTML=ok.map((o,k)=>`<div class="an-ayet" data-k="${k}"><span class="kelimeler" lang="ar" style="justify-content:center">${CUR.ayetler[o.ayet-(CUR.ilkAyet||1)].w.map((w,wi)=>(o.c!==undefined&&CUR.cumleler&&(wi<CUR.cumleler[o.c].bas||wi>=CUR.cumleler[o.c].son))?"":`<span class="k${(wi*5+o.ayet*3)%12} ${(A.ipuclari||[]).some(p=>p.ayet===o.ayet&&p.w===wi)?"an-sk":""}">${w.a}</span>`).join("")}<span class="n-ar">﴿${arNum(o.ayet)}﴾</span></span></div>`).join("");
+  if(ok&&CUR&&CUR.ayetler){kt.hidden=false;kt.innerHTML=ok.map((o,k)=>`<div class="an-ayet" data-k="${k}"><span class="yatay-orta kelimeler" lang="ar">${CUR.ayetler[o.ayet-(CUR.ilkAyet||1)].w.map((w,wi)=>(o.c!==undefined&&CUR.cumleler&&(wi<CUR.cumleler[o.c].bas||wi>=CUR.cumleler[o.c].son))?"":`<span class="k${(wi*5+o.ayet*3)%12} ${(A.ipuclari||[]).some(p=>p.ayet===o.ayet&&p.w===wi)?"an-sk":""}">${w.a}</span>`).join("")}<span class="n-ar">﴿${arNum(o.ayet)}﴾</span></span></div>`).join("");
   }else{kt.hidden=true;kt.innerHTML="";}
   const sh=A.sahneler[i],bl=kutu.querySelector(".an-balon");D.ses.ontimeupdate=null;
   const ipK=$("anIpucu"),zamanli=D.sesli&&A.ses&&(D.oto||D.elle);let ipBek=[];
@@ -194,4 +194,10 @@ function animGit(i,devam){
   else D.zaman=setTimeout(sonraki,bekle);
 }
 
+/* Minik ana ekranındaki "Hikâye": kısa surelerden birinin canlandırılmış hikâyesini açar (her gün başka sure; son açılan kısa sureyse o) */
+const MINIK_HIKAYE=[105,112,108,103,106,107,113,114,110,111,1,97,93,94,95];
+async function minikHikaye(){const son=+S.sonSure,no=MINIK_HIKAYE.includes(son)?son:MINIK_HIKAYE[new Date().getDate()%MINIK_HIKAYE.length];
+  await ac(no,"cocuk");/* ac → show("cocuk") hikâyeyi hazırlar; hazır olunca doğrudan canlandırmayı aç */
+  for(let i=0;i<50&&CUR&&CUR.no===no&&(CUR.anim===undefined||cur!=="cocuk");i++)await new Promise(r=>setTimeout(r,100));
+  if(CUR&&CUR.no===no&&CUR.anim&&cur==="cocuk"){animAc(CUR.anim,()=>{CUR=null;anaSayfa();});window.scrollTo({top:0});}}
 async function animYukle(no){const E=await ekParca(no,"a");return E._anim||null;}

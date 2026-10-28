@@ -20,7 +20,7 @@ async function yarKur(){if(CUR&&CUR.ayetler){yarAc();return;}
   CUR=null;baslik();setTabs();$("baslik").textContent="Aile yarışması";$("altbaslik").textContent="Önce bir sure seç";
   const V=$("view"),calisilan=KATALOG.filter(k=>!k.gruplar&&S.sure&&S.sure[k.no]);
   const L=(calisilan.length?calisilan:KATALOG.filter(k=>!k.gruplar&&!k.etiket&&k.ayet&&k.ayet<=11)).slice(0,30);
-  V.innerHTML=`<button class="geri" id="yG">← Sureler</button><h2>👪 Aile yarışması kur</h2>
+  V.innerHTML=`<button class="geri" id="yG">${ikon("arrow-left")}Sureler</button><h2>${ikon("trophy")} Aile yarışması kur</h2>
   <p>${calisilan.length?"Çalıştığın surelerden":"Kısa surelerden"} birini seç; o surenin kelimelerinden 8 soruluk canlı bir yarışma açılır. Bu ekranı herkesin göreceği yere koy; aile üyeleri kendi telefonlarından katılır.</p>
   <div class="sure-grid">${L.map(k=>`<button class="sure-kart" data-yn="${k.no}"><span class="sar" lang="ar">${k.adAr}</span><span class="sad">${esc(k.ad)}</span><span class="sbilgi">${k.etiket?"Tek ayet":k.ayet+" ayet"}</span></button>`).join("")||"<p>Seçilebilecek sure bulunamadı.</p>"}</div>`;
   $("yG").onclick=()=>anaSayfa();
@@ -29,10 +29,10 @@ async function yarKur(){if(CUR&&CUR.ayetler){yarAc();return;}
 function yarBirak(){const Y=YAR;if(!Y)return;YAR=null;try{if(Y.host){clearInterval(Y.tik);Y.durum="bitti";Y.R.emit("durum",{kod:Y.kod,sure:Y.sure,durum:"bitti",i:Y.i,n:Y.Q.length,opts:[],takim:Y.takim?{p:Y.tp,c:Y.tc,n:Y.Q.length}:null,skor:Y.takim?[]:Object.entries(Y.puan).map(([p,n])=>[Y.ad[p]||"Oyuncu",n,p])}).catch(()=>{});}Y.R.leave().catch(()=>{});}catch(e){}}
 window.addEventListener("pagehide",()=>yarBirak());
 const TAKIM_HEDEF=6;
-function yarTakimHtml(t){if(!t)return "";const c=Number(t.c)||0,n=Number(t.n)||0;return `<div class="detay aile-kart"><p style="font-size:20px"><b>👪 Aile puanı: ${Number(t.p)||0}</b></p><p>Ailece bilinen soru: <b>${c} / ${n}</b> · Hedef: ${TAKIM_HEDEF}${c>=TAKIM_HEDEF?" · <b>Hedefe ulaştınız, maşallah!</b>":""}</p></div>`;}
+function yarTakimHtml(t){if(!t)return "";const c=Number(t.c)||0,n=Number(t.n)||0;return `<div class="detay aile-kart"><p class="yazi-4"><b>${ikon("trophy")} Aile puanı: ${Number(t.p)||0}</b></p><p>Ailece bilinen soru: <b>${c} / ${n}</b> · Hedef: ${TAKIM_HEDEF}${c>=TAKIM_HEDEF?" · <b>Hedefe ulaştınız, maşallah!</b>":""}</p></div>`;}
 function yarSkor(){if(YAR.takim)return "";return Object.entries(YAR.puan).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<li><b>${esc(YAR.ad[p]||"Oyuncu")}</b> · ${Number(n)||0} puan</li>`).join("")||"<li>Henüz katılan yok</li>";}
 async function yarAc(){const V=$("view"),oda=await odaAl();
-  if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">← Geri</button>`;$("yG").onclick=()=>show("harita");return;}
+  if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">${ikon("arrow-left")}Geri</button>`;$("yG").onclick=()=>show("harita");return;}
   const kod=rastgeleKod(8);let R;try{R=await oda.join("yaris-"+kod);}catch(e){toast("Oda açılamadı");return;}
   YAR={kod,R,host:true,Q:yarSorular(),i:-1,durum:"bekle",puan:{},ad:{},cevap:{},sure:CUR.ad,takim:true,tp:0,tc:0};
   R.onPeers(()=>{R.peers().forEach(p=>{if(p.isMe)return;const pr=p.presence||{};if(pr.ad){YAR.ad[p.peer]=pr.ad;if(YAR.puan[p.peer]===undefined)YAR.puan[p.peer]=0;}
@@ -40,45 +40,45 @@ async function yarAc(){const V=$("view"),oda=await odaAl();
   YAR.tik=setInterval(()=>{if(YAR&&YAR.host)yarYay();},2500);yarCiz();}
 function yarYay(){const Y=YAR,q=Y.Q[Y.i];Y.R.emit("durum",{kod:Y.kod,sure:Y.sure,durum:Y.durum,i:Y.i,n:Y.Q.length,tur:q?q.tur:"",soruAr:q&&q.ar&&q.tur==="anlam"?q.ar:"",kel:q&&q.kel?q.kel:[],k:q&&q.k!==undefined?q.k:-1,opts:q?q.opts:[],ar:q?q.tur==="bosluk":false,dogru:Y.durum==="sonuc"&&q?q.dogru:null,kolay:q&&q.kolay?q.kolay:[],ses:q&&q.ses?q.ses:[],takim:Y.takim?{p:Y.tp,c:Y.tc,n:Y.Q.length}:null,skor:Y.takim?[]:Object.entries(Y.puan).map(([p,n])=>[Y.ad[p]||"Oyuncu",n,p])}).catch(()=>{});}
 function yarCiz(){const Y=YAR,V=$("view");if(!Y||!Y.host)return;const q=Y.Q[Y.i];const cevapSay=Object.keys(Y.cevap).length,oyuncu=Object.keys(Y.ad).length;
-  V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="yKapat">← Yarışmayı kapat</button></div>
-  <h2>👪 Aile yarışması · ${esc(Y.sure)}</h2>
-  <p style="font-size:20px">Katılım kodu: <b style="font-size:40px;letter-spacing:6px">${Y.kod}</b></p>
+  V.innerHTML=`<div class="esnek ara-2 sarmal"><button class="geri" id="yKapat">${ikon("arrow-left")}Yarışmayı kapat</button></div>
+  <h2>${ikon("trophy")} Aile yarışması · ${esc(Y.sure)}</h2>
+  <p class="yazi-4">Katılım kodu: <b style="font-size:40px;letter-spacing:6px">${Y.kod}</b></p>
   <p>Oyuncular bu sayfayı kendi telefonlarında açıp ana sayfadaki <b>Aile yarışmasına katıl</b> düğmesine basar ve kodu yazar.</p>
-  ${Y.durum==="bekle"?`<p><b>${oyuncu} oyuncu katıldı.</b></p><p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><b>Oyun biçimi:</b><button data-tk="1" class="${Y.takim?"on":""}">👪 Aile takımı (ortak puan)</button><button data-tk="0" class="${Y.takim?"":"on"}">Herkes kendi puanına</button></p>
-   <p style="font-size:14px">${Y.takim?`Herkesin doğrusu ortak puana yazılır; sıralama yok. Hedef: ${Y.Q.length} sorunun ${TAKIM_HEDEF}'sını ailece bilmek.`:"Her oyuncunun puanı ayrı tutulur ve sıralama gösterilir."} Küçük yaştaki oyunculara iki şık ve sesli kelime gelir.</p>
-   <button class="primary" id="yBasla" ${oyuncu?"":"disabled"} style="font-size:20px">Başlat</button>`:""}
+  ${Y.durum==="bekle"?`<p><b>${oyuncu} oyuncu katıldı.</b></p><p class="esnek ara-2 sarmal dik-orta"><b>Oyun biçimi:</b><button data-tk="1" class="${Y.takim?"on":""}">${ikon("users")} Aile takımı (ortak puan)</button><button data-tk="0" class="${Y.takim?"":"on"}">Herkes kendi puanına</button></p>
+   <p class="kucuk-yazi">${Y.takim?`Herkesin doğrusu ortak puana yazılır; sıralama yok. Hedef: ${Y.Q.length} sorunun ${TAKIM_HEDEF}'sını ailece bilmek.`:"Her oyuncunun puanı ayrı tutulur ve sıralama gösterilir."} Küçük yaştaki oyunculara iki şık ve sesli kelime gelir.</p>
+   <button class="yazi-4 primary" id="yBasla" ${oyuncu?"":"disabled"}>Başlat</button>`:""}
   ${q&&Y.durum!=="bitti"?`<div class="qhead"><span>Soru ${Y.i+1} / ${Y.Q.length}</span><span>${cevapSay} / ${oyuncu} cevap</span></div>${yarSoruHtml(q)}
    <div class="opts ${q.tur==="bosluk"?"ar-opts":""}">${q.opts.map(o=>`<button disabled ${q.tur==="bosluk"?'lang="ar"':""} class="${Y.durum==="sonuc"&&o===q.dogru?"ok":""}">${esc(o)}</button>`).join("")}</div>
    ${Y.durum==="soru"?`<button class="primary" id="yGoster">Cevabı göster</button>`:`<button class="primary" id="ySonraki">${Y.i+1<Y.Q.length?"Sonraki soru":"Sonuçlar"}</button>`}`:""}
-  ${Y.durum==="bitti"?`<h2>Sonuç</h2>`:""}${Y.takim?yarTakimHtml({p:Y.tp,c:Y.tc,n:Y.Q.length}):`<h3>Puan tablosu</h3><ol style="font-size:19px">${yarSkor()}</ol>`}`;
+  ${Y.durum==="bitti"?`<h2>Sonuç</h2>`:""}${Y.takim?yarTakimHtml({p:Y.tp,c:Y.tc,n:Y.Q.length}):`<h3>Puan tablosu</h3><ol class="yazi-4">${yarSkor()}</ol>`}`;
   V.querySelectorAll("[data-tk]").forEach(b=>b.onclick=()=>{Y.takim=b.dataset.tk==="1";yarYay();yarCiz();});
   $("yKapat").onclick=()=>{yarBirak();show("harita");};
   const b=$("yBasla");if(b)b.onclick=()=>{Y.i=0;Y.durum="soru";Y.cevap={};yarYay();yarCiz();efekt("seri");};
   const g=$("yGoster");if(g)g.onclick=()=>{Y.durum="sonuc";let bilen=0;Object.entries(Y.cevap).forEach(([p,j])=>{if(q.opts[j]===q.dogru){Y.puan[p]=(Y.puan[p]||0)+10;bilen++;}});Y.tp+=bilen*10;if(bilen)Y.tc++;yarYay();yarCiz();efekt("dogru");};
   const s=$("ySonraki");if(s)s.onclick=()=>{if(Y.i+1<Y.Q.length){Y.i++;Y.durum="soru";Y.cevap={};}else{Y.durum="bitti";kutla();efekt("gorev");}yarYay();yarCiz();};}
 async function yarKatil(){const V=$("view");CUR=null;baslik();setTabs();$("baslik").textContent="Aile yarışması";
-  const oda=await odaAl();if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">← Sureler</button>`;$("yG").onclick=()=>anaSayfa();return;}
+  const oda=await odaAl();if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">${ikon("arrow-left")}Sureler</button>`;$("yG").onclick=()=>anaSayfa();return;}
   let ad="";try{ad=localStorage.getItem("yaris-ad")||"";}catch(e){}
-  V.innerHTML=`<button class="geri" id="yG">← Sureler</button><h2>👪 Aile yarışmasına katıl</h2>
+  V.innerHTML=`<button class="geri" id="yG">${ikon("arrow-left")}Sureler</button><h2>${ikon("trophy")} Aile yarışmasına katıl</h2>
   <p><label><b>Adın</b><br><input id="yAd" class="ara" value="${esc(ad)}" maxlength="20" placeholder="Adını yaz"></label></p>
-  <p><label><b>Katılım kodu</b><br><input id="yKod" class="ara" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="8 harfli kod" style="text-transform:uppercase;letter-spacing:2px"></label></p><button class="primary" id="yGir" style="font-size:20px">Katıl</button>`;
+  <p><label><b>Katılım kodu</b><br><input id="yKod" class="ara" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="8 harfli kod" style="text-transform:uppercase;letter-spacing:2px"></label></p><button class="yazi-4 primary" id="yGir">Katıl</button>`;
   $("yG").onclick=()=>anaSayfa();
   $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim().toUpperCase().replace(/\s/g,"");if(!a||!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(k)){toast("Adını ve 8 harfli kodu yaz");return;}
     try{localStorage.setItem("yaris-ad",a);}catch(e){}
     let R;try{R=await oda.join("yaris-"+k);}catch(e){toast("Katılamadım, kodu denetle");return;}
     YAR={host:false,R,kod:k,ad:a,son:null,secim:{}};R.presence({ad:a}).catch(()=>{});
-    V.innerHTML=`<h2>👪 ${esc(a)}, yarışmaya katıldın</h2><div id="yEkran"><p>Sunucunun başlatmasını bekliyoruz…</p></div><button class="geri" id="yCik">Yarışmadan çık</button>`;
+    V.innerHTML=`<h2>${ikon("trophy")} ${esc(a)}, yarışmaya katıldın</h2><div id="yEkran"><p>Sunucunun başlatmasını bekliyoruz…</p></div><button class="geri" id="yCik">Yarışmadan çık</button>`;
     $("yCik").onclick=()=>{yarBirak();anaSayfa();};
     R.on("durum",m=>{if(!YAR||YAR.host||m.isMe)return;yarOyuncuCiz(m.data||{});});};}
 function yarOyuncuCiz(d){const Y=YAR,E=$("yEkran");if(!E||!d||typeof d!=="object")return;d.opts=Array.isArray(d.opts)?d.opts.map(String):[];d.i=Number(d.i)||0;d.n=Number(d.n)||0;const ar=d.tur==="bosluk";const sh=yarSoruHtml({tur:d.tur,ar:d.soruAr,kel:d.kel,k:d.k});const imza=d.durum+"|"+d.i;const skor=(Array.isArray(d.skor)?d.skor:[]).filter(Array.isArray).sort((a,b)=>(Number(b[1])||0)-(Number(a[1])||0));
   const benim=skor.find(s=>s[2]===undefined);
   if(Y.son===imza&&d.durum!=="bekle")return;Y.son=imza;
   if(d.durum==="bekle"){E.innerHTML=`<p>Sunucunun başlatmasını bekliyoruz… (${esc(d.sure||"")})</p>`;return;}
-  const tablo=d.takim&&typeof d.takim==="object"?yarTakimHtml(d.takim):`<h3>Puan tablosu</h3><ol style="font-size:18px">${skor.map(s=>`<li><b>${esc(String(s[0]))}</b> · ${Number(s[1])||0}</li>`).join("")}</ol>`;
+  const tablo=d.takim&&typeof d.takim==="object"?yarTakimHtml(d.takim):`<h3>Puan tablosu</h3><ol class="yazi-4">${skor.map(s=>`<li><b>${esc(String(s[0]))}</b> · ${Number(s[1])||0}</li>`).join("")}</ol>`;
   const kolay=kucuk()&&Array.isArray(d.kolay)&&d.kolay.length===2?d.kolay.map(Number).filter(j=>j>=0&&j<d.opts.length):null;
   const gor=j=>!kolay||kolay.includes(j);const sesVar=Array.isArray(d.ses)&&d.ses.length===3&&d.ses.every(x=>typeof x==="number");
   if(d.durum==="bitti"){E.innerHTML=`<h2>Yarışma bitti</h2>${tablo}`;kutla();return;}
-  if(d.durum==="soru"){E.innerHTML=`<div class="qhead"><span>Soru ${d.i+1} / ${d.n}</span></div>${sh}${sesVar?`<button class="dn" id="ySes" style="font-size:18px">🎧 Kelimeyi dinle</button>`:""}<div class="opts ${ar?"ar-opts":""}" ${kolay?'data-buyuk="1"':""}>${d.opts.map((o,j)=>gor(j)?`<button data-j="${j}" ${ar?'lang="ar"':""}>${esc(o)}</button>`:"").join("")}</div><p class="feedback" id="yFb"></p>`;
+  if(d.durum==="soru"){E.innerHTML=`<div class="qhead"><span>Soru ${d.i+1} / ${d.n}</span></div>${sh}${sesVar?`<button class="yazi-4 dn" id="ySes">${ikon("headphones")} Kelimeyi dinle</button>`:""}<div class="opts ${ar?"ar-opts":""}" ${kolay?'data-buyuk="1"':""}>${d.opts.map((o,j)=>gor(j)?`<button data-j="${j}" ${ar?'lang="ar"':""}>${esc(o)}</button>`:"").join("")}</div><p class="feedback" id="yFb"></p>`;
     E.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{Y.secim[d.i]=+b.dataset.j;E.querySelectorAll("[data-j]").forEach(x=>{x.disabled=true;});b.classList.add("on");$("yFb").textContent="Cevabın gönderildi";Y.R.presence({ad:Y.ad,c:{q:d.i,j:+b.dataset.j}}).catch(()=>{});});
     const sb=$("ySes");if(sb)sb.onclick=()=>kelimeSes({k:d.ses.map(Number)});if(sb&&kucuk())setTimeout(()=>sb.click(),300);return;}
   if(d.durum==="sonuc"){const j=Y.secim[d.i],ok=j!==undefined&&d.opts[j]===d.dogru;efekt(ok?"dogru":"yanlis");if(ok)gorevIsle("soru");
@@ -102,18 +102,18 @@ window.addEventListener("pagehide",()=>{if(hedefDegisen.size)hedefGonder();});
 async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent="Ortak hedef";$("altbaslik").textContent="Aile ya da sınıfça birlikte ulaşılan hedef";
   const V=$("view");V.innerHTML=`<p class="yukleniyor">Yükleniyor…</p>`;
   await bulutDB();
-  if(!DB){V.innerHTML=`<button class="geri" id="hG">← Sureler</button><p>Ortak hedef için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p>`;$("hG").onclick=()=>anaSayfa();return;}
+  if(!DB){V.innerHTML=`<button class="geri" id="hG">${ikon("arrow-left")}Sureler</button><p>Ortak hedef için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p>`;$("hG").onclick=()=>anaSayfa();return;}
   const yaz=USR_YAZ;const H=S.hedefler||{};
   if(!hedefSayfa.ilk){hedefSayfa.ilk=1;Object.keys(H).forEach(k=>hedefDegisen.add(k));}  /* eski sürümden kalan katkıları bir kez taşı */
   if(hedefDegisen.size)hedefGonder();
   const L=(await Promise.all(Object.keys(H).map(hedefGetir))).filter(Boolean);
-  V.innerHTML=`<button class="geri" id="hG">← Sureler</button><h2>🤝 Ortak hedef</h2>
+  V.innerHTML=`<button class="geri" id="hG">${ikon("arrow-left")}Sureler</button><h2>${ikon("handshake")} Ortak hedef</h2>
   <p>Aile ya da sınıf birlikte bir hedef koyar: örneğin "Bu hafta hep birlikte 100 ayet tekrarı". Herkesin katkısı toplanır; sıralama yoktur, hedefe birlikte ulaşılır.</p>
   ${yaz===false&&!(window.claude&&claude.bulut)?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
   ${L.map(h=>{const hd=Math.max(1,hSayi(h.hedef)),{t,k}=hedefToplam(h),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${k} kişi katıldı · Benim katkım: <b>${hSayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
   <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu" aria-label="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
   <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)" aria-label="Hedefin adı"></p>
-  <p style="display:flex;gap:8px;flex-wrap:wrap"><select id="hTur" aria-label="Hedef türü" style="min-height:44px;font-size:17px"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" aria-label="Hedef sayısı" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
+  <p class="esnek ara-2 sarmal"><select id="hTur" aria-label="Hedef türü" class="dokun44 yazi-3"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" aria-label="Hedef sayısı" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
   $("hG").onclick=()=>anaSayfa();
   $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();if(!/^[A-Z0-9]{4,8}$/.test(k)){toast("Hedef kodunu denetle");return;}const h=await hedefGetir(k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
     S.hedefler=S.hedefler||{};S.hedefler[k]=S.hedefler[k]||{tur:h.tur,n:0};save();hedefDegisen.add(k);hedefGonder();toast("Hedefe katıldın");hedefSayfa();};
@@ -131,6 +131,11 @@ function sayacIsle(bolum){const t=today();S.kullanim=S.kullanim||{};const g=S.ku
 /* Bulut eşitlemesi isteğe bağlı: ebeveyn, ebeveyn bölümünden açar (varsayılan kapalı) */
 const BULUT_ACIK_KEY="bahce-bulut-acik";
 function bulutKapali(){try{return localStorage.getItem(BULUT_ACIK_KEY)!=="1";}catch(e){return true;}}
+/* Aile kodu: aynı ailenin cihazları kayıtları aileler/{kod}/kayit altında paylaşır (yalnız GitHub sürümü); kod yoksa kişisel yol */
+const AILE_KEY="bahce-aile-kodu";
+function aileKodu(){if(!(window.claude&&claude.bulut))return "";try{const k=localStorage.getItem(AILE_KEY)||"";return /^[A-Z2-9]{10}$/.test(k)?k:"";}catch(e){return "";}}
+function kayitYolu(uid){const k=aileKodu();return k?"aileler/"+k+"/kayit":"data/users/"+(uid||UID);}
+function kayitKoleksiyonu(){return DB&&UID?DB.collection(kayitYolu()):null;}
 /* Ortak hedef gibi kullanıcının kendi başlattığı bulut işleri için bağlantı (eşitleme kapalı olsa da) */
 async function bulutDB(){if(DB&&UID)return true;if(!window.claude||!claude.use)return false;
   try{const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);const id=await user.id();if(!db||!id)return false;DB=db;UID=id;return true;}catch(e){return false;}}
@@ -140,6 +145,8 @@ async function bulutSil(){await bulutDB();if(!DB||!UID)throw new Error("bulut yo
   try{localStorage.removeItem(BULUT_ACIK_KEY);}catch(e){}
   /* ortak hedeflerdeki katkıyı sıfırla */
   const hz=Object.keys(S.hedefler||{}).map(k=>DB.collection("hedef").doc(k)).filter(d=>typeof d.update==="function").map(d=>d.update({["u_"+UID]:0}));
+  /* aile kaydı (sahipse aileyi ve kayıtlarını siler, üyeyse aileden çıkar) ve sınıf kayıtları (js/19) */
+  if(typeof aileSinifSil==="function"){try{hz.push(...(await aileSinifSil()));}catch(e){}}
   /* listeden daha önce çıkarılmış kişilerin kayıtları da silinsin */
   try{const s=await kol.get();(s.docs||[]).forEach(d=>{if(!L.some(x=>x.id===d.id))L.push(kol.doc(d.id));});}catch(e){}
   const r=await Promise.allSettled([...hz,...L.map(d=>typeof d.delete==="function"?d.delete():Promise.resolve())]);

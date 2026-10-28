@@ -75,7 +75,10 @@
       },
       set: function (v) { return ref.set(temiz(v)); },
       update: function (v) { return ref.update(temiz(v)); },
-      delete: function () { return ref.delete(); }
+      delete: function () { return ref.delete(); },
+      /* Aile kodu: üye olmayan belgeyi okuyamaz; listeye kendini sunucuda ekler/çıkarır (kurallar yalnız kendi kimliğine izin verir) */
+      listeyeEkle: function (alan, deger) { var o = {}; o[alan] = firebase.firestore.FieldValue.arrayUnion(deger); return ref.update(o); },
+      listedenCikar: function (alan, deger) { var o = {}; o[alan] = firebase.firestore.FieldValue.arrayRemove(deger); return ref.update(o); }
     };
   }
   function koleksiyon(yol) {

@@ -18,13 +18,13 @@ async function hangiSure(){
   for(const x of secim){try{if(!CACHE[x.no])continue;
       const d=CACHE[x.no],b=d.ses&&d.ses.bas;if(!b||!b.length)continue;const i=Math.floor(Math.random()*b.length);
       const son=i+1<b.length?b[i+1]:d.ses.son;const uz=kucukMu?6:4;items.push({...x,bas:b[i],son:Math.min(son,b[i]+uz),son2:Math.min(d.ses.son,b[i]+uz*2.5)});}catch(e){}}
-  if(items.length<3){V.innerHTML=`<p>Sesler yüklenemedi. İnternet bağlantını denetleyip yeniden dene.</p><button class="geri" id="hsG">← Sureler</button>`;$("hsG").onclick=()=>anaSayfa();return;}
+  if(items.length<3){V.innerHTML=`<p>Sesler yüklenemedi. İnternet bağlantını denetleyip yeniden dene.</p><button class="geri" id="hsG">${ikon("arrow-left")}Sureler</button>`;$("hsG").onclick=()=>anaSayfa();return;}
   const adlar=[...new Set(L.map(x=>x.ad))];let su=null;
   window.hsDinle=(uzun)=>{if(!su)return;durSes();hizUygula();calParca(su.no,su.bas,uzun?su.son2:su.son);};
   sayacIsle("hangi");
   quiz({title:"Hangi sure?",items,tek:true,
     build:x=>{su=x;setTimeout(()=>window.hsDinle(false),300);
-      return {html:`<p style="font-size:20px;font-weight:800">Dinle: bu hangi sure?</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" data-hs="0" style="font-size:19px">🔊 Yeniden dinle</button><button data-hs="1">Biraz daha dinle</button></div>`,
+      return {html:`<p class="yazi-4 kalin">Dinle: bu hangi sure?</p><div class="esnek ara-2 sarmal"><button class="yazi-4 primary" data-hs="0">${ikon("volume-2")} Yeniden dinle</button><button data-hs="1">Biraz daha dinle</button></div>`,
         answer:x.ad,opts:secenek(x.ad,adlar,kucukMu?2:3),tek:true,buyuk:kucukMu,otoSesYok:true,sonuc:()=>{}};},
     bitince:(d,n)=>{durSes();S.hangiEnIyi=Math.max(S.hangiEnIyi||0,Math.round(d/n*100));if(d===n)S.hangiTam=true;checkBadges();save();},
     geri:()=>{durSes();anaSayfa();}});}

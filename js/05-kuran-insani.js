@@ -5,14 +5,14 @@ function portre(){
   const V=$("view"),P=CUR.portre;
   const alt=[["tani","On özellik"],["olc","Kendini değerlendir"],["plan","On günlük plan"],["zitoyun","Zıddını bul"]];
   V.innerHTML=`<h2>Kur'an insanı</h2>${P.baslik?`<p><b>${esc(P.baslik)}</b></p>`:""}<p>${esc(P.giris)}</p>
-  <div class="subtabs">${alt.map(([k,a])=>`<button data-a="${k}" class="${portreAlt===k?"on":""}">${a}</button>`).join("")}</div><div id="palt" style="display:grid;gap:14px"></div>`;
+  <div class="subtabs">${alt.map(([k,a])=>`<button data-a="${k}" class="${portreAlt===k?"on":""}">${a}</button>`).join("")}</div><div id="palt" class="izgara ara-4"></div>`;
   V.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{portreAlt=b.dataset.a;portre();});
   ({tani:pTani,olc:pOlc,plan:pPlan,zitoyun:pZit})[portreAlt]($("palt"));
 }
 function pTani(el){
   const P=CUR.portre,t=SS(CUR.no).portre;
   el.innerHTML=P.bolumler.map(b=>`<div class="bolum"><h3>${esc(b.ad)} · ${esc(b.alt||"")}</h3>${P.oz.map((o,i)=>o.b!==b.ad?"":`<button class="oz" data-o="${i}"><span class="no">${i+1}</span><span>${esc(o.ad)}</span><span class="durum">${t.olcek[i]?"Puan "+t.olcek[i]+"/5":""}</span></button><div id="d${i}" hidden></div>`).join("")}</div>`).join("")+
-  `<p style="font-size:14px">Kaynak: ${esc(CUR.ad)} kitabınızın Kur'an insanı portresi. Portre yapay zekâ desteğiyle hazırlanmıştır; uzman incelemesi yerine geçmez.</p>`;
+  `<p class="kucuk-yazi">Kaynak: ${esc(CUR.ad)} kitabınızın Kur'an insanı portresi. Portre yapay zekâ desteğiyle hazırlanmıştır; uzman incelemesi yerine geçmez.</p>`;
   el.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{
     const i=+b.dataset.o,d=$("d"+i);if(!d.hidden){d.hidden=true;return;}
     const o=P.oz[i];d.className="detay pop";d.hidden=false;
@@ -37,7 +37,7 @@ function pOlc(el){
   el.innerHTML=`<p>Her özellik için kendine 1 ile 5 arası puan ver: <b>1 hiç · 2 az · 3 bazen · 4 çoğu zaman · 5 her zaman</b>. Puanlar yalnız sana görünür.</p>
   <div class="olcek">${P.oz.map((p,i)=>`<div class="r"><span><b>${i+1}.</b> ${esc(p.ad)}</span><span class="puanlar">${[1,2,3,4,5].map(n=>`<button data-i="${i}" data-n="${n}" class="${o[i]===n?"on":""}" aria-label="${i+1}. özellik için ${n}">${n}</button>`).join("")}</span></div>`).join("")}</div>
   ${odak}<button class="primary" id="kaydet" ${dolu<N?"disabled":""}>${dolu<N?`Kaydetmek için bütün özellikleri puanla (${dolu}/${N})`:"Bu ölçümü kaydet"}</button>
-  ${son?`<div><b>Önceki ölçümler</b><ul style="margin:6px 0 0;padding-left:20px">${son}</ul></div>`:""}`;
+  ${son?`<div><b>Önceki ölçümler</b><ul class="m0 ust-2 liste-ic">${son}</ul></div>`:""}`;
   el.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{o[b.dataset.i]=+b.dataset.n;checkBadges();save();pOlc(el);});
   $("kaydet").onclick=()=>{if(dolu<N)return;const ort=(Object.values(o).reduce((a,b)=>a+b,0)/N).toFixed(1);
     t.gecmis.push({t:new Date().toLocaleDateString("tr-TR"),ort});gun();S.puan+=20;toast("Ölçüm kaydedildi, 20 puan");save();renderStats();pOlc(el);};
@@ -57,8 +57,8 @@ function pZit(el){
       $("zy").onclick=()=>pZit(el);return;}
     const i=items[k],d=P.oz[i].zit;const opts=secenek(d,P.oz.map(p=>p.zit),2);
     el.innerHTML=`<div class="qhead"><span>Zıddını bul</span><span>${k+1} / ${items.length} · Doğru: ${dogru}</span></div><div class="bar"><i style="width:${k/items.length*100}%"></i></div>
-    <p>Bu özelliğin zıddı hangisidir?</p><p style="font-size:22px;font-weight:800">${esc(P.oz[i].ad)}</p>
-    <div class="opts" style="grid-template-columns:1fr">${opts.map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb"></p>`;
+    <p>Bu özelliğin zıddı hangisidir?</p><p class="yazi-4 kalin">${esc(P.oz[i].ad)}</p>
+    <div class="tek-sutun opts">${opts.map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb"></p>`;
     let ikinci=false;
     el.querySelectorAll(".opts button").forEach(b=>b.onclick=()=>{const ok=opts[+b.dataset.j]===d,k1=kucuk();
       if(!ok&&k1&&CUR&&!ikinci&&opts.length>2){ikinci=true;b.disabled=true;b.classList.add("soluk");const fb=$("fb");fb.className="feedback dene";fb.textContent="Bir daha dene";soyle("Bir daha dene");return;}

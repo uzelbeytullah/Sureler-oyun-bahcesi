@@ -10,7 +10,7 @@ const HARF_AR={"ا":"أَلِف","ب":"بَاء","ت":"تَاء","ث":"ثَاء"
 function arSesVar(){try{return "speechSynthesis" in window&&speechSynthesis.getVoices().some(v=>/^ar/i.test(v.lang));}catch(e){return false;}}
 function harfAdSoyle(h){try{KEL.pause();speechSynthesis.cancel();if(arSesVar()){const u=new SpeechSynthesisUtterance(HARF_AR[h[0]]);u.lang="ar-SA";u.rate=0.8;const v=speechSynthesis.getVoices().find(x=>/^ar/i.test(x.lang));if(v)u.voice=v;speechSynthesis.speak(u);}else soyle(h[1]);}catch(e){}}
 function harfSesHtml(h){const L=ELIF_ORNEK[h[0]]||[];
-  return `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${("speechSynthesis" in window)?`<button class="dn" data-hads="${h[0]}">🔊 Adını dinle</button>`:""}${L.map((w,i)=>`<button class="dn" data-horn="${h[0]}|${i}" title="${esc(w.ok)} · ${esc(w.tr)}">🎧 <span lang="ar" style="font-family:var(--f-ar);font-size:22px">${esc(w.a)}</span> <span style="font-size:13px">${esc(w.ok)}</span></button>`).join("")}</div>`;}
+  return `<div class="esnek ara-2 sarmal dik-orta">${("speechSynthesis" in window)?`<button class="dn" data-hads="${h[0]}">${ikon("volume-2")} Adını dinle</button>`:""}${L.map((w,i)=>`<button class="dn" data-horn="${h[0]}|${i}" title="${esc(w.ok)} · ${esc(w.tr)}">${ikon("headphones")} <span lang="ar" style="font-family:var(--f-ar);font-size:22px">${esc(w.a)}</span> <span class="yazi-1">${esc(w.ok)}</span></button>`).join("")}</div>`;}
 document.addEventListener("click",e=>{const a=e.target.closest&&e.target.closest("[data-hads]");if(a){const h=harfBul(a.dataset.hads);if(h)harfAdSoyle(h);return;}
   const o=e.target.closest&&e.target.closest("[data-horn]");if(o){const [c,i]=o.dataset.horn.split("|");const w=(ELIF_ORNEK[c]||[])[+i];if(w)kelimeSes(w);}});
 const ZWJ="\u0640";  /* bağlantı çizgisi (keşide): harfin hangi yandan bağlandığını gösterir */
@@ -26,21 +26,21 @@ let elifAlt="tablo";
 function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="Elif-ba";$("altbaslik").textContent="Arap harflerini tanı · 28 harf";sayacIsle("elifba");
   const V=$("view"),n=elifBilinen();
   const alt=[["tablo","Harfler"],["tani","Harf tanı"],["bul","Harfi bul"],["sekil","Şekiller"],["kelime","Kelimede harf"]];
-  V.innerHTML=`<button class="geri" id="ebG">← Sureler</button><h2>🔤 Elif-ba köşesi</h2>
+  V.innerHTML=`<button class="geri" id="ebG">${ikon("arrow-left")}Sureler</button><h2>${ikon("languages")} Elif-ba köşesi</h2>
   <p>Kur'an'ı okumanın ilk adımı harfleri tanımak. Her harf kelimedeki yerine göre biraz değişik yazılır. <b>${n} / 28 harfi</b> öğrendin (bir harfi üç kez doğru bilince öğrenilmiş sayılır).</p>
   <div class="bar"><i style="width:${n/28*100}%"></i></div>
-  <div class="subtabs">${alt.map(([k,a])=>`<button data-ea="${k}" class="${elifAlt===k?"on":""}">${a}</button>`).join("")}</div><div id="ebIc" style="display:grid;gap:12px"></div>
-  <p style="font-size:14px">Bir harfe dokununca adını dinleyebilir, o harfle başlayan kelimeleri kârinin sesinden duyabilirsin.${arSesVar()?"":" Harfin adı cihazın Türkçe sesiyle okunur; cihazda Arapça ses varsa Arapça okunur."}</p>`;
+  <div class="subtabs">${alt.map(([k,a])=>`<button data-ea="${k}" class="${elifAlt===k?"on":""}">${a}</button>`).join("")}</div><div id="ebIc" class="izgara ara-3"></div>
+  <p class="kucuk-yazi">Bir harfe dokununca adını dinleyebilir, o harfle başlayan kelimeleri kârinin sesinden duyabilirsin.${arSesVar()?"":" Harfin adı cihazın Türkçe sesiyle okunur; cihazda Arapça ses varsa Arapça okunur."}</p>`;
   $("ebG").onclick=()=>anaSayfa();
   V.querySelectorAll("[data-ea]").forEach(b=>b.onclick=()=>{elifAlt=b.dataset.ea;elifba();});
   const el=$("ebIc");
   if(elifAlt==="tablo"){
-    el.innerHTML=`<div class="sure-grid" style="grid-template-columns:repeat(auto-fill,minmax(84px,1fr))">${HARFLER.map((h,i)=>{const r=(S.elifba||{})[h[0]]||{};return `<button class="sure-kart ${r.d>=3?"tam":""}" data-hi="${i}" style="text-align:center;justify-items:center"><span class="ar" lang="ar" style="font-size:40px;line-height:1.7;padding-bottom:4px">${h[0]}</span><span class="sad" style="font-size:15px">${h[1]}</span></button>`;}).join("")}</div><div id="ebD" hidden></div>`;
+    el.innerHTML=`<div class="sure-grid" style="grid-template-columns:repeat(auto-fill,minmax(84px,1fr))">${HARFLER.map((h,i)=>{const r=(S.elifba||{})[h[0]]||{};return `<button class="sure-kart ${r.d>=3?"tam":""}" data-hi="${i}" style="text-align:center;justify-items:center"><span class="ar" lang="ar" style="font-size:40px;line-height:1.7;padding-bottom:4px">${h[0]}</span><span class="kucuk-yazi sad">${h[1]}</span></button>`;}).join("")}</div><div id="ebD" hidden></div>`;
     el.querySelectorAll("[data-hi]").forEach(b=>b.onclick=()=>{const h=HARFLER[+b.dataset.hi],d=$("ebD");d.hidden=false;d.className="detay pop";
-      d.innerHTML=`<p style="font-size:22px"><b>${h[1]}</b> · okunuşu: <b>${esc(h[2])}</b></p>
-      ${harfSesHtml(h)}<p style="font-size:14px;margin:0">Örnek kelimeler kâri Mişari Râşid el-Afasi'nin okuyuşundan.</p>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">${["tek","bas","orta","son"].map(y=>`<div style="border:2px solid var(--line);border-radius:12px;padding:6px"><div class="ar" lang="ar" style="font-size:44px;line-height:1.4">${harfSekil(h,y)}</div><span style="font-size:13px;font-weight:700">${YER_AD[y]}</span></div>`).join("")}</div>
-      ${h[3]?"":`<p style="font-size:15px"><b>Dikkat:</b> ${h[1]} kendinden sonraki harfe bağlanmaz.</p>`}<button id="ebK">Kapat</button>`;
+      d.innerHTML=`<p class="yazi-4"><b>${h[1]}</b> · okunuşu: <b>${esc(h[2])}</b></p>
+      ${harfSesHtml(h)}<p class="kucuk-yazi m0">Örnek kelimeler kâri Mişari Râşid el-Afasi'nin okuyuşundan.</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">${["tek","bas","orta","son"].map(y=>`<div class="sinir kose-2 ic-2"><div class="ar" lang="ar" style="font-size:44px;line-height:1.4">${harfSekil(h,y)}</div><span class="yazi-1 kalin-7">${YER_AD[y]}</span></div>`).join("")}</div>
+      ${h[3]?"":`<p class="kucuk-yazi"><b>Dikkat:</b> ${h[1]} kendinden sonraki harfe bağlanmaz.</p>`}<button id="ebK">Kapat</button>`;
       $("ebK").onclick=()=>{d.hidden=true;};d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});});
     return;}
   const adlar=HARFLER.map(h=>h[1]),harf=HARFLER.map(h=>h[0]);
@@ -49,20 +49,20 @@ function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="
   const agirlik=h=>{const r=(S.elifba||{})[h[0]]||{d:0,y:0};return 1+Math.max(0,r.y-r.d)+(r.d<3?1:0);};
   const sec=(n)=>{const L=[];HARFLER.forEach(h=>{for(let k=0;k<agirlik(h);k++)L.push(h);});return [...new Set(shuffle(L))].slice(0,n);};
   if(elifAlt==="tani"){quiz({title:"Harf tanı",items:sec(10),geri,bitince:bitti,
-    build:h=>({html:`<p style="font-size:20px;font-weight:800">Bu harfin adı ne?</p><div class="qbig ar" lang="ar" style="font-size:80px">${h[0]}</div>`,answer:h[1],opts:secenek(h[1],adlar),tek:false,buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
+    build:h=>({html:`<p class="yazi-4 kalin">Bu harfin adı ne?</p><div class="qbig ar" lang="ar" style="font-size:80px">${h[0]}</div>`,answer:h[1],opts:secenek(h[1],adlar),tek:false,buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
   if(elifAlt==="bul"){quiz({title:"Harfi bul",items:sec(10),geri,bitince:bitti,
-    build:h=>({html:`<p style="font-size:20px;font-weight:800">Hangisi <b>${h[1]}</b>?</p>${harfSesHtml(h)}`,answer:h[0],opts:secenek(h[0],harf),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
+    build:h=>({html:`<p class="yazi-4 kalin">Hangisi <b>${h[1]}</b>?</p>${harfSesHtml(h)}`,answer:h[0],opts:secenek(h[0],harf),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
   if(elifAlt==="sekil"){/* yalnız birbirinden (ve tek başına hâlinden) farklı görünen konumları sor; bağlanmayan harflerde orta = son olduğundan "son" sorulur */
     const yerler=h=>{const g=new Set([harfSekil(h,"tek")]);return ["son","bas","orta"].filter(y=>{const s=harfSekil(h,y);if(g.has(s))return false;g.add(s);return true;});};
     const items=sec(10).map(h=>{const L=yerler(h);return {h,y:L[Math.floor(Math.random()*L.length)]||"son"};});
     quiz({title:"Şekiller",items,geri,bitince:bitti,
-      build:({h,y})=>({html:`<p style="font-size:20px;font-weight:800">Bu, hangi harfin ${YER_AD[y]} yazılışı?</p><div class="qbig ar" lang="ar" style="font-size:80px">${harfSekil(h,y)}</div>`,answer:h[1],opts:secenek(h[1],adlar),buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
+      build:({h,y})=>({html:`<p class="yazi-4 kalin">Bu, hangi harfin ${YER_AD[y]} yazılışı?</p><div class="qbig ar" lang="ar" style="font-size:80px">${harfSekil(h,y)}</div>`,answer:h[1],opts:secenek(h[1],adlar),buyuk:kucuk(),otoSesYok:true,sonuc:ok=>elifIsle(h[0],ok)})});return;}
   if(elifAlt==="kelime"){
     const kaynak=Object.values(CACHE).filter(d=>d&&d.ayetler);const kel=[];kaynak.forEach(d=>d.ayetler.forEach(a=>a.w.forEach(w=>{const H=kelimeHarfleri(w.a);if(H.length>=2&&H.length<=6)kel.push({w,H});})));
     if(kel.length<5){el.innerHTML=`<p>Bu oyun için önce bir sure aç (örneğin Fâtiha); o surenin kelimeleriyle oynarız.</p><button class="primary" id="ebF">Fâtiha'yı aç</button>`;$("ebF").onclick=()=>ac(1,"oku");return;}
     const items=shuffle(kel).slice(0,10);
     quiz({title:"Kelimede harf",items,geri,bitince:bitti,
       build:({w,H})=>{const c=H[Math.floor(Math.random()*H.length)],yok=harf.filter(x=>!H.includes(x));
-        return {html:`<p style="font-size:20px;font-weight:800">Bu kelimede hangi harf var?</p><div class="qbig ar" lang="ar">${esc(w.a)}</div><p class="okunus">${esc(w.ok||"")}</p>`,answer:c,opts:shuffle([c,...shuffle(yok).slice(0,kucuk()?1:3)]),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(c,ok)};}});return;}
+        return {html:`<p class="yazi-4 kalin">Bu kelimede hangi harf var?</p><div class="qbig ar" lang="ar">${esc(w.a)}</div><p class="okunus">${esc(w.ok||"")}</p>`,answer:c,opts:shuffle([c,...shuffle(yok).slice(0,kucuk()?1:3)]),arOpts:true,buyuk:true,otoSesYok:true,sonuc:ok=>elifIsle(c,ok)};}});return;}
 }
 BADGES.push(["elif10","Elif-ba'da on harfi öğrendi",()=>elifBilinen()>=10],["elif28","Elif-ba'da bütün harfleri öğrendi",()=>elifBilinen()>=28]);

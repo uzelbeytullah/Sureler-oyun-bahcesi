@@ -183,4 +183,81 @@ ev('S.puan=0;S.ardarda=4;S.gunDogru=null;answer(true)');ok('art arda bonus yok',
 ok('puan rozetleri listenin sonunda',ev('BADGES.slice(-6).map(b=>b[0]).sort().join()')==="bin,onlu,seri15,seri5,yuz,yuzdogru");
 w.__L={};for(const g of ["2026-01-01","2026-01-02","2026-01-04","2026-01-05","2026-01-07"])w.__L[g]={soru:1};ok('7 günde 5 gün rozeti',ev('haftaBesGun({log:__L})')&&!ev('(delete __L["2026-01-07"],__L["2026-01-09"]={soru:1},haftaBesGun({log:__L}))'));
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
-(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10,test_t11,test_t12]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
+/* 4-6 yaş (minik): yaş eşlemesi, sade ana ekran, puan kutuları gizli, "Büyükler için" yetişkin kapısından geçer */
+async function test_t13(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const V=()=>w.document.getElementById('view');const bekle=ms=>new Promise(r=>setTimeout(r,ms));
+ok('yaş eşlemesi 5→minik, 8→küçük, 12→genç, 20→yetişkin',ev('[yasSeviye(5),yasSeviye(3),yasSeviye(8),yasSeviye(12),yasSeviye(20)].join()')==="minik,minik,kucuk,genc,yetiskin");
+ok('SEVIYE: Minik ve 7-9 etiketi',ev('SEVIYE.minik.ad')==="Minik (4-6 yaş)"&&/7-9/.test(ev('SEVIYE.kucuk.ad')));
+ev('PROF.liste=[{id:"p0",ad:"Elif",yas:5}];PROF.aktif="p0";S.seviye=yasSeviye(5);S.molaDk=undefined;anaSayfa()');
+ok('kucuk() minikte de doğru, mola 15 dk',ev('kucuk()&&minik()&&molaDk()===15'));
+const D=[...V().querySelectorAll('.minik-dug')];ok('minik ana ekranında 4 büyük düğme',D.length===4&&D.map(b=>b.querySelector('.minik-ad').textContent).join()==="Dinle,Hikâye,Bahçem,Ailemle"&&D.every(b=>parseInt(w.getComputedStyle(b).minHeight)>=120));
+ok('sure listesi, arama ve rozet yok',!w.document.getElementById('grid')&&!w.document.getElementById('ara')&&!V().querySelector('.badges'));
+const st=w.document.querySelector('.stats');ok('puan kutuları gizli',w.document.body.dataset.seviye==="minik"&&w.getComputedStyle(st).display==="none");
+w.document.getElementById('minikBuyuk').click();await bekle(100);ok('"Büyükler için" yetişkin kapısına gidiyor',/Bu bölüm yetişkinler için/.test(V().textContent)&&!w.document.getElementById('grid'));
+ev('KAPI_ZAMAN=Date.now()');w.document.getElementById('kG').click();await bekle(50);w.document.getElementById('minikBuyuk').click();await bekle(100);
+ok('kapı açıkken normal ana sayfa',!!w.document.getElementById('grid')&&!!w.document.getElementById('minikDon'));
+w.document.getElementById('minikDon').click();await bekle(50);ok('minik ekranına dönüş',V().querySelectorAll('.minik-dug').length===4);
+V().querySelector('[data-mk="dinle"]').click();await bekle(700);const sek=[...w.document.querySelectorAll('#tabs [data-v]')].map(b=>b.dataset.v).join();
+ok('Dinle sureye gidiyor, yalnız Dinle/Hikâye/oyun sekmeleri: '+sek,ev('CUR&&CUR.no')===1&&ev('cur')==="oku"&&sek==="sureler,oku,cocuk,kelime");
+await ev('show("kelime")');await bekle(100);ok('oyun başlığında sayı yok',!/Doğru:/.test(V().querySelector('.qhead').textContent));
+ev('quiz({title:"x",items:[1],build:()=>({html:"",answer:"a",opts:["a","b"]})})');V().querySelector('.opts button[data-j]').click();
+const dj=V().querySelector('.opts button.ok');ok('doğru şık işaretlendi',!!dj);await bekle(1700);
+ok('sonuç: büyük yıldız ve Aferin, sayı yok',!!V().querySelector('.minik-yildiz')&&/Aferin/.test(V().textContent)&&!/\d+ \/ \d+/.test(V().textContent));
+ev('CUR=null;anaSayfa()');V().querySelector('[data-mk="hikaye"]').click();await bekle(1500);ok('Hikâye canlandırmayı açıyor',!!w.document.getElementById('anSahne'));
+ev('animDur();S.seviye="genc";anaSayfa()');ok('genç seviyede normal ana sayfa, puan görünür',!!w.document.getElementById('grid')&&w.getComputedStyle(st).display!=="none");
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+/* 14: aile kodu ve öğretmen paneli (Firebase yok: bulut şimini taklit eden bellek içi sahte veritabanı; kurallar burada sınanmaz) */
+async function test_t14(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};const bekle=ms=>new Promise(r=>setTimeout(r,ms));
+ev('window.__eski=window.claude;window.claude={use:async()=>null};localStorage.setItem("bahce-aile-kodu","ABCDEFGH23")');
+ok('claude.ai sürümünde aile/sınıf düğmeleri ve ödev kartı gizli',ev('aileSinifDugmeleri()')===""&&ev('odevKartiHtml()')===""&&ev('aileKodu()')==="");
+ev('localStorage.removeItem("bahce-aile-kodu");window.claude=window.__eski');
+ok('GitHub sürümünde ebeveyn bölümünde düğmeler',/Öğretmen paneli/.test(ev('aileSinifDugmeleri()')));
+w.eval(`(()=>{const M=new Map();window.__M=M;window.__uid="U1";const kopya=v=>v===undefined?undefined:JSON.parse(JSON.stringify(v));
+ function belge(yol,id){const k=yol+"/"+id;return {id,get:async()=>({id,exists:M.has(k),data:()=>kopya(M.get(k))}),set:async v=>{M.set(k,kopya(v));},
+  update:async v=>{if(!M.has(k))throw new Error("yok");M.set(k,Object.assign(M.get(k),kopya(v)));},delete:async()=>{M.delete(k);},
+  listeyeEkle:async(a,d)=>{const o=M.get(k);if(!o)throw new Error("yok");if(o[a].includes(d))throw new Error("izin");o[a]=o[a].concat([d]);},
+  listedenCikar:async(a,d)=>{const o=M.get(k);o[a]=o[a].filter(x=>x!==d);}};}
+ const db={collection:yol=>({doc:id=>belge(yol,String(id)),get:async()=>({docs:[...M.keys()].filter(k=>k.startsWith(yol+"/")&&!k.slice(yol.length+1).includes("/")).map(k=>({id:k.slice(yol.length+1),data:()=>kopya(M.get(k))}))})})};
+ window.claude={bulut:true,use:async ne=>ne==="db"?db:ne==="user"?{id:async()=>window.__uid,canEdit:async()=>true,can:async()=>true}:null};})()`);
+const cihaz=(uid)=>ev(`window.__uid="${uid}";DB=null;UID=null;docRef=null;window.DBK=null;`);
+/* 14a: aile kodu oluşturma */
+cihaz("U1");ev('localStorage.setItem("bahce-bulut-acik","1");PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";profKaydet();S=normalize(null);S.sure={"112":{yildiz:{oku:true,kelime:false,tamamla:false,sirala:false}}};save()');
+ok('aile kodu yokken kişisel yol',await ev('bulutDB().then(()=>kayitYolu())')==="data/users/U1");
+const kod=await ev('aileOlustur()');const A=k=>JSON.parse(ev(`JSON.stringify(__M.get(${JSON.stringify(k)})||null)`));
+ok('aile kodu 10 harf '+kod,/^[A-Z2-9]{10}$/.test(kod));
+ok('aileler/{kod} = {sahip, uyeler:[uid], t}',(()=>{const a=A("aileler/"+kod);return a&&a.sahip==="U1"&&JSON.stringify(a.uyeler)==='["U1"]'&&Object.keys(a).sort().join()==="sahip,t,uyeler";})());
+ok('kayıtlar aileye kopyalandı',!!(A("aileler/"+kod+"/kayit/fatiha")||{sure:{}}).sure["112"]&&(A("aileler/"+kod+"/kayit/profiller")||{liste:[]}).liste.length===1);
+ok('eşitleme aile yolunda',ev('kayitYolu()')==="aileler/"+kod+"/kayit"&&ev('localStorage.getItem("bahce-aile-kodu")')===kod);
+/* 14b: ikinci cihaz katılır, kayıtlar birleşir */
+ev('localStorage.clear()');cihaz("U2");ev('PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";S=normalize(null);S.sure={"113":{yildiz:{oku:true,kelime:true,tamamla:false,sirala:false}}};save()');
+ok('izin yokken bulut kapalı',ev('bulutKapali()'));
+await ev(`aileKatil(" ${kod.toLowerCase()} ")`);
+ok('uyeler listesine eklendi',JSON.stringify(A("aileler/"+kod).uyeler)==='["U1","U2"]');
+ok('yerel ve aile kaydı birleşti',ev('!!(S.sure["112"].yildiz.oku&&S.sure["113"].yildiz.kelime)'));
+ok('birleşik kayıt aileye yazıldı',!!A("aileler/"+kod+"/kayit/fatiha").sure["113"]);
+ok('bulut açıldı, aile yolu',!ev('bulutKapali()')&&ev('kayitYolu()')==="aileler/"+kod+"/kayit");
+await ev('bulutBasla()');ev('S.puan=777;bulutGonder()');await bekle(50);
+ok('bulutBasla aile yolundan eşitliyor (js/17)',A("aileler/"+kod+"/kayit/fatiha").puan===777&&!A("data/users/U2/fatiha"));
+await ev('aileBirak()');
+ok('üye aileden çıktı, kişisel yola döndü',JSON.stringify(A("aileler/"+kod).uyeler)==='["U1"]'&&ev('kayitYolu()')==="data/users/U2");
+/* 14c: öğretmen paneli */
+cihaz("T1");const sk=await ev('sinifOlustur("Cumartesi kursu")');
+ok('sınıf belgesi',/^[A-Z2-9]{8}$/.test(sk)&&(()=>{const c=A("siniflar/"+sk);return c.ogretmen==="T1"&&c.ad==="Cumartesi kursu"&&c.odev===null;})());
+await ev(`odevVer("${sk}",{sure:112,tur:"yildiz",son:"2099-01-01"})`);
+ok('ödev alanı',JSON.stringify(A("siniflar/"+sk).odev)==='{"sure":112,"tur":"yildiz","son":"2099-01-01"}');
+cihaz("U2");await ev(`sinifKatil("${sk}","Ali K.")`);
+const o=A("siniflar/"+sk+"/ogrenciler/U2");
+ok('öğrenci özeti: yalnız takma ad ve sayılar',o&&Object.keys(o).sort().join()==="ad,ozet,t"&&o.ad==="Ali K."&&o.ozet.yildiz===3&&o.ozet.ezberde===0&&o.ozet.odevDurum==="suruyor"&&Object.keys(o.ozet).sort().join()==="ezberde,odevDurum,sonGun,yildiz");
+ok('ana sayfa ödev kartı',/Öğretmeninin ödevi/.test(ev('odevKartiHtml()'))&&/İhlâs/.test(ev('odevKartiHtml()')));
+ok('değişmeyen özet yazılmaz',await ev('sinifOzetGonder(false)')===false);
+ev('S.sure["112"].yildiz={oku:true,kelime:true,tamamla:true,sirala:true}');ok('ödev tamam',ev('odevDurumu()')==="tamam"&&await ev('sinifOzetGonder(false)')===true&&A("siniflar/"+sk+"/ogrenciler/U2").ozet.odevDurum==="tamam");
+ok('ikinci çocuğun belge adı',ev('(()=>{const a=PROF.aktif;PROF.aktif="p1x";const r=ogrenciBelge();PROF.aktif=a;return r;})()')==="U2_p1x");
+cihaz("T1");ev('KAPI_ZAMAN=Date.now()');await ev(`ogretmenPaneli("${sk}")`);
+ok('öğretmen panelinde öğrenci listesi',(()=>{const t=w.document.getElementById('view').textContent;return t.includes("Ali K.")&&t.includes(sk)&&t.includes("✓ Tamam");})());
+await ev(`sinifSil("${sk}")`);ok('sınıf ve öğrenci kayıtları silindi',!A("siniflar/"+sk)&&!A("siniflar/"+sk+"/ogrenciler/U2")&&ev('siniflarim().length')===0);
+/* 14d: bulut kaydını silme (sahip) aileyi ve aile kayıtlarını da siler */
+cihaz("U1");ev(`localStorage.setItem("bahce-aile-kodu","${kod}");localStorage.setItem("bahce-bulut-acik","1")`);await ev('bulutSil()');
+ok('bulutSil: aile ve aile kayıtları silindi',!A("aileler/"+kod)&&!A("aileler/"+kod+"/kayit/fatiha")&&!A("aileler/"+kod+"/kayit/profiller")&&ev('aileKodu()')==="");
+ev('window.claude=window.__eski;DB=null;UID=null;docRef=null;window.DBK=null');
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10,test_t11,test_t12,test_t13,test_t14]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
