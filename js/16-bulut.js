@@ -1,4 +1,6 @@
 /* Sureler Oyun Bahçesi · Aile yarışması, ortak hedef, kullanım sayacı (bulut) */
+/* Tahmin edilemeyen kod: karışan harfler (0,O,1,I,L) yok; 8 karakter ≈ 10^12 olasılık */
+function rastgeleKod(n){const A="ABCDEFGHJKMNPQRSTUVWXYZ23456789",b=new Uint8Array(n);crypto.getRandomValues(b);let k="";for(const x of b)k+=A[x%A.length];return k;}
 /* ========== AİLE YARIŞMASI (canlı oda), ORTAK HEDEF ve KULLANIM SAYACI (veritabanı) ========== */
 let DB=null,USR=null,UID=null,ODA=null,USR_EDIT=false,USR_YAZ=null;
 async function odaAl(){if(ODA!==null)return ODA;try{ODA=(window.claude&&claude.use)?await claude.use("room"):null;}catch(e){ODA=null;}return ODA;}
@@ -20,7 +22,7 @@ function yarTakimHtml(t){if(!t)return "";const c=Number(t.c)||0,n=Number(t.n)||0
 function yarSkor(){if(YAR.takim)return "";return Object.entries(YAR.puan).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<li><b>${esc(YAR.ad[p]||"Oyuncu")}</b> · ${Number(n)||0} puan</li>`).join("")||"<li>Henüz katılan yok</li>";}
 async function yarAc(){const V=$("view"),oda=await odaAl();
   if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">← Geri</button>`;$("yG").onclick=()=>show("harita");return;}
-  const kod=String(Math.floor(100000+Math.random()*900000));let R;try{R=await oda.join("yaris-"+kod);}catch(e){toast("Oda açılamadı");return;}
+  const kod=rastgeleKod(8);let R;try{R=await oda.join("yaris-"+kod);}catch(e){toast("Oda açılamadı");return;}
   YAR={kod,R,host:true,Q:yarSorular(),i:-1,durum:"bekle",puan:{},ad:{},cevap:{},sure:CUR.ad,takim:true,tp:0,tc:0};
   R.onPeers(()=>{R.peers().forEach(p=>{if(p.isMe)return;const pr=p.presence||{};if(pr.ad){YAR.ad[p.peer]=pr.ad;if(YAR.puan[p.peer]===undefined)YAR.puan[p.peer]=0;}
     if(pr.c&&YAR.durum==="soru"&&pr.c.q===YAR.i&&YAR.cevap[p.peer]===undefined)YAR.cevap[p.peer]=pr.c.j;});yarCiz();});
@@ -48,12 +50,12 @@ async function yarKatil(){const V=$("view");CUR=null;baslik();setTabs();$("basli
   let ad="";try{ad=localStorage.getItem("yaris-ad")||"";}catch(e){}
   V.innerHTML=`<button class="geri" id="yG">← Sureler</button><h2>👪 Aile yarışmasına katıl</h2>
   <p><label><b>Adın</b><br><input id="yAd" class="ara" value="${esc(ad)}" maxlength="20" placeholder="Adını yaz"></label></p>
-  <p><label><b>Katılım kodu</b><br><input id="yKod" class="ara" inputmode="numeric" maxlength="6" placeholder="6 haneli kod"></label></p><button class="primary" id="yGir" style="font-size:20px">Katıl</button>`;
+  <p><label><b>Katılım kodu</b><br><input id="yKod" class="ara" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="8 harfli kod" style="text-transform:uppercase;letter-spacing:2px"></label></p><button class="primary" id="yGir" style="font-size:20px">Katıl</button>`;
   $("yG").onclick=()=>anaSayfa();
-  $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim();if(!a||!/^\d{6}$/.test(k)){toast("Adını ve 6 haneli kodu yaz");return;}
+  $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim().toUpperCase().replace(/\s/g,"");if(!a||!/^[A-Z2-9]{8}$/.test(k)){toast("Adını ve 8 harfli kodu yaz");return;}
     try{localStorage.setItem("yaris-ad",a);}catch(e){}
     let R;try{R=await oda.join("yaris-"+k);}catch(e){toast("Katılamadım, kodu denetle");return;}
-    YAR={host:false,R,kod:k,ad:a,son:null,secim:{}};R.presence({ad:a,sv:S.seviye||""}).catch(()=>{});
+    YAR={host:false,R,kod:k,ad:a,son:null,secim:{}};R.presence({ad:a}).catch(()=>{});
     V.innerHTML=`<h2>👪 ${esc(a)}, yarışmaya katıldın</h2><div id="yEkran"><p>Sunucunun başlatmasını bekliyoruz…</p></div><button class="geri" id="yCik">Yarışmadan çık</button>`;
     $("yCik").onclick=()=>{yarBirak();anaSayfa();};
     R.on("durum",m=>{if(!YAR||YAR.host||m.isMe)return;yarOyuncuCiz(m.data||{});});};}
@@ -66,7 +68,7 @@ function yarOyuncuCiz(d){const Y=YAR,E=$("yEkran");if(!E||!d||typeof d!=="object
   const gor=j=>!kolay||kolay.includes(j);const sesVar=Array.isArray(d.ses)&&d.ses.length===3&&d.ses.every(x=>typeof x==="number");
   if(d.durum==="bitti"){E.innerHTML=`<h2>Yarışma bitti</h2>${tablo}`;kutla();return;}
   if(d.durum==="soru"){E.innerHTML=`<div class="qhead"><span>Soru ${d.i+1} / ${d.n}</span></div>${sh}${sesVar?`<button class="dn" id="ySes" style="font-size:18px">🎧 Kelimeyi dinle</button>`:""}<div class="opts ${ar?"ar-opts":""}" ${kolay?'data-buyuk="1"':""}>${d.opts.map((o,j)=>gor(j)?`<button data-j="${j}" ${ar?'lang="ar"':""}>${esc(o)}</button>`:"").join("")}</div><p class="feedback" id="yFb"></p>`;
-    E.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{Y.secim[d.i]=+b.dataset.j;E.querySelectorAll("[data-j]").forEach(x=>{x.disabled=true;});b.classList.add("on");$("yFb").textContent="Cevabın gönderildi";Y.R.presence({ad:Y.ad,sv:S.seviye||"",c:{q:d.i,j:+b.dataset.j}}).catch(()=>{});});
+    E.querySelectorAll("[data-j]").forEach(b=>b.onclick=()=>{Y.secim[d.i]=+b.dataset.j;E.querySelectorAll("[data-j]").forEach(x=>{x.disabled=true;});b.classList.add("on");$("yFb").textContent="Cevabın gönderildi";Y.R.presence({ad:Y.ad,c:{q:d.i,j:+b.dataset.j}}).catch(()=>{});});
     const sb=$("ySes");if(sb)sb.onclick=()=>kelimeSes({k:d.ses.map(Number)});if(sb&&kucuk())setTimeout(()=>sb.click(),300);return;}
   if(d.durum==="sonuc"){const j=Y.secim[d.i],ok=j!==undefined&&d.opts[j]===d.dogru;efekt(ok?"dogru":"yanlis");if(ok)gorevIsle("soru");
     E.innerHTML=`${sh}<div class="opts ${ar?"ar-opts":""}">${d.opts.map((o,k)=>gor(k)?`<button disabled ${ar?'lang="ar"':""} class="${o===d.dogru?"ok":k===j?"bad":""}">${esc(o)}</button>`:"").join("")}</div><p class="feedback ${ok?"ok":"bad"}"><b>${ok?(d.takim?"Doğru! Aile puanına +10":"Doğru! +10"):j===undefined?"Cevap vermedin":"Doğrusu: "+esc(String(d.dogru||""))}</b></p>${tablo}`;}}
@@ -95,14 +97,14 @@ async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent=
   <p>Aile ya da sınıf birlikte bir hedef koyar: örneğin "Bu hafta hep birlikte 100 ayet tekrarı". Herkesin katkısı toplanır; sıralama yoktur, hedefe birlikte ulaşılır.</p>
   ${yaz===false?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
   ${L.map(h=>{const hd=Math.max(1,hSayi(h.hedef)),{t,k}=hedefToplam(h),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${k} kişi katıldı · Benim katkım: <b>${hSayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
-  <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
-  <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)"></p>
-  <p style="display:flex;gap:8px;flex-wrap:wrap"><select id="hTur" style="min-height:44px;font-size:17px"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
+  <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu" aria-label="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
+  <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)" aria-label="Hedefin adı"></p>
+  <p style="display:flex;gap:8px;flex-wrap:wrap"><select id="hTur" aria-label="Hedef türü" style="min-height:44px;font-size:17px"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" aria-label="Hedef sayısı" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
   $("hG").onclick=()=>anaSayfa();
   $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();if(!/^[A-Z0-9]{4,8}$/.test(k)){toast("Hedef kodunu denetle");return;}const h=await hedefGetir(k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
     S.hedefler=S.hedefler||{};S.hedefler[k]=S.hedefler[k]||{tur:h.tur,n:0};save();hedefDegisen.add(k);hedefGonder();toast("Hedefe katıldın");hedefSayfa();};
   $("hKoy").onclick=async()=>{const ad=$("hAd").value.trim(),n=Math.max(10,Math.min(10000,Math.round(+$("hSay").value)||100)),tur=$("hTur").value;if(!ad){toast("Hedefe bir ad ver");return;}
-    const kod=Math.random().toString(36).slice(2,8).toUpperCase().replace(/[^A-Z0-9]/g,"X").padEnd(6,"X");
+    const kod=rastgeleKod(8);
     try{await DB.collection("hedef").doc(kod).set({ad,hedef:n,tur,t:today()});}catch(e){toast("Hedef kaydedilemedi: bu sayfada yazma iznin yok");return;}
     S.hedefler=S.hedefler||{};S.hedefler[kod]={tur,n:0};save();hedefDegisen.add(kod);hedefGonder();toast("Hedef kondu. Kodu ailene ya da sınıfına ver: "+kod);hedefSayfa();};}
 

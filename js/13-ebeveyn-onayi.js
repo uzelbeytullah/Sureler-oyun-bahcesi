@@ -1,6 +1,7 @@
 /* Sureler Oyun Bahçesi · Ebeveyn onayı, namaz hazırlığı yolu, haftalık aile halkası */
 /* ========== EBEVEYN ONAYI ve NAMAZ HAZIRLIĞI YOLU ========== */
-const onayGerek=()=>S.ebeveynOnay!==undefined?!!S.ebeveynOnay:S.seviye!=="yetiskin";
+/* Şifre konduysa onay, seviye ya da yaş değişse de açık kalır; yalnız şifreyle kapatılabilir */
+const onayGerek=()=>S.ebeveynOnay!==undefined?!!S.ebeveynOnay:(pinVar()||S.seviye!=="yetiskin");
 const PIN_KEY="bahce-ebeveyn-pin";
 const pinOz=p=>{let h=7;for(const c of "sob:"+p)h=(h*31+c.charCodeAt(0))>>>0;return String(h);};
 function pinVar(){try{return !!localStorage.getItem(PIN_KEY);}catch(e){return false;}}
@@ -58,13 +59,15 @@ function ebeveynAyarHtml(){const L=KATALOG.filter(k=>!k.gruplar&&k.no>=78&&k.aye
   return `<section class="detay"><h3>Ebeveyn onayı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3>
   <p>Açıkken ezberde son basamağa gelen ayet, siz dinleyip şifrenizle onaylayınca "ezberde" sayılır.</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap"><button data-onay="1" class="${onayGerek()?"on":""}">Açık</button><button data-onay="0" class="${onayGerek()?"":"on"}">Kapalı</button></p>
-  <p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Eski şifre" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
+  <p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
   <section class="detay"><h3>Namaz hazırlığı yolu</h3><p>Fâtiha'nın yanında ezberlenecek üç kısa sureyi seçin:</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap">${L.map(k=>`<button data-nzs="${k.no}" class="${sec.includes(k.no)?"on":""}" style="min-height:40px">${esc(k.ad)}</button>`).join("")}</p>
   ${S.seviye==="yetiskin"?`<p><button data-nzac="1" class="${S.namazAcik?"on":""}">Ana sayfada göster</button></p>`:""}</section>`;}
 function ebeveynAyarBagla(){const V=$("view");
-  V.querySelectorAll("[data-onay]").forEach(b=>b.onclick=()=>{S.ebeveynOnay=b.dataset.onay==="1";save();ebeveynOzet();});
-  const pk=$("ePinKaydet");if(pk)pk.onclick=()=>{const y=$("ePin").value.trim(),e=$("ePinEski");if(!/^\d{4}$/.test(y)){toast("Şifre 4 rakam olmalı");return;}if(pinVar()&&!pinDogru(e?e.value.trim():"")){toast("Eski şifre yanlış");return;}pinKoy(y);toast("Ebeveyn şifresi kaydedildi");ebeveynOzet();};
+  V.querySelectorAll("[data-onay]").forEach(b=>b.onclick=()=>{const ac=b.dataset.onay==="1";
+    if(!ac&&pinVar()){const e=$("ePinEski");if(!pinDogru(e?e.value.trim():"")){toast("Kapatmak için mevcut şifreyi \"Mevcut şifre\" kutusuna yazın");if(e)e.focus();return;}}
+    S.ebeveynOnay=ac;save();ebeveynOzet();});
+  const pk=$("ePinKaydet");if(pk)pk.onclick=()=>{const y=$("ePin").value.trim(),e=$("ePinEski");if(!/^\d{4}$/.test(y)){toast("Şifre 4 rakam olmalı");return;}if(pinVar()&&!pinDogru(e?e.value.trim():"")){toast("Mevcut şifre yanlış");return;}pinKoy(y);toast("Ebeveyn şifresi kaydedildi");ebeveynOzet();};
   V.querySelectorAll("[data-nzs]").forEach(b=>b.onclick=()=>{let sec=namazSureler().slice(1);const n=+b.dataset.nzs;if(sec.includes(n))sec=sec.filter(x=>x!==n);else{sec.push(n);if(sec.length>3)sec.shift();}S.namazSure=sec.length===3?sec:sec.concat(NAMAZ_VARSAYILAN.filter(x=>!sec.includes(x))).slice(0,3);save();ebeveynOzet();});
   V.querySelectorAll("[data-nzac]").forEach(b=>b.onclick=()=>{S.namazAcik=!S.namazAcik;save();ebeveynOzet();});}
 

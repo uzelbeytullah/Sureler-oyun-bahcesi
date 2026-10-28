@@ -25,7 +25,7 @@ function aracCiz(){
   const V=$("view"),ilk=CUR.ilkAyet||1;
   const ust=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="arGeri">← Ezber köşesi</button></div>`;
   const geriBagla=()=>{$("arGeri").onclick=()=>{aracDur();ezberArac=null;ezber();};};
-  const ayetSec=(id,sec)=>`<select class="ara" style="width:auto" id="${id}">${CUR.ayetler.map((_,i)=>`<option value="${i}" ${i===sec?"selected":""}>${ilk+i}. ayet</option>`).join("")}</select>`;
+  const ayetSec=(id,sec)=>`<select class="ara" style="width:auto" id="${id}" aria-label="${id==="dtBas"?"Başlangıç ayeti":id==="dtSon"?"Bitiş ayeti":"Ayet seç"}">${CUR.ayetler.map((_,i)=>`<option value="${i}" ${i===sec?"selected":""}>${ilk+i}. ayet</option>`).join("")}</select>`;
   const metin=(i,gizle)=>`<div class="kelimeler" lang="ar" style="justify-content:center">${CUR.ayetler[i].w.map((w,j)=>gizle?`<span class="k${j%12}">${ilkHarf(w.a)}</span>`:`<span class="k${j%12}">${w.a}</span>`).join("")}</div>`;
   if(ezberArac==="dt"){
     const A=S.dtAyar=S.dtAyar||{bas:0,tekrar:2,carpan:1,gizle:false};

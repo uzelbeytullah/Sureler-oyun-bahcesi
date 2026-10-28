@@ -1,6 +1,6 @@
 /* Düzen: tek sütun; üstte puan şeridi, altında oyun kartları; tezhip havası lacivert ve altın */
 :root{
-  --bg:#F3F5FA; --surface:#FFFFFF; --ink:#101A33; --soft:#2A3656;
+  --bg:#F3F5FA; --surface:#FFFFFF; --card:#FFFFFF; --ink:#101A33; --soft:#2A3656;
   --lapis:#1D4AA0; --gold:#8A6200; --gold-bg:#FFF4D6;
   --ok:#11734A; --ok-bg:#DDF5E8; --bad:#B3261E; --bad-bg:#FCE3E1; --line:#C9D2E6;
   --c0:#B3261E; --c1:#1D4AA0; --c2:#11734A; --c3:#8A4B00; --c4:#7A1FA2; --c5:#00727A; --c6:#A0275C; --c7:#4A5A00; --c8:#5B3FA8; --c9:#8C2F00; --c10:#2F6B1F; --c11:#0B5E8A;
@@ -9,12 +9,12 @@
   --f-ar:"Amiri","Traditional Arabic","Scheherazade New",serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0C1222; --surface:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
+  --bg:#0C1222; --surface:#151E35; --card:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
   --lapis:#8FB1F2; --gold:#F0C35A; --gold-bg:#3A2E0E;
   --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#2E3A5C;
   --c0:#FF8F87; --c1:#8FB1F2; --c2:#6FE0A8; --c3:#F5B661; --c4:#D9A0F5; --c5:#5FD8E0; --c6:#F59AC2; --c7:#C8DB6A; --c8:#B9A6F5; --c9:#FFA77A; --c10:#9FE08A; --c11:#7CC8F2; --t-sessiz:#D9B26F; --t-medd1:#FF8F87; --t-medd2:#FDBA74; --t-medd3:#FCA5A5; --t-medd4:#F59AC2; --t-gunne:#6FE0A8; --t-ihfa:#C4B5FD; --t-iklab:#8FB1F2; --t-idgam:#5FD8E0; --t-kalkale:#93C5FD; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0C1222; --surface:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
+  --bg:#0C1222; --surface:#151E35; --card:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
   --lapis:#8FB1F2; --gold:#F0C35A; --gold-bg:#3A2E0E;
   --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#2E3A5C;
   --c0:#FF8F87; --c1:#8FB1F2; --c2:#6FE0A8; --c3:#F5B661; --c4:#D9A0F5; --c5:#5FD8E0; --c6:#F59AC2; --c7:#C8DB6A; --c8:#B9A6F5; --c9:#FFA77A; --c10:#9FE08A; --c11:#7CC8F2; --t-sessiz:#D9B26F; --t-medd1:#FF8F87; --t-medd2:#FDBA74; --t-medd3:#FCA5A5; --t-medd4:#F59AC2; --t-gunne:#6FE0A8; --t-ihfa:#C4B5FD; --t-iklab:#8FB1F2; --t-idgam:#5FD8E0; --t-kalkale:#93C5FD; color-scheme:dark}
@@ -64,7 +64,7 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
 .order-item .ar{font-size:22px;min-width:0;overflow-wrap:anywhere}
 .order-item .num{font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;width:1.5em;text-align:center}
 .order-item .mv{display:flex;flex-direction:column;gap:4px}
-.order-item .mv button{min-height:36px;padding:2px 10px}
+.order-item .mv button{min-height:44px;min-width:44px;padding:2px 10px}
 .order-item{cursor:grab;user-select:none;-webkit-user-select:none}
 .order-item.drag{cursor:grabbing;border-color:var(--gold);background:var(--gold-bg);box-shadow:0 6px 18px rgba(0,0,0,.25);position:relative;z-index:2}
 .grip{touch-action:none;display:grid;place-items:center;gap:0;min-width:44px;min-height:44px;cursor:grab}
@@ -105,8 +105,8 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
 .olcek{display:grid;gap:8px}
 .olcek .r{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border-bottom:2px solid var(--line);padding-bottom:8px}
 .olcek .puanlar{display:flex;gap:4px}
-.olcek .puanlar button{min-width:40px;min-height:40px;padding:0}
-.olcek .puanlar button.on{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.olcek .puanlar button{min-width:44px;min-height:44px;padding:0}
+.olcek .puanlar button.on{background:var(--gold);border-color:var(--gold);color:#FFFFFF}
 @media (max-width:520px){.olcek .r{grid-template-columns:1fr}}
 .plan{display:grid;gap:8px}
 .plan label{display:grid;grid-template-columns:auto auto 1fr;gap:10px;align-items:start;border:2px solid var(--line);border-radius:12px;padding:10px;cursor:pointer}
@@ -195,7 +195,7 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
 .mola{position:fixed;inset:0;z-index:60;background:rgba(15,20,40,.55);display:grid;place-items:center;padding:16px}.mola-kutu{background:var(--card,#fff);color:var(--ink);border-radius:20px;padding:22px;max-width:420px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.3)}
 .ozet-satir{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin:8px 0}.ozet-satir div{display:grid;text-align:center;border:2px solid var(--lapis);border-radius:12px;padding:8px}.ozet-satir b{font-size:24px}.ozet-satir span{font-size:13px;font-weight:700}
 .aile-kart{border-color:#2E7D5B;background:#EAF6EC}
-.kayit{background:#C0392B!important;border-color:#C0392B!important;animation:anParla 1.2s infinite}
+.kayit{background:#C0392B!important;border-color:#C0392B!important;color:#FFFFFF!important;animation:anParla 1.2s infinite}
 .kutla{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}.kutla i{position:absolute;top:-24px;width:10px;height:14px;border-radius:2px;font-style:normal;font-size:16px;color:#C9A227;line-height:14px;animation:kDus linear forwards}
 @keyframes kDus{to{top:105%;transform:rotate(540deg) translateX(40px)}}
 .bahce-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:10px 0}
@@ -222,3 +222,24 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
 @media (prefers-reduced-motion:reduce){.pop{animation:none}.bar i{transition:none}}
 @media print{header.top,.toast,.yazdirma-yok{display:none!important}body{background:#fff}section.panel{border:0}}
 @media (max-width:420px){.stats{grid-template-columns:repeat(2,1fr)}.stars{grid-template-columns:repeat(2,1fr)}.qbig{font-size:38px}}
+
+/* Koyu tema: sabit açık renkli bileşenler */
+@media (prefers-color-scheme: dark){
+:root:not([data-theme="light"]) .olcek .puanlar button.on{color:#0C1222}
+:root:not([data-theme="light"]) .aile-kart{border-color:#3E9A6F;background:#10301F;color:var(--ink)}
+:root:not([data-theme="light"]) .bahce-hucre{color:#101A33;border-color:#4F8A4D}
+:root:not([data-theme="light"]) .an-ip{background:var(--card);color:var(--ink)}
+:root:not([data-theme="light"]) .an-ip .ar{color:var(--gold)}
+:root:not([data-theme="light"]) .an-ip.on{background:#4A3B10;border-color:var(--gold);color:var(--ink)}
+}
+:root[data-theme="dark"] .olcek .puanlar button.on{color:#0C1222}
+:root[data-theme="dark"] .aile-kart{border-color:#3E9A6F;background:#10301F;color:var(--ink)}
+:root[data-theme="dark"] .bahce-hucre{color:#101A33;border-color:#4F8A4D}
+:root[data-theme="dark"] .an-ip{background:var(--card);color:var(--ink)}
+:root[data-theme="dark"] .an-ip .ar{color:var(--gold)}
+:root[data-theme="dark"] .an-ip.on{background:#4A3B10;border-color:var(--gold);color:var(--ink)}
+/* Hareket azaltma: kayıt yanıp sönmesi, ipucu geçişi */
+@media (prefers-reduced-motion:reduce){.kayit{animation:none!important}.an-ip{transition:none}.an-ip.on{transform:none}}
+/* Erişilebilirlik: boş canlı alan görünmez kalır; ekran okuyucu için görünmez metin */
+.toast:empty{padding:0;background:transparent;box-shadow:none}
+.gorunmez{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

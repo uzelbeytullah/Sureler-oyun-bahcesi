@@ -50,7 +50,7 @@ function pPlan(el){
   el.querySelectorAll("input[data-i]").forEach(c=>c.onchange=()=>{if(c.checked){denedim(+c.dataset.i);pPlan(el);}});
 }
 function pZit(el){
-  const P=CUR.portre,t=SS(CUR.no).portre,items=shuffle(P.oz.map((_,i)=>i));let k=0,dogru=0;
+  const P=CUR.portre,t=SS(CUR.no).portre,items=shuffle(P.oz.map((_,i)=>i));let k=0,dogru=0;const ekran=EKRAN_NO;
   function step(){
     if(k>=items.length){const ok=dogru>=Math.ceil(items.length*0.8);if(ok&&!t.zit){t.zit=true;checkBadges();save();}
       el.innerHTML=`<div class="result pop"><h2>Zıddını bul bitti</h2><b class="big">${dogru} / ${items.length}</b><p>${ok?"Çok güzel, zıtları tanıdın.":"Rozet için en az %80 doğru gerekiyor."}</p><button class="primary" id="zy">Yeniden oyna</button></div>`;
@@ -63,7 +63,7 @@ function pZit(el){
       el.querySelectorAll(".opts button").forEach(x=>{x.disabled=true;if(opts[+x.dataset.j]===d)x.classList.add("ok");});
       if(!ok)b.classList.add("bad");if(ok)dogru++;answer(ok);
       const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad");fb.textContent=ok?"Doğru!":"Doğrusu işaretlendi.";
-      setTimeout(()=>{k++;step();},ok?900:1800);});
+      setTimeout(()=>{if(ekran!==EKRAN_NO||!fb.isConnected)return;k++;step();},ok?900:1800);});
   }
   step();
 }

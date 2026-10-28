@@ -27,34 +27,44 @@ service cloud.firestore {
                     && yeni().diff(resource.data).affectedKeys().hasOnly(['u_' + request.auth.uid])
                     && yeni()['u_' + request.auth.uid] is int
                     && yeni()['u_' + request.auth.uid] >= 0 && yeni()['u_' + request.auth.uid] <= 100000
+                    // bir yazmada en cok 1000 artis (tek seferde hedefi bitirme hilesine karsi)
+                    && yeni()['u_' + request.auth.uid] <= resource.data.get('u_' + request.auth.uid, 0) + 1000
                     && resource.data.keys().size() < 500;
     }
 
     // Kullanim sayaci: herkes yalniz kendininkini yazar; okumak yalniz konsoldan
     match /kullanim/{uid} {
-      allow write: if ben(uid) && yeni().keys().hasOnly(['g', 's']);
+      allow write: if ben(uid) && yeni().keys().hasOnly(['g', 's'])
+                    && yeni().g is map && yeni().g.size() <= 92
+                    && yeni().s is string && yeni().s.size() <= 12;
     }
 
     // Aile yarismasi canli odalari
-    // Odaya ilk yayin yapan sahip olur; 3 saatten eski bir odayi baskasi devralabilir
+    // Odaya ilk yayin yapan sahip olur; sahip her nabizda zamani tazeler, 3 saat sessiz kalan odayi baskasi devralabilir
+    // Oda adi: yaris- + 8 harf/rakam (tahmin edilemeyen kod)
+    function odaAdi(oda) { return oda.matches('yaris-[A-Z2-9]{8}'); }
     match /odalar/{oda} {
       allow get: if girisli();
-      allow create: if girisli() && yeni().keys().hasOnly(['sahip', 't'])
+      allow create: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't'])
                     && yeni().sahip == request.auth.uid && yeni().t == request.time;
-      allow update: if girisli() && yeni().keys().hasOnly(['sahip', 't'])
+      allow update: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't'])
                     && yeni().sahip == request.auth.uid && yeni().t == request.time
                     && (resource.data.sahip == request.auth.uid || resource.data.t < request.time - duration.value(3, 'h'));
     }
     match /odalar/{oda}/esler/{uid} {
       allow read: if girisli();
-      allow create, update: if ben(uid) && yeni().keys().hasOnly(['presence', 't']) && yeni().t == request.time;
+      // Oyuncu kaydi: yalniz ad (en cok 20 harf) ve secilen cevap
+      allow create, update: if ben(uid) && odaAdi(oda) && yeni().keys().hasOnly(['presence', 't']) && yeni().t == request.time
+                    && yeni().presence is map && yeni().presence.keys().hasOnly(['ad', 'c'])
+                    && (!('ad' in yeni().presence) || (yeni().presence.ad is string && yeni().presence.ad.size() <= 20))
+                    && (!('c' in yeni().presence) || (yeni().presence.c is map && yeni().presence.c.keys().hasOnly(['q', 'j'])));
       allow delete: if ben(uid);
     }
     match /odalar/{oda}/olaylar/{olay} {
       allow read: if girisli();
       allow create, update: if girisli()
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid
-                    && yeni().keys().hasOnly(['data', 'kimden', 't'])
+                    && odaAdi(oda) && yeni().keys().hasOnly(['data', 'kimden', 't'])
                     && yeni().kimden == request.auth.uid && yeni().t == request.time;
       allow delete: if girisli()
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid;

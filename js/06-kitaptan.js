@@ -25,12 +25,13 @@ function ekRozet(){
 function tecvidKelime(ai,wi){
   const k=CUR.tecvid&&CUR.tecvid[ai]&&CUR.tecvid[ai][wi];
   if(!k)return esc(CUR.ayetler[ai].w[wi].a);
-  return k.map(([t,c])=>c?`<span class="tc-${TC[c]||"sessiz"}" data-c="${c}" tabindex="0" role="button" aria-label="Tecvid kuralı">${t}</span>`:t).join("");
+  const kAd=c=>esc(((TKUR&&TKUR.kurallar||{})[c]||{}).ad||"Tecvid kuralı");
+  return k.map(([t,c])=>c?`<span class="tc-${TC[c]||"sessiz"}" data-c="${c}" tabindex="0" role="button" title="${kAd(c)}" aria-describedby="tkl-${String(c).replace(/[^\w-]/g,"_")}">${t}</span>`:t).join("");
 }
 function tecvidLejant(){
   const K=TKUR.kurallar,var_=new Set();
   CUR.tecvid.forEach(a=>(a||[]).forEach(w=>w.forEach(([t,c])=>{if(c)var_.add(c);})));
-  return `<div class="lejant">${[...var_].map(c=>`<span class="tc-${TC[c]||"sessiz"}" style="border-color:currentColor">${esc((K[c]||{}).ad||c)}</span>`).join("")}</div>
+  return `<div class="lejant">${[...var_].map(c=>`<span class="tc-${TC[c]||"sessiz"}" id="tkl-${String(c).replace(/[^\w-]/g,"_")}" style="border-color:currentColor">${esc((K[c]||{}).ad||c)}</span>`).join("")}</div>
   <p style="font-size:14px">Renkli harfe dokununca kuralın açıklaması çıkar. ${esc((CUR.ek&&CUR.ek.tecvid&&CUR.ek.tecvid.genel)||"Okuyuşunuzu bir hocaya dinletmeniz en sağlamıdır.")}</p>`;
 }
 function tecvidAc(V,ai,c){
@@ -159,7 +160,7 @@ function yol(){
     return `<div class="bolum"><h3>${esc(l.ad)}</h3>${l.maddeler.map((m,mi)=>`<label style="display:flex;gap:10px;align-items:flex-start;padding:6px 0"><input type="checkbox" data-l="${li}" data-m="${mi}" ${st[mi]?"checked":""} style="width:22px;height:22px;accent-color:var(--ok)"><span>${esc(m)}</span></label>`).join("")}</div>`;}).join("")}
   <p style="font-size:14px">Günlük liste her gün, haftalık liste her hafta, aylık liste her ay kendiliğinden boşalır.</p>
   <h2>Kişisel eylem planım</h2><p style="font-size:14px">Yazdıkların yalnız sana görünür ve kendiliğinden kaydedilir.</p>
-  ${Y.eylem_plani.map((p,pi)=>`<label style="display:grid;gap:4px"><b>${esc(p.soru)}</b>${p.ornek?`<span style="font-size:14px">Örnek: ${esc(p.ornek)}</span>`:""}<textarea id="ep${pi}" data-p="${pi}" rows="2" class="ara" style="resize:vertical">${esc(T.plan[pi]||"")}</textarea></label>`).join("")}
+  ${Y.eylem_plani.map((p,pi)=>`<label style="display:grid;gap:4px"><b>${esc(p.soru)}</b>${p.ornek?`<span style="font-size:14px">Örnek: ${esc(p.ornek)}</span>`:""}<textarea id="ep${pi}" data-p="${pi}" rows="2" class="ara" style="resize:vertical" aria-label="${esc(p.soru)}">${esc(T.plan[pi]||"")}</textarea></label>`).join("")}
   <h2>Beklenen davranış değişimleri</h2><ul style="margin:0;padding-left:20px">${Y.davranis_degisimleri.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
   V.querySelectorAll("[data-g]").forEach(b=>{const f=()=>{const g=+b.dataset.g;if(T.gunler.includes(g))return;T.gunler.push(g);gun();S.puan+=15;toast(g+". gün tamam, 15 puan");checkBadges();save();renderStats();yol();};
     if(b.tagName==="INPUT")b.onchange=()=>{if(b.checked)f();};else b.onclick=f;});

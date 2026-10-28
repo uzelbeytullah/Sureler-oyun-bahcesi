@@ -44,7 +44,7 @@
         auth.onAuthStateChanged(function (u) { if (u) ok(u); });
         auth.signInAnonymously().catch(hata);
       } catch (e) { hata(e); }
-    }); });
+    }); }).catch(function (e) { hazir = null; throw e; });   // bağlantı düşerse sonraki çağrıda yeniden dene
     return hazir;
   }
   /* Firestore iç içe listeleri ([[a,b],[c,d]]) kabul etmez: içteki listeleri {__d:[...]} ile sarıp geri açıyoruz */
@@ -112,7 +112,11 @@
         function ms(t) { return t && t.toMillis ? t.toMillis() : (typeof t === "number" ? t : 0); }
         function simdi() { return Date.now() + fark; }
 
-        function nabiz() { return benim.set({ presence: temiz(benimDurum), t: SUNUCU() }); }
+        function nabiz() {
+          // Oda sahibi her nabızda sahipliğini tazeler; böylece süren yarışmayı başkası devralamaz
+          if (sahibim) kok.set({ sahip: u.uid, t: SUNUCU() }).catch(function () {});
+          return benim.set({ presence: temiz(benimDurum), t: SUNUCU() });
+        }
         var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 15000);
 
         kapat.push(esler.onSnapshot(function (s) {

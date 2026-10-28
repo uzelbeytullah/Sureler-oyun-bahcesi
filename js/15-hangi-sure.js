@@ -14,7 +14,8 @@ async function hangiSure(){
   if(havuz.length<4)havuz=L;
   const secim=shuffle(havuz).slice(0,Math.min(8,havuz.length));
   const items=[];
-  for(const x of secim){try{if(!CACHE[x.no]){const r=await fetch("data/"+String(x.no).padStart(3,"0")+".json?v="+SURUM);if(!r.ok)continue;CACHE[x.no]=await r.json();}
+  await Promise.all(secim.filter(x=>!CACHE[x.no]).map(x=>fetch("data/"+String(x.no).padStart(3,"0")+".json?v="+SURUM).then(r=>r.ok?r.json():null).then(d=>{if(d)CACHE[x.no]=d;}).catch(()=>{})));   // hepsi aynı anda iner
+  for(const x of secim){try{if(!CACHE[x.no])continue;
       const d=CACHE[x.no],b=d.ses&&d.ses.bas;if(!b||!b.length)continue;const i=Math.floor(Math.random()*b.length);
       const son=i+1<b.length?b[i+1]:d.ses.son;const uz=kucukMu?6:4;items.push({...x,bas:b[i],son:Math.min(son,b[i]+uz),son2:Math.min(d.ses.son,b[i]+uz*2.5)});}catch(e){}}
   if(items.length<3){V.innerHTML=`<p>Sesler yüklenemedi. İnternet bağlantını denetleyip yeniden dene.</p><button class="geri" id="hsG">← Sureler</button>`;$("hsG").onclick=()=>anaSayfa();return;}

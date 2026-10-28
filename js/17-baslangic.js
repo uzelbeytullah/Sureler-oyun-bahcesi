@@ -6,17 +6,18 @@ document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.tar
 /* ---------- başlangıç ---------- */
 anaSayfa();
 fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch(()=>{});
-(async()=>{
+async function bulutBasla(){
   try{
     if(!window.claude||!claude.use)return;
     const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
     if(!db||!user)return;
     const id=await user.id();if(!id)return;DB=db;USR=user;UID=id;try{USR_EDIT=!!(await user.canEdit());USR_YAZ=await user.can("data.write");}catch(e){}
     window.DBK=db.collection("data/users/"+id).doc("profiller");
-    try{const ps=await DBK.get();const rl=ps&&ps.exists?(ps.data().liste||[]):[];let deg=false;rl.forEach(p=>{if(!PROF.liste.some(x=>x.id===p.id)){PROF.liste.push(p);deg=true;}});
+    try{const ps=await DBK.get();const rl=(ps&&ps.exists?(ps.data().liste||[]):[]).filter(p=>p&&/^[\w-]{1,40}$/.test(String(p.id))).map(p=>({...p,yas:Number(p.yas)||undefined}));   // buluttan gelen kişi kaydını ekrana basmadan önce denetlelet deg=false;rl.forEach(p=>{if(!PROF.liste.some(x=>x.id===p.id)){PROF.liste.push(p);deg=true;}});
       try{localStorage.setItem("bahce-profil",JSON.stringify(PROF));}catch(e){}if(rl.length<PROF.liste.length||deg)DBK.set({liste:PROF.liste}).catch(()=>{});}catch(e){}
     if(!PROF.aktif){if(!CUR)anaSayfa();return;}
     docRef=db.collection("data/users/"+id).doc(docAdi(PROF.aktif));
+    const once=JSON.stringify(S);   // bulut gelirken çocuk ilerleme yaptıysa açık ekranı yeni durumla yeniden çizeceğiz
     const snap=await docRef.get();
     const raw=snap&&snap.exists?snap.data():null;
     const remote=raw?normalize(JSON.parse(JSON.stringify(raw))):null;
@@ -24,6 +25,9 @@ fetch("data/001.json?v="+SURUM).then(r=>r.json()).then(d=>{CACHE[1]=d;}).catch((
     sonPuan=S.puan;
     bulutGonder();
     $("sync").textContent="İlerleme hesabına kaydediliyor; telefonda ve bilgisayarda aynı kalır";
-    renderStats();if(!CUR)anaSayfa();else if(cur==="harita")harita();
+    renderStats();if(!CUR)anaSayfa();else if(cur==="harita")harita();else if(remote&&cur&&JSON.stringify(S)!==once)show(cur);
   }catch(e){}
-})();
+}
+bulutBasla();
+/* Uygulama çevrimdışı açıldıysa, bağlantı gelince bulut eşitlemesini bir kez yeniden dene */
+window.addEventListener("online",()=>{if(!UID&&window.claude&&claude.bulut&&!bulutBasla.denendi){bulutBasla.denendi=true;bulutBasla();}});

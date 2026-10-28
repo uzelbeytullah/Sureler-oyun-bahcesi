@@ -37,7 +37,9 @@ ev(`for(const [no,n] of [[1,7],[112,4],[113,5],[114,6]]){S.sure[no]=S.sure[no]||
 ev('anaSayfa()');ok('belge düğmesi',!!w.document.getElementById('namazBelge'));w.document.getElementById('namazBelge').click();
 ok('belge ekranı adla',/Namazda okuyabilirim/.test(V().textContent)&&/Ali/.test(V().textContent));ok('rozet',ev('S.rozet.includes("namaz")'));
 // ebeveyn ayarları
-await ev('ebeveynOzet()');await new Promise(r=>setTimeout(r,300));ok('ebeveyn ayarları',!!V().querySelector('[data-onay="0"]'));V().querySelector('[data-onay="0"]').click();await new Promise(r=>setTimeout(r,300));ok('onay kapatıldı',ev('onayGerek()')===false);
+await ev('ebeveynOzet()');await new Promise(r=>setTimeout(r,300));ok('ebeveyn ayarları',!!V().querySelector('[data-onay="0"]'));V().querySelector('[data-onay="0"]').click();await new Promise(r=>setTimeout(r,300));ok('şifresiz kapatılamadı',ev('onayGerek()')===true);
+ev('S.seviye="yetiskin"');ok('seviye değişince onay açık kalır',ev('onayGerek()')===true);
+V().querySelector('#ePinEski').value='1234';V().querySelector('[data-onay="0"]').click();await new Promise(r=>setTimeout(r,300));ok('şifreyle onay kapatıldı',ev('onayGerek()')===false);
 V().querySelector('[data-nzs="108"]').click();await new Promise(r=>setTimeout(r,300));ok('namaz sure seçimi '+JSON.stringify(ev('S.namazSure')),ev('S.namazSure').includes(108)&&ev('S.namazSure').length===3);
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
@@ -73,7 +75,7 @@ ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";S.ilk
 w.document.getElementById('elifAc').click();const V=()=>w.document.getElementById('view');
 ok('tablo 28 harf',V().querySelectorAll('[data-hi]').length===28);V().querySelector('[data-hi="4"]').click();ok('cim şekilleri',/Cim/.test(V().textContent)&&V().querySelectorAll('#ebD .ar').length===4);
 V().querySelector('[data-hi="7"]').click();ok('dal bağlanmaz uyarısı',/bağlanmaz/.test(V().textContent));
-for(const alt of ['tani','bul','sekil']){ev(`elifAlt="${alt}";elifba()`);let n=0;for(let k=0;k<12;k++){const b=V().querySelector('.opts button[data-j]');if(!b)break;b.click();n++;await new Promise(r=>setTimeout(r,1850));}ok(alt+' oyunu bitti ('+n+' soru)',/bitti/.test(V().textContent));}
+for(const alt of ['tani','bul','sekil']){ev(`elifAlt="${alt}";elifba()`);let n=0;for(let k=0;k<12;k++){{const dv=V().querySelector('#devam');if(dv){dv.click();await new Promise(r=>setTimeout(r,50));}}const b=V().querySelector('.opts button[data-j]');if(!b)break;b.click();n++;await new Promise(r=>setTimeout(r,1850));}ok(alt+' oyunu bitti ('+n+' soru)',/bitti/.test(V().textContent));}
 ok('ilerleme kaydı',Object.keys(ev('S.elifba')).length>3);
 await ev('ac(1)');await new Promise(r=>setTimeout(r,500));ev('elifAlt="kelime";elifba()');const b=V().querySelector('.opts button[data-j]');ok('kelimede harf sorusu',!!b&&/hangi harf var/.test(V().textContent));
 const q=V().querySelector('.qbig').textContent;console.log('örnek kelime',q,'harfler',JSON.stringify(ev(`kelimeHarfleri(${JSON.stringify(q)})`)));

@@ -180,13 +180,13 @@ function animGit(i,devam){
   ipK.onclick=ev=>{const c=ev.target.closest(".an-ip");if(!c)return;const p=A.ipuclari[+c.dataset.i];const y=CUR&&CUR.ayetler[p.ayet-(CUR.ilkAyet||1)];if(y&&y.w[p.w])kelimeSes(y.w[p.w]);};
   // balon: konuşan kişinin sözü başladığında açılsın
   let blT=null;if(bl&&sh.balon&&sh.parca&&D.sesli&&A.ses&&(D.oto||D.elle)){const p=sh.parca.find(q=>q.kim===sh.balon.kim);if(p){blT=p.t;bl.classList.add("bekle");}}
-  clearInterval(D.izle);D.izle=setInterval(()=>{if(D.i!==i){clearInterval(D.izle);return;}const t=animZaman(),cal=animCalar();
+  clearInterval(D.izle);D.izle=setInterval(()=>{if(D.i!==i||animDurum!==D||!$("anOyna")){clearInterval(D.izle);return;}const t=animZaman(),cal=animCalar();
     if(blT!==null&&cal&&t>=blT-0.15){bl.classList.remove("bekle");blT=null;}
     if(ipBek.length&&cal){ipBek=ipBek.filter(q=>{if(t>=q.t-0.1){const e=ipK.querySelector(`[data-i="${q.i}"]`);if(e){e.classList.remove("bekle");e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1800);}return false;}return true;});}
     if(ok&&cal){let k=-1;ok.forEach((o,j)=>{if(t>=o.t-0.05)k=j;});if(k>=0&&ok[k].bit&&t>ok[k].bit+0.3&&k===ok.length-1)k=-1;if(sh.okuma)ipK.querySelectorAll(".an-ip").forEach(e=>e.classList.toggle("on",k>=0&&A.ipuclari[+e.dataset.i].ayet===ok[k].ayet));kt.querySelectorAll(".an-ayet").forEach((e,j)=>{e.classList.toggle("on",j===k);if(j===k&&e.dataset.g!=="1"){e.dataset.g="1";e.scrollIntoView({block:"nearest",behavior:"smooth"});}});}},30);
   // bir sonraki sahnenin sesini önceden yükle
   if(A.ses&&!A.dosya&&i+1<A.sahneler.length){D.on=new Audio();D.on.preload="auto";D.on.src=`anim/${A.klasor||String(A.no).padStart(3,"0")}/${i+1}.mp3?v=${SURUM}`;}$("anBar").style.width=((i+1)/A.sahneler.length*100)+"%";
-  D.izlenen=D.izlenen||new Set();clearTimeout(D.izSure);{const sc=A.sahneler[i];D.izSure=setTimeout(()=>{if(D.i===i)animIzlendi(i);},Math.max(3000,Math.min(((sc.sure||0)*1000)*0.8,(sc.metin||"").length*45+2000)));}
+  D.izlenen=D.izlenen||new Set();clearTimeout(D.izSure);{const sc=A.sahneler[i];D.izSure=setTimeout(()=>{if(D.i===i&&animDurum===D&&$("anOyna"))animIzlendi(i);},Math.max(3000,Math.min(((sc.sure||0)*1000)*0.8,(sc.metin||"").length*45+2000)));}
   D.ses.pause();animKlipDur();
   if(!D.oto){if(D.sesli&&D.A.ses&&D.elle)animSesCal(i);return;}
   const sonraki=()=>{if(!D.oto||D.i!==i)return;if(i<A.sahneler.length-1)animGit(i+1,true);else animDur();};

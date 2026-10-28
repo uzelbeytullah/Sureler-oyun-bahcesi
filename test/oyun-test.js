@@ -19,7 +19,7 @@ await new Promise(r=>{if(w.document.readyState==='complete')r();else w.addEventL
 return {w,dom,errs,ev:s=>w.eval(s)};};
 
 async function test_t3(){const {w,errs,ev}=await kur();
-const ok=(ad,v)=>console.log((v?'TAMAM ':'HATA  ')+ad);
+const ok=(ad,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+ad);};
 // birleştirme
 const A={puan:100,dogru:10,ardarda:3,rekor:5,seri:2,sonGun:"2026-10-20",rozet:["ilk"],sus:["kus"],hiz:1.25,sure:{"112":{yildiz:{oku:true,kelime:false},ezberDurum:{"0":{kutu:2,sonraki:"2026-10-25"}}}},gunluk:{"2026-10-20":30}};
 const B={puan:80,dogru:12,ardarda:0,rekor:4,seri:5,sonGun:"2026-10-22",rozet:["onlu"],sus:["cit"],hiz:0.75,sure:{"112":{yildiz:{oku:false,kelime:true},ezberDurum:{"0":{kutu:3,sonraki:"2026-10-30"},"1":{kutu:0,sonraki:"2026-10-23"}}},"113":{yildiz:{oku:true}}},gunluk:{"2026-10-20":10,"2026-10-21":40}};

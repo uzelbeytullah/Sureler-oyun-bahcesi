@@ -17,7 +17,7 @@ function sesliSoru(q,V){if(!kucuk())return;const arW=(()=>{const m=(q.html||"").
   bar.innerHTML=`${trSesVar()?`<button class="dn" data-ss="soru" style="font-size:18px">🔊 Soruyu dinle</button>`:""}${arW?`<button class="dn" data-ss="kelime" style="font-size:18px">🎧 Kelimeyi dinle</button>`:""}`;
   const opts=V.querySelector(".opts");if(!opts)return;opts.before(bar);
   bar.querySelectorAll("[data-ss]").forEach(b=>b.onclick=()=>b.dataset.ss==="soru"?soyle(duzMetin(q.html)):kelimeSes(arW));
-  opts.querySelectorAll("button[data-j]").forEach(b=>{const o=q.opts[+b.dataset.j];const s=document.createElement("button");s.type="button";s.className="ops-ses";s.setAttribute("aria-label","Şıkkı dinle");s.textContent="🔊";
+  opts.querySelectorAll("button[data-j]").forEach(b=>{const o=q.opts[+b.dataset.j];const s=document.createElement("button");s.type="button";s.className="ops-ses";s.setAttribute("aria-label",`${+b.dataset.j+1}. şıkkı dinle`);s.textContent="🔊";
     s.onclick=ev=>{ev.stopPropagation();if(q.arOpts){kelimeSes(kelimeBul(o));}else soyle(o);};b.after(s);});
   opts.classList.add("ops-kucuk");
   if(!q.otoSesYok)setTimeout(()=>{if(arW)kelimeSes(arW);else if(trSesVar())soyle(duzMetin(q.html));},350);}
@@ -36,12 +36,19 @@ function molaDk(){if(S.molaDk!==undefined)return S.molaDk;return S.seviye==="kuc
 setInterval(()=>{if(document.hidden||Date.now()-sonDokunus>60000||!PROF.aktif)return;const t=today();S.log=S.log||{};const g=S.log[t]=S.log[t]||{soru:0,dogru:0,tekrar:0,hikaye:0,dk:0,s:{},zor:[]};
   g.dk=Math.round(((g.dk||0)+0.25)*100)/100;S.oturumDk=(S.oturumDk||0)+0.25;
   const m=molaDk();if(m&&S.oturumDk>=m+molaSonra&&!document.querySelector(".mola"))molaGoster();},15000);
-function molaGoster(){const p=aktifKisi();const d=document.createElement("div");d.className="mola";d.setAttribute("role","dialog");d.setAttribute("aria-label","Mola zamanı");
+function molaGoster(){const p=aktifKisi();const once=document.activeElement;const d=document.createElement("div");d.className="mola";d.setAttribute("role","dialog");d.setAttribute("aria-label","Mola zamanı");
   d.innerHTML=`<div class="mola-kutu pop"><div style="font-size:54px">🌿</div><h2>${p&&p.ad?esc(p.ad)+", b":"B"}ugün çok güzel çalıştın!</h2><p style="font-size:19px">Şimdi biraz mola verelim. Öğrendiğin ayeti annene ya da babana okur musun?</p>
   <div style="display:grid;gap:8px"><button class="primary" id="molaTamam" style="font-size:20px;min-height:56px">Mola veriyorum</button>${molaSonra>0?`<p style="font-size:15px">Bir kez uzattık. Daha fazla süre için annen ya da baban <b>Ebeveyn özeti</b>nden mola ayarını değiştirebilir.</p>`:`<button id="molaBes">5 dakika daha</button>`}</div></div>`;
   document.body.appendChild(d);efekt("gorev");
-  $("molaTamam").onclick=()=>{S.oturumDk=0;molaSonra=0;save();d.remove();durSes();animDur&&animDur();anaSayfa();};
-  const mb=$("molaBes");if(mb)mb.onclick=()=>{molaSonra+=5;d.remove();};
+  /* kapanınca odak, pencere açılmadan önceki öğeye döner (o öğe yerinde kaldıysa) */
+  const kapat=()=>{d.remove();if(once&&once.isConnected&&once.focus)try{once.focus({preventScroll:true});}catch(e){}};
+  $("molaTamam").onclick=()=>{S.oturumDk=0;molaSonra=0;save();kapat();durSes();animDur&&animDur();anaSayfa();};
+  const mb=$("molaBes");if(mb)mb.onclick=()=>{molaSonra+=5;kapat();};
+  /* Esc: uzatma hakkı varsa "5 dakika daha", yoksa "Mola veriyorum"; Tab odağı pencere içinde tutar */
+  d.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();(mb||$("molaTamam")).click();return;}
+    if(e.key!=="Tab")return;const f=[...d.querySelectorAll("button:not([disabled]),[href],input,select,textarea,[tabindex]:not([tabindex='-1'])")];if(!f.length)return;
+    const ilk=f[0],son=f[f.length-1];if(e.shiftKey&&(document.activeElement===ilk||!d.contains(document.activeElement))){e.preventDefault();son.focus();}else if(!e.shiftKey&&(document.activeElement===son||!d.contains(document.activeElement))){e.preventDefault();ilk.focus();}});
+  d.addEventListener("focusout",e=>{if(d.isConnected&&e.relatedTarget&&!d.contains(e.relatedTarget)){const t=$("molaTamam");if(t)t.focus();}});
   d.setAttribute("aria-modal","true");setTimeout(()=>{const t=$("molaTamam");if(t)t.focus();},50);}
 document.addEventListener("visibilitychange",()=>{if(document.hidden){S.gizliT=Date.now();save();}else if(S.gizliT&&Date.now()-S.gizliT>15*60000){S.oturumDk=0;molaSonra=0;}});
 
@@ -73,7 +80,7 @@ async function ebeveynOzet(){CUR=null;baslik();setTabs();$("baslik").textContent
   V.innerHTML=`<button class="geri" id="eGeri">← Sureler</button><h2>👨‍👩‍👧 Haftalık ebeveyn özeti</h2>
   <p>Çocuğunuzun bu hafta neye çalıştığını ve nerede zorlandığını gösterir. Övgüyü emeğe yöneltin: "Bu hafta 4 gün çalıştın" demek, puandan daha çok işe yarar.</p>
   ${bolum.join("")||"<p>Henüz kayıtlı kişi yok.</p>"}
-  <section class="detay"><h3>Mola ayarı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3><p style="display:flex;gap:6px;flex-wrap:wrap">${[[0,"Kapalı"],[15,"15 dk"],[20,"20 dk"],[30,"30 dk"],[45,"45 dk"]].map(([m,a])=>`<button data-mola="${m}" class="${molaDk()===m?"on":""}" style="min-height:40px">${a}</button>`).join("")}</p></section>
+  <section class="detay"><h3>Mola ayarı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3><p style="display:flex;gap:6px;flex-wrap:wrap">${[[0,"Kapalı"],[15,"15 dk"],[20,"20 dk"],[30,"30 dk"],[45,"45 dk"]].map(([m,a])=>`<button data-mola="${m}" class="${molaDk()===m?"on":""}" aria-pressed="${molaDk()===m}" style="min-height:44px">${a}</button>`).join("")}</p></section>
   ${ebeveynAyarHtml()}`;
   $("eGeri").onclick=()=>anaSayfa();V.querySelectorAll("[data-mola]").forEach(b=>b.onclick=()=>{S.molaDk=+b.dataset.mola;save();ebeveynOzet();});ebeveynAyarBagla();window.scrollTo({top:0});}
 /* ========== ÇOCUK ANLATIMI, GÜNLÜK KÜÇÜK İYİLİK, BEN OKUYAYIM ========== */
@@ -95,7 +102,8 @@ async function benOku(i,btn,durum){
   if(KAYIT&&KAYIT.rec&&KAYIT.rec.state==="recording"){KAYIT.rec.stop();return;}
   if(!navigator.mediaDevices||!window.MediaRecorder){durum.textContent="Bu cihazda ses kaydı yapılamıyor.";return;}
   let st;try{st=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){durum.textContent="Mikrofon izni verilmedi. Sayfanın mikrofon kullanmasına izin verirsen kendi okuyuşunu dinleyebilirsin.";return;}
-  const parca=[];const rec=new MediaRecorder(st);KAYIT={rec};rec.ondataavailable=e=>{if(e.data.size)parca.push(e.data);};
+  if(KAYIT&&KAYIT.url)URL.revokeObjectURL(KAYIT.url);const parca=[];const rec=new MediaRecorder(st);KAYIT={rec};
+  const bekci=setInterval(()=>{if(rec.state!=="recording"){clearInterval(bekci);return;}if(!btn.isConnected)rec.stop();},1000);   // ekrandan çıkılırsa mikrofonu kapatrec.ondataavailable=e=>{if(e.data.size)parca.push(e.data);};
   rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());btn.textContent="🎙 Yeniden oku";btn.classList.remove("kayit");
     const url=URL.createObjectURL(new Blob(parca,{type:rec.mimeType||"audio/webm"}));KAYIT.url=url;
     durum.innerHTML=`<b>Önce kendi sesini, sonra Alafasy'yi dinle. Farkı duyuyor musun?</b><br><button id="kendim" class="dn">▶ Benim okuyuşum</button> <button id="hoca" class="dn">▶ Alafasy</button>`;
@@ -114,7 +122,7 @@ function kisiSec(){CUR=null;baslik();setTabs();const V=$("view");$("baslik").tex
   <label><b>Yaş</b><br><input id="kYas" type="number" min="3" max="99" inputmode="numeric" style="min-height:44px;width:90px;font-size:18px"></label>
   <button class="primary" id="kEkle" style="font-size:18px">Ekle ve başla</button></p>
   <p style="font-size:14px">Ad ve yaş yalnız bu uygulamada, senin hesabında ve bu cihazda saklanır. Yaşa göre sorular ve görevler ayarlanır.</p></section>
-  ${L.length?`<details><summary><b>Kişileri düzenle</b></summary>${L.map(p=>`<p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input data-ad="${p.id}" class="ara" value="${esc(p.ad)}" maxlength="24" style="max-width:200px"><input data-yas="${p.id}" type="number" min="3" max="99" value="${p.yas||""}" style="min-height:40px;width:80px"><button data-kay="${p.id}">Kaydet</button>${L.length>1?`<button data-sil="${p.id}">Listeden çıkar</button>`:""}</p>`).join("")}</details>`:""}`;
+  ${L.length?`<details><summary><b>Kişileri düzenle</b></summary>${L.map(p=>`<p style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><input data-ad="${p.id}" class="ara" value="${esc(p.ad)}" maxlength="24" aria-label="${esc(p.ad||"Adsız kişi")}: ad" style="max-width:200px"><input data-yas="${p.id}" type="number" min="3" max="99" value="${p.yas||""}" aria-label="${esc(p.ad||"Adsız kişi")}: yaş" style="min-height:44px;width:80px"><button data-kay="${p.id}">Kaydet</button>${L.length>1?`<button data-sil="${p.id}">Listeden çıkar</button>`:""}</p>`).join("")}</details>`:""}`;
   V.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>kisiGec(b.dataset.k));
   $("kEkle").onclick=()=>{const ad=$("kAd").value.trim(),yas=+$("kYas").value;if(!ad){toast("Adını yaz");return;}if(!(yas>=3&&yas<=99)){toast("Yaşını yaz (3-99)");return;}
     const id=PROF.liste.some(p=>p.id==="p0")||PROF.liste.length?"p"+Date.now().toString(36):"p0";PROF.liste.push({id,ad,yas});profKaydet();kisiGec(id,true);};
@@ -125,4 +133,4 @@ function confirmSil(p){const b=document.querySelector(`[data-sil="${p.id}"]`);if
 async function kisiGec(id,yeni){if(PROF.aktif&&PROF.aktif!==id){save();bulutGonder();}PROF.aktif=id;profKaydet();profYukle(id);const p=aktifKisi();if(p&&p.yas)S.seviye=yasSeviye(p.yas);sonPuan=S.puan;
   if(DB&&UID){docRef=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await docRef.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;}catch(e){}}
   save();toast(yeni?`Hoş geldin ${p.ad}!`:`${p.ad||"Kişi"} seçildi`);anaSayfa();}
-function kisiDugme(){const p=aktifKisi();return p?`<button id="kisiDeg" style="min-height:40px">👤 ${esc(p.ad||"Adsız")}${p.yas?" · "+p.yas:""} · Değiştir</button>`:"";}
+function kisiDugme(){const p=aktifKisi();return p?`<button id="kisiDeg" style="min-height:44px">👤 ${esc(p.ad||"Adsız")}${p.yas?" · "+p.yas:""} · Değiştir</button>`:"";}

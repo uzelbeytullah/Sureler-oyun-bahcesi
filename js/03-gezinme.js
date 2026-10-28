@@ -1,19 +1,27 @@
 /* Sureler Oyun Bahçesi · Sekmeler, ana sayfa, ilk giriş yolu, sure açma */
 /* ---------- gezinme ---------- */
 let CUR=null,cur="harita";const CACHE={};
-function setTabs(){
+/* Ekran sayacı: her ekran değişiminde artar; gecikmeli işler (soru geçişi vb.) eski ekranda kaldıysa çalışmaz */
+let EKRAN_NO=0;
+/* Erişilebilirlik yardımcıları: hareket azaltma tercihi, ekran okuyucuya duyuru, klavyeyle role=button */
+function kaydirmaDavranisi(){try{return window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth";}catch(e){return "smooth";}}
+function canliDuyur(t){let el=document.getElementById("canliAlan");if(!el){el=document.createElement("div");el.id="canliAlan";el.className="gorunmez";el.setAttribute("role","status");el.setAttribute("aria-live","polite");document.body.appendChild(el);}
+  el.textContent="";setTimeout(()=>{el.textContent=t;},60);}
+document.addEventListener("keydown",e=>{const t=e.target;if((e.key==="Enter"||e.key===" ")&&t&&t.matches&&t.matches('[role=button][tabindex]:not(button):not([data-c])')){e.preventDefault();t.click();}});
+function setTabs(ayniEkran){if(!ayniEkran)EKRAN_NO++;
   const T=$("tabs");
   if(!CUR){T.innerHTML="";T.hidden=true;return;}
   T.hidden=false;
-  const b=([k,a])=>`<button data-v="${k}" class="${cur===k?"on":""}">${a}</button>`;
+  const ac_=k=>cur===k?' aria-current="page"':"";
+  const b=([k,a])=>`<button data-v="${k}" class="${cur===k?"on":""}"${ac_(k)}>${a}</button>`;
   const ust=["harita","oku","ezber","ilkeler","portre"],alt=["kelime","tamamla","sirala","bilgi"];
   if(kucuk()&&!S.tumBolum){const B=[["oku","🎧 Dinle"],["cocuk","🎬 Hikâye"],["kelime","🎮 Dinle ve seç"],["tamamla","🧩 Dinle ve tamamla"],["sirala","🔢 Sırayı bul"],["ezber","🧠 Ezber"]].filter(x=>x[0]!=="cocuk"||CUR.ek);
-    T.innerHTML=`<div class="sira">${CUR.ust?`<button data-v="gruplar" class="geri">← Yâsîn grupları</button>`:""}<button data-v="sureler" class="geri">← Sureler</button><button data-v="harita" class="${cur==="harita"?"on":""}">⭐ Yıldızlarım</button><button data-tum="1">Bütün bölümler</button></div><div class="buyuk-yol">${B.map(([k,a])=>`<button data-v="${k}" class="${cur===k?"on primary":""}">${a}</button>`).join("")}</div>`;return;}
-  const one=S.seviye==="kucuk"&&CUR.ek?`<button data-v="cocuk" class="${cur==="cocuk"?"on":""}">🎬 Çocuklar için</button>`:S.seviye==="yetiskin"&&CUR.ek?`<button data-v="sinav" class="${cur==="sinav"?"on":""}">📘 Kitap sınavı</button>`:"";
+    T.innerHTML=`<div class="sira">${CUR.ust?`<button data-v="gruplar" class="geri">← Yâsîn grupları</button>`:""}<button data-v="sureler" class="geri">← Sureler</button><button data-v="harita" class="${cur==="harita"?"on":""}"${ac_("harita")}>⭐ Yıldızlarım</button><button data-tum="1">Bütün bölümler</button></div><div class="buyuk-yol">${B.map(([k,a])=>`<button data-v="${k}" class="${cur===k?"on primary":""}"${ac_(k)}>${a}</button>`).join("")}</div>`;return;}
+  const one=S.seviye==="kucuk"&&CUR.ek?`<button data-v="cocuk" class="${cur==="cocuk"?"on":""}"${ac_("cocuk")}>🎬 Çocuklar için</button>`:S.seviye==="yetiskin"&&CUR.ek?`<button data-v="sinav" class="${cur==="sinav"?"on":""}"${ac_("sinav")}>📘 Kitap sınavı</button>`:"";
   T.innerHTML=`<div class="sira">${CUR.ust?`<button data-v="gruplar" class="geri">← Yâsîn grupları</button>`:""}<button data-v="sureler" class="geri">← Sureler</button>${kucuk()?`<button data-sade="1">Sade görünüm</button>`:""}${one}${GAMES.filter(g=>ust.includes(g[0])&&(g[0]!=="ilkeler"||CUR.ilke)).map(b).join("")}</div>
   <div class="sira">${GAMES.filter(g=>alt.includes(g[0])).map(b).join("")}</div>${CUR.ek?`<div class="sira" aria-label="Kitaptan"><b style="align-self:center;font-size:13px;color:var(--gold)">KİTAPTAN</b>${EK_SEKME.map(b).join("")}</div>`:""}`;
 }
-$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;TEKRAR_AKIS=false;if(b.dataset.tum){S.tumBolum=true;save();setTabs();return;}if(b.dataset.sade){S.tumBolum=false;save();setTabs();return;}aracDur();animDur();ezberArac=null;
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;TEKRAR_AKIS=false;if(b.dataset.tum){S.tumBolum=true;save();setTabs(true);return;}if(b.dataset.sade){S.tumBolum=false;save();setTabs(true);return;}aracDur();animDur();ezberArac=null;
   if(b.dataset.v==="sureler"){CUR=null;anaSayfa();return;}
   if(b.dataset.v==="gruplar"){CUR=null;grupMenu(YASIN());return;}show(b.dataset.v);});
 async function animHazirla(){if(!CUR||CUR.anim!==undefined)return;const no=CUR.no,a=await animYukle(no);if(!CUR||CUR.no!==no)return;CUR.anim=null;CUR.animEk={};
