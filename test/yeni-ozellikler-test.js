@@ -1,4 +1,4 @@
-/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz hazırlığı yolu, aile halkası, aile takımı
+/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz yolu, aile halkası, aile takımı, Elif-ba ve harf sesleri, çocuk oyunu
    Çalıştırmak için:  npm install jsdom@24  ardından  node test/yeni-ozellikler-test.js */
 let HATA=0;
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
@@ -7,10 +7,10 @@ const kur=async function(){
 const html=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){
   w.fetch=async(u)=>{u=String(u).replace(/^https:\/\/x\.test\//,'').split('?')[0];const p=path.join(ROOT,u);if(!fs.existsSync(p))return {ok:false,status:404,json:async()=>{throw 1},text:async()=>''};const b=fs.readFileSync(p);return {ok:true,status:200,json:async()=>JSON.parse(b.toString()),text:async()=>b.toString(),arrayBuffer:async()=>b};};
-  w.Audio=function(){return {play:()=>Promise.resolve(),pause(){},addEventListener(){},removeEventListener(){},set src(v){},currentTime:0,duration:1}};
+  w.Audio=function(){return {dataset:{},load(){},play:()=>Promise.resolve(),pause(){},addEventListener(){},removeEventListener(){},set src(v){},currentTime:0,duration:1}};
   w.AudioContext=w.webkitAudioContext=function(){return {createOscillator:()=>({connect(){},start(){},stop(){},frequency:{setValueAtTime(){},value:0},type:''}),createGain:()=>({connect(){},gain:{setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){},value:0}}),destination:{},currentTime:0,resume(){}}};
   w.speechSynthesis={getVoices:()=>[],speak(){},cancel(){}};w.HTMLMediaElement.prototype.play=()=>Promise.resolve();w.HTMLMediaElement.prototype.pause=()=>{};
-  w.scrollTo=()=>{};w.matchMedia=()=>({matches:false,addEventListener(){},addListener(){}});
+  w.scrollTo=()=>{};w.Element.prototype.scrollIntoView=function(){};w.matchMedia=()=>({matches:false,addEventListener(){},addListener(){}});
 }});
 const w=dom.window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
 await new Promise(r=>setTimeout(r,300));
@@ -66,4 +66,29 @@ ok('ses düğmesi (anlam sorusunda)',kopya.tur!=='anlam'||!!w.document.getElemen
 ev('YAR.son=null');kopya.durum='sonuc';kopya.dogru=q.dogru;w.yarOyuncuCiz(kopya);ok('sonuçta aile tablosu',/Aile puanı/.test(E().textContent));
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
-(async()=>{for(const f of [test_t5,test_t6,test_t7]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
+async function test_t8(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";anaSayfa()');
+w.document.getElementById('elifAc').click();const V=()=>w.document.getElementById('view');
+ok('tablo 28 harf',V().querySelectorAll('[data-hi]').length===28);V().querySelector('[data-hi="4"]').click();ok('cim şekilleri',/Cim/.test(V().textContent)&&V().querySelectorAll('#ebD .ar').length===4);
+V().querySelector('[data-hi="7"]').click();ok('dal bağlanmaz uyarısı',/bağlanmaz/.test(V().textContent));
+for(const alt of ['tani','bul','sekil']){ev(`elifAlt="${alt}";elifba()`);let n=0;for(let k=0;k<12;k++){const b=V().querySelector('.opts button[data-j]');if(!b)break;b.click();n++;await new Promise(r=>setTimeout(r,1850));}ok(alt+' oyunu bitti ('+n+' soru)',/bitti/.test(V().textContent));}
+ok('ilerleme kaydı',Object.keys(ev('S.elifba')).length>3);
+await ev('ac(1)');await new Promise(r=>setTimeout(r,500));ev('elifAlt="kelime";elifba()');const b=V().querySelector('.opts button[data-j]');ok('kelimede harf sorusu',!!b&&/hangi harf var/.test(V().textContent));
+const q=V().querySelector('.qbig').textContent;console.log('örnek kelime',q,'harfler',JSON.stringify(ev(`kelimeHarfleri(${JSON.stringify(q)})`)));
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+
+async function test_t9(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const calan=[];w.eval('kelimeSes=function(x){window.__k.push(x&&x.a);return true}');w.__k=calan;
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";elifAlt="tablo";elifba()');
+const V=()=>w.document.getElementById('view');V().querySelector('[data-hi="1"]').click();
+ok('be için örnek kelime düğmeleri',V().querySelectorAll('[data-horn^="ب|"]').length===3);
+V().querySelector('[data-horn^="ب|"]').click();ok('örnek kelime çalındı: '+calan[0],calan.length===1);
+ok('28 harfin hepsinde örnek',ev('HARFLER.every(h=>(ELIF_ORNEK[h[0]]||[]).length>0)'));
+ev('elifAlt="bul";elifba()');ok('harfi bul ekranında ses düğmeleri',!!V().querySelector('[data-horn]'));
+// çocuk oyunu
+await ev('ac(112)');await new Promise(r=>setTimeout(r,400));await ev('show("cocuk")');await new Promise(r=>setTimeout(r,400));
+w.document.getElementById('cOyun').click();const metin=V().textContent;ok('çocuk oyunu sorusu çocuğa hitap ediyor',!/çocuğa/.test(metin));console.log('   ',metin.slice(0,160).replace(/\s+/g,' '));
+const n=ev('CUR.ek.cocuk.oyun_sorulari.filter(q=>!q.ebeveyn).length');ok('İhlâs çocuk soru sayısı '+n,n>=6);
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+
+(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
