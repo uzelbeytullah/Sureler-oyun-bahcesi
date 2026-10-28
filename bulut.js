@@ -111,7 +111,7 @@
         var esler = kok.collection("esler"), olaylar = kok.collection("olaylar");
         var benim = esler.doc(u.uid);
         var liste = [], peerCb = [], olayCb = {}, sonYayin = {}, kapat = [], acik = true, sahibim = false;
-        var benimDurum = {}, fark = 0;   // fark: sunucu saati - cihaz saati (cihaz saati yanlış olabilir)
+        var benimDurum = {}, fark = 0, sahipT = 0, eslerAcik = false;   // fark: sunucu saati - cihaz saati (cihaz saati yanlış olabilir)
         var SUNUCU = firebase.firestore.FieldValue.serverTimestamp;
         function ms(t) { return t && t.toMillis ? t.toMillis() : (typeof t === "number" ? t : 0); }
         function simdi() { return Date.now() + fark; }
@@ -119,22 +119,27 @@
         function son() { return firebase.firestore.Timestamp.fromMillis(simdi() + 864e5); }
 
         function nabiz() {
-          // Oda sahibi her nabızda sahipliğini tazeler; böylece süren yarışmayı başkası devralamaz
-          if (sahibim) kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).catch(function () {});
+          /* Oda sahibi sahipliğini 10 dakikada bir tazeler (kurallar 3 saat sessiz kalan odayı devrettirir; sık yazmaya gerek yok) */
+          if (sahibim && Date.now() - sahipT > 600000) { sahipT = Date.now(); kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).catch(function () { sahipT = 0; }); }
           return benim.set({ presence: temiz(benimDurum), t: SUNUCU(), son: son() });
         }
-        /* 30 saniyede bir "buradayım" (ücretsiz plandaki günlük yazma sınırını korumak için seyrek) */
-        var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 30000);
+        /* 60 saniyede bir "buradayım" (ücretsiz plandaki günlük sınırı korumak için seyrek) */
+        var nabizT = setInterval(function () { if (acik) nabiz().catch(function () {}); }, 60000);
 
-        kapat.push(esler.onSnapshot(function (s) {
+        /* Oyuncu listesini yalnız onu isteyen (oda sahibi) dinler. Herkes dinlerse her "buradayım" yazısı
+           odadaki herkese okuma olarak sayılır ve okuma, oyuncu sayısının karesiyle büyür. */
+        function eslerDinle() {
+          if (eslerAcik || !acik) return; eslerAcik = true;
+          kapat.push(esler.onSnapshot(function (s) {
           var ben = s.docs.find(function (d) { return d.id === u.uid; });
           var bt = ben && ms(ben.data({ serverTimestamps: "estimate" }).t);
           if (ben && !ben.metadata.hasPendingWrites && bt) fark = bt - Date.now();
-          var sinir = simdi() - 75000;   // iki nabız kaçıran oyuncu listeden düşer
+          var sinir = simdi() - 135000;   /* iki nabız kaçıran oyuncu listeden düşer */
           liste = s.docs.filter(function (d) { return ms(d.data({ serverTimestamps: "estimate" }).t) > sinir || d.id === u.uid; })
             .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: ac(d.data().presence || {}) }; });
           peerCb.forEach(function (f) { try { f(liste); } catch (e) {} });
-        }, function () {}));
+          }, function () {}));
+        }
 
         kapat.push(olaylar.onSnapshot(function (s) {
           s.docChanges().forEach(function (c) {
@@ -150,13 +155,13 @@
         /* Odaya ilk yayın yapan oda sahibi olur; olaylara yalnız sahibi yazabilir (kurallar da bunu denetler) */
         function sahiplen() {
           if (sahibim) return Promise.resolve();
-          return kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).then(function () { sahibim = true; });
+          return kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).then(function () { sahibim = true; sahipT = Date.now(); });
         }
 
         return nabiz().then(function () {
           return {
             peers: function () { return liste.slice(); },
-            onPeers: function (f) { peerCb.push(f); return function () { peerCb = peerCb.filter(function (x) { return x !== f; }); }; },
+            onPeers: function (f) { eslerDinle(); peerCb.push(f); return function () { peerCb = peerCb.filter(function (x) { return x !== f; }); }; },
             presence: function (v) {
               /* değişmeyen durumu yeniden yazma; nabız zaten tazeliyor */
               var j = JSON.stringify(v || {});
@@ -167,7 +172,8 @@
             emit: function (olay, veri) {
               var j = JSON.stringify(veri);
               var o = sonYayin[olay];
-              if (o && o.j === j && Date.now() - o.t < 20000) return Promise.resolve();   // değişmeyeni sık yazma
+              /* değişmeyeni yeniden yazma; yalnız 50 sn'de bir tazele ki sonradan katılan (60 sn'den eskiyi saymayan) durumu görsün */
+              if (o && o.j === j && Date.now() - o.t < 50000) return Promise.resolve();
               sonYayin[olay] = { j: j, t: Date.now() };
               return sahiplen().then(function () {
                 return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: SUNUCU(), son: son() });
