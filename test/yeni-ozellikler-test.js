@@ -1,19 +1,21 @@
-/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz yolu, aile halkası, aile takımı, Elif-ba, harf sesleri, çocuk oyunu, küçükler için sesli oyunlar, ilk giriş, bahçe
+/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz yolu, aile halkası, aile takımı, Elif-ba, harf sesleri, çocuk oyunu, küçükler, ilk giriş, bahçe
    Çalıştırmak için:  npm install jsdom@24  ardından  node test/yeni-ozellikler-test.js */
 let HATA=0;
-const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
+const {JSDOM,ResourceLoader,VirtualConsole}=require('jsdom');const fs=require('fs'),path=require('path');
 const ROOT=require('path').join(__dirname,'..');
 const kur=async function(){
 const html=fs.readFileSync(path.join(ROOT,'index.html'),'utf8');
-const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){
+class Yerel extends ResourceLoader{fetch(url,opt){const u=url.replace(/^https:\/\/x\.test\//,'').split('?')[0];const p=path.join(ROOT,u);if(/^https?:/.test(u)||!fs.existsSync(p))return Promise.resolve(Buffer.from(''));return Promise.resolve(fs.readFileSync(p));}}
+const __errs=[];const vc=new VirtualConsole();vc.on('jsdomError',e=>__errs.push(String(e.message||e)));
+const dom=new JSDOM(html,{virtualConsole:vc,runScripts:'dangerously',resources:new Yerel(),pretendToBeVisual:true,url:'https://x.test/',beforeParse(w){
   w.fetch=async(u)=>{u=String(u).replace(/^https:\/\/x\.test\//,'').split('?')[0];const p=path.join(ROOT,u);if(!fs.existsSync(p))return {ok:false,status:404,json:async()=>{throw 1},text:async()=>''};const b=fs.readFileSync(p);return {ok:true,status:200,json:async()=>JSON.parse(b.toString()),text:async()=>b.toString(),arrayBuffer:async()=>b};};
   w.Audio=function(){return {dataset:{},load(){},play:()=>Promise.resolve(),pause(){},addEventListener(){},removeEventListener(){},set src(v){},currentTime:0,duration:1}};
   w.AudioContext=w.webkitAudioContext=function(){return {createOscillator:()=>({connect(){},start(){},stop(){},frequency:{setValueAtTime(){},value:0},type:''}),createGain:()=>({connect(){},gain:{setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){},value:0}}),destination:{},currentTime:0,resume(){}}};
   w.speechSynthesis={getVoices:()=>[],speak(){},cancel(){}};w.HTMLMediaElement.prototype.play=()=>Promise.resolve();w.HTMLMediaElement.prototype.pause=()=>{};
   w.scrollTo=()=>{};w.Element.prototype.scrollIntoView=function(){};w.matchMedia=()=>({matches:false,addEventListener(){},addListener(){}});
 }});
-const w=dom.window;const errs=[];w.addEventListener('error',e=>errs.push(e.message));
-await new Promise(r=>setTimeout(r,300));
+const w=dom.window;const errs=__errs;w.addEventListener('error',e=>errs.push(e.message));
+await new Promise(r=>{if(w.document.readyState==='complete')r();else w.addEventListener('load',()=>r());});await new Promise(r=>setTimeout(r,300));
 return {w,dom,errs,ev:s=>w.eval(s)};};
 
 async function test_t5(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};

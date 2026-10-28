@@ -19,7 +19,12 @@
   }
   function sdkHazir() {
     if (window.firebase && window.firebase.firestore && window.firebase.auth) return Promise.resolve();
-    return yukle("app").then(function () { return Promise.all([yukle("auth"), yukle("firestore")]); });
+    return yukle("app").then(function () {
+      var l = [yukle("auth"), yukle("firestore")];
+      // App Check yüklenemezse (ör. reklam engelleyici) oyun yine de denesin
+      if (AYAR.appCheckKey) l.push(yukle("app-check").catch(function () {}));
+      return Promise.all(l);
+    });
   }
 
   var app, fs, hazir = null;
@@ -28,6 +33,12 @@
     hazir = sdkHazir().then(function () { return new Promise(function (ok, hata) {
       try {
         app = firebase.initializeApp(AYAR);
+        // App Check: Firestore'a gelen isteklerin bu siteden geldiğini kanıtlar (veritabanından önce açılmalı)
+        if (AYAR.appCheckKey && firebase.appCheck) {
+          try {
+            firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider(AYAR.appCheckKey), true);
+          } catch (e) { console.warn("App Check açılamadı", e); }
+        }
         fs = firebase.firestore();
         var auth = firebase.auth();
         auth.onAuthStateChanged(function (u) { if (u) ok(u); });

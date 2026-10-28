@@ -4,8 +4,8 @@
    - Yazı tipleri ve Firebase kütüphanesi: kayıtlı kopya varsa o, arkada tazelenir
    - Ses dosyaları (mp3) tarayıcının kendi önbelleğine bırakılır (kısmi isteklerle çalıştıkları için)
    - Firestore bağlantılarına hiç dokunulmaz */
-const SURUM = "sob-v1";
-const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=4", "./bulut.js?v=4", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
+const SURUM = "sob-v2";
+const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=5", "./bulut.js?v=5", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
@@ -22,6 +22,7 @@ self.addEventListener("fetch", e => {
   const u = new URL(r.url);
   const ayni = u.origin === self.location.origin;
   if (!ayni && !DIS.includes(u.hostname)) return;          // Firestore vb. dokunma
+  if (u.hostname === "www.gstatic.com" && !u.pathname.startsWith("/firebasejs/")) return;  // reCAPTCHA (App Check) dosyalarına dokunma
   if (/\.mp3$/i.test(u.pathname) || r.headers.has("range")) return;
 
   if (r.mode === "navigate") {                             // sayfa: önce ağ
