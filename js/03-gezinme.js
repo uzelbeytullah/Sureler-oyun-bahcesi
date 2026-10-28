@@ -36,11 +36,11 @@ function baslik(){
 }
 let araMetin="";
 function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
-  CUR=null;baslik();setTabs();renderStats();
+  CUR=null;baslik();setTabs();anaSayfa.no=EKRAN_NO;renderStats();
   const V=$("view");if(!aktifKisi()){kisiSec();return;}if(!S.seviye){seviyeSor(anaSayfa);return;}
   if(ilkYolGoster()){ilkYol();return;}
   V.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:6px">${kisiDugme()}</div>${gorevKart()}<div id="eylemKart"></div><div id="halkaKart"></div>${namazKart()}${bugunPaneli()}<h2>Bir sure seç</h2><p>Her surede dört yıldız var: okudum, kelimeleri bildim, ayetleri tamamladım, sırayı bildim.</p>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="bahceAc" style="background:#2E7D5B;border-color:#2E7D5B">🌳 Bahçem</button><button id="hangiAc">🎧 Hangi sure?</button><button id="elifAc">🔤 Elif-ba</button><button id="yarKatil">👪 Aile yarışmasına katıl</button><button id="hedefAc">🤝 Ortak hedef</button><button id="ebeveynAc">👨‍👩‍👧 Ebeveyn özeti</button><button class="primary" id="atlasAc">İlke atlası: bütün surelerin ilkeleri</button></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary yesil-dug" id="bahceAc">🌳 Bahçem</button><button id="hangiAc">🎧 Hangi sure?</button><button id="elifAc">🔤 Elif-ba</button><button id="yarKatil">👪 Aile yarışmasına katıl</button><button id="hedefAc">🤝 Ortak hedef</button><button id="ebeveynAc">👨‍👩‍👧 Ebeveyn özeti</button><button class="primary" id="atlasAc">İlke atlası: bütün surelerin ilkeleri</button></div>
   <input class="ara" id="ara" type="search" placeholder="Sure adı ya da numarası yaz" aria-label="Sure ara" value="${esc(araMetin)}">
   <div class="sure-grid" id="grid"></div>
   <h2>Rozetler</h2>${(()=>{const var_=BADGES.filter(([id])=>S.rozet.includes(id)),yok=BADGES.filter(([id])=>!S.rozet.includes(id));

@@ -32,7 +32,7 @@
     if (hazir) return hazir;
     hazir = sdkHazir().then(function () { return new Promise(function (ok, hata) {
       try {
-        app = firebase.initializeApp(AYAR);
+        app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(AYAR);   // yeniden denemede ikinci kez kurma
         // App Check: Firestore'a gelen isteklerin bu siteden geldiğini kanıtlar (veritabanından önce açılmalı)
         if (AYAR.appCheckKey && firebase.appCheck) {
           try {

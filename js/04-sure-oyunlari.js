@@ -4,7 +4,7 @@ function harita(){
   const t=SS(CUR.no),V=$("view");
   V.innerHTML=`<h2>${esc(CUR.ad)} · yıldızların</h2>
   <p>${esc(CUR.konu||"")}</p>
-  <div class="stars">${STAR_GAMES.map(k=>`<button class="star ${t.yildiz[k]?"got":""}" data-g="${k}"><div class="s">★</div>${STAR_NAMES[k]}</button>`).join("")}</div>
+  <div class="stars">${STAR_GAMES.map(k=>`<button class="star ${t.yildiz[k]?"got":""}" data-g="${k}"><div class="s" aria-hidden="true">★</div>${STAR_NAMES[k]}<span class="gorunmez">${t.yildiz[k]?" · yıldız kazanıldı":" · yıldız henüz kazanılmadı"}</span></button>`).join("")}</div>
   <p>Yıldızlar için: Oku bölümünde bütün ayetleri işaretle; kelime ve tamamlama oyunlarında en az %80 doğru yap; ayetleri doğru sıraya diz. Bilgi yarışması ve Kur'an insanı bölümleri puan ve rozet kazandırır.</p>`;
   V.querySelectorAll(".star").forEach(b=>b.onclick=()=>show(b.dataset.g));
   if(USR_EDIT&&CUR.ayetler.flatMap(a=>a.w).length>=6){const d=document.createElement("div");d.innerHTML=`<section class="detay"><h3>👪 Aile yarışması</h3><p>Bu surenin kelimelerinden 8 soruluk canlı bir yarışma aç. Bu ekranı herkesin göreceği yere koy; aile üyeleri kendi telefonlarından katılıp cevap verir.</p><button class="primary" id="yarAcB">Yarışma aç</button></section>`;V.appendChild(d);$("yarAcB").onclick=()=>yarAc();}
@@ -60,9 +60,9 @@ function oku(){
   V.querySelectorAll(".kelimeler[data-ai] [data-c]").forEach(sp=>{sp.style.cursor="pointer";sp.onclick=()=>tecvidAc(V,+sp.closest(".kelimeler").dataset.ai,sp.dataset.c);});
   V.querySelectorAll(".hz").forEach(b=>b.onclick=()=>{S.hiz=+b.dataset.h;hizUygula();save();V.querySelectorAll(".hz").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",String(x===b));});});
   const sureSrc="ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM;
-  {const ib=$("indir");if(ib){const no=CUR.no,yaz=v=>{ib.textContent=v?"✓ İnternetsiz dinlenebilir · kaldır":"⬇ İnternetsiz dinlemek için indir";ib.dataset.var=v?"1":"";ib.setAttribute("aria-pressed",String(!!v));};
+  {const ib=$("indir");if(ib){const no=CUR.no,yaz=v=>{ib.textContent=v?"✓ İnternetsiz dinlenebilir · kaldır":"⬇ İnternetsiz dinlemek için indir";ib.dataset.var=v?"1":"";delete ib.dataset.onay;};
     sesIndirildi(no).then(yaz);
-    ib.onclick=async()=>{if(ib.dataset.var){await sesSil(no);yaz(false);toast("İndirilen ses kaldırıldı");return;}
+    ib.onclick=async()=>{if(ib.dataset.var){if(!ib.dataset.onay){ib.dataset.onay="1";ib.textContent="Emin misin? Bir daha bas";return;}await sesSil(no);yaz(false);toast("İndirilen ses kaldırıldı");return;}
       ib.disabled=true;ib.textContent="İndiriliyor…";try{await sesIndir(no);yaz(true);toast("Bu sure artık internetsiz de dinlenebilir");}catch(e){yaz(false);toast("İndirilemedi; bağlantıyı denetle");}ib.disabled=false;};}}
   $("hepsi").onclick=async()=>{
     if(sira){durSes();bitir();return;}
@@ -112,8 +112,8 @@ function quiz({title,items,build,star,need=0.8,bitince,geri}){
       $("again").onclick=()=>geri?geri():show(cur);return;}
     const q=build(items[i]);
     V.innerHTML=`<div class="qhead"><span>${title}</span><span>${i+1} / ${items.length} · Doğru: ${dogru}</span></div>
-    <div class="bar"><i style="width:${i/items.length*100}%"></i></div>${q.html}
-    <div class="opts ${q.arOpts?"ar-opts":""}" ${q.tek?'style="grid-template-columns:1fr"':""} ${q.buyuk?'data-buyuk="1"':""}>${q.opts.map((o,j)=>`<button data-j="${j}" ${q.arOpts?'lang="ar" dir="rtl"':""}>${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb" role="status" aria-live="polite"></p>`;
+    <div class="bar"><i style="width:${i/items.length*100}%"></i></div><div id="soruMetni" style="display:grid;gap:14px">${q.html}</div>
+    <div class="opts ${q.arOpts?"ar-opts":""}" role="group" aria-label="Şıklar" aria-describedby="soruMetni" ${q.tek?'style="grid-template-columns:1fr"':""} ${q.buyuk?'data-buyuk="1"':""}>${q.opts.map((o,j)=>`<button data-j="${j}" ${q.arOpts?'lang="ar" dir="rtl"':""}>${esc(o)}</button>`).join("")}</div><p class="feedback" id="fb" role="status" aria-live="polite"></p>`;
     sesliSoru(q,V);
     if(odakla){odakla=false;const ilkSik=V.querySelector(".opts button[data-j]");if(ilkSik)try{ilkSik.focus({preventScroll:true});}catch(e){}}
     V.querySelectorAll(".opts button[data-j]").forEach(b=>b.onclick=()=>{
@@ -123,9 +123,9 @@ function quiz({title,items,build,star,need=0.8,bitince,geri}){
       const fb=$("fb");fb.className="feedback "+(ok?"ok":"bad");
       fb.textContent=ok?(S.ardarda>=3?"Doğru! Art arda "+S.ardarda+" doğru, ek puan":"Doğru!"):"Doğrusu: "+q.answer;
       if(q.aciklama){const p=document.createElement("div");p.className="detay";p.innerHTML=`<p>${esc(q.aciklama)}</p><button class="primary" id="devam">Devam</button>`;fb.after(p);$("devam").onclick=ileri;$("devam").focus();}
-      else if(!ok){const d=document.createElement("button");d.className="primary";d.id="devam";d.type="button";d.textContent="Devam ▶";fb.after(d);d.onclick=ileri;try{d.focus({preventScroll:true});}catch(e){}
-        if(kucuk()){if(q.arOpts){const w=kelimeBul(q.answer);if(!(w&&kelimeSes(w)))soyle("Doğrusu işaretlendi");}else soyle("Doğrusu: "+q.answer);}}
-      else setTimeout(()=>{if(ekran!==EKRAN_NO||!fb.isConnected)return;ileri();},900);});
+      else if(!ok){const k1=kucuk(),d=document.createElement("button");d.className="primary"+(k1?" devam-buyuk":"");d.id="devam";d.type="button";d.textContent=k1?"▶ Devam":"Devam ▶";fb.after(d);d.onclick=ileri;try{d.focus({preventScroll:true});}catch(e){}try{d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});}catch(e){}
+        if(k1){const ek="Devam etmek için oka dokun";if(q.arOpts){const w=kelimeBul(q.answer);if(w&&kelimeSes(w))setTimeout(()=>{if(d.isConnected&&KEL.paused)soyle(ek);},1800);else soyle("Doğrusu işaretlendi. "+ek);}else soyle("Doğrusu: "+q.answer+". "+ek);}}
+      else setTimeout(()=>{if(ekran!==EKRAN_NO||!fb.isConnected)return;ileri();},1500);});
   }
   step();
 }
@@ -163,7 +163,7 @@ function siralaKucuk(){const A=CUR.ayetler,n=A.length;
       const opts=shuffle([i+1,...digerIdx]);setTimeout(()=>ayetCal(i),300);
       return {html:`<p style="font-size:20px;font-weight:800">Bu ayeti dinle. Sonra hangisi gelir?</p><button class="primary" data-ayetcal="${i}" style="font-size:18px">🔊 Ayeti dinle</button>
         <p>Seçenekleri dinle: ${opts.map((x,j)=>`<button class="dn" data-ayetcal="${x}" style="font-size:18px">🎧 ${j+1}. seçenek</button>`).join(" ")}</p>`,
-        answer:dogru,opts:opts.map(x=>bas(A[x])),arOpts:true,tek:true,buyuk:true,otoSesYok:true,sonuc:()=>{}};}});}
+        answer:dogru,opts:opts.map(x=>bas(A[x])),sikAyet:opts,arOpts:true,tek:true,buyuk:true,otoSesYok:true,sonuc:()=>{}};}});}
 function sirala(){if(kucuk()&&!S.tumBolum)return siralaKucuk();let siraTam=false;
   const V=$("view");const CM=!!CUR.cumleler;
   const A=CM?CUR.cumleler.map(c=>({ar:CUR.ayetler[0].w.slice(c.bas,c.son).map(w=>w.a)})):CUR.ayetler;const BLOK=CM?A.length:7;
@@ -173,9 +173,9 @@ function sirala(){if(kucuk()&&!S.tumBolum)return siralaKucuk();let siraTam=false
   function draw(sonuc){
     V.innerHTML=`<h2>${CM?"Cümleleri sırala":"Ayetleri sırala"}</h2><p>${CM?"Ayetin on cümlesini doğru sıraya diz. ":""}${A.length>BLOK?`Bu turda ${basI+1}-${basI+idx.length}. ayetler var. `:""}Ayetleri tutup sürükleyerek doğru sıraya diz. Farede satırın her yerinden, telefonda soldaki ⠿ tutamağından tut. Oklarla da taşıyabilirsin.</p>
     <div class="order-list">${order.map((ai,pos)=>`<div class="order-item ${sonuc?(ai===idx[pos]?"ok":"bad"):""}" data-ai="${ai}">
-      <span class="grip" aria-hidden="true"><span class="num">${pos+1}</span><span class="dots">⠿</span></span><span class="ar" lang="ar" dir="rtl">${A[ai].ar.join(" ")}</span>
-      <span class="mv"><button aria-label="Yukarı taşı" data-u="${pos}" ${pos===0?"disabled":""}>▲</button><button aria-label="Aşağı taşı" data-d="${pos}" ${pos===order.length-1?"disabled":""}>▼</button></span></div>`).join("")}</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="kontrol">Kontrol et</button>${A.length>BLOK?`<button id="yeni">Başka ayetlerle oyna</button>`:""}</div><p class="feedback" id="fb" role="status" aria-live="polite"></p>`;
+      <span class="grip" aria-hidden="true"><span class="num">${pos+1}</span>${sonuc?`<span class="isaret">${ai===idx[pos]?"✓":"✗"}</span>`:""}<span class="dots">⠿</span></span><span class="ar" lang="ar" dir="rtl">${A[ai].ar.join(" ")}${sonuc?`<span class="gorunmez" lang="tr" dir="ltr"> · ${ai===idx[pos]?"doğru yerde":"yanlış yerde"}</span>`:""}</span>
+      <span class="mv"><button aria-label="${pos+1}. sıradaki ${CM?"cümleyi":"ayeti"} yukarı taşı" data-u="${pos}" ${pos===0?"disabled":""}>▲</button><button aria-label="${pos+1}. sıradaki ${CM?"cümleyi":"ayeti"} aşağı taşı" data-d="${pos}" ${pos===order.length-1?"disabled":""}>▼</button></span></div>`).join("")}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="kontrol">Kontrol et</button>${A.length>BLOK?`<button id="yeni">Başka ayetlerle oyna</button>`:""}</div><p class="feedback" id="fb" tabindex="-1"></p>`;
     const tasi=(p,y)=>{[order[y],order[p]]=[order[p],order[y]];draw();const u=V.querySelector(`[data-u="${y}"]`),d=V.querySelector(`[data-d="${y}"]`);
       const hedef=(p>y?(u&&!u.disabled?u:d):(d&&!d.disabled?d:u));if(hedef)try{hedef.focus({preventScroll:true});}catch(e){}canliDuyur(`${y+1}. sıraya taşındı`);};
     V.querySelectorAll("[data-u]").forEach(b=>b.onclick=()=>{const p=+b.dataset.u;tasi(p,p-1);});
@@ -201,7 +201,8 @@ function sirala(){if(kucuk()&&!S.tumBolum)return siralaKucuk();let siraTam=false
     $("kontrol").onclick=()=>{if(siraTam)return;const ds=order.filter((ai,p)=>ai===idx[p]).length;const tam=ds===order.length;
       answer(tam);draw(true);const fb=$("fb");
       if(tam){fb.className="feedback ok";fb.textContent="Tebrikler, sıra tamamen doğru!";giveStar("sirala");siraTam=true;const kb=$("kontrol");if(kb){kb.disabled=true;kb.onclick=null;}}
-      else{fb.className="feedback bad";fb.textContent=ds+" ayet doğru yerde. Kırmızıları düzeltip yeniden kontrol et.";}};
+      else{fb.className="feedback bad";fb.textContent=ds+" ayet doğru yerde. ✗ işaretli kırmızıları düzeltip yeniden kontrol et.";}
+      canliDuyur(fb.textContent);{const kb=$("kontrol"),hedef=kb&&!kb.disabled?kb:($("yeni")||fb);try{hedef.focus({preventScroll:true});}catch(e){}}};
   }
   draw();
 }

@@ -18,7 +18,7 @@ function sesliSoru(q,V){if(!kucuk())return;const arW=(()=>{const m=(q.html||"").
   const opts=V.querySelector(".opts");if(!opts)return;opts.before(bar);
   bar.querySelectorAll("[data-ss]").forEach(b=>b.onclick=()=>b.dataset.ss==="soru"?soyle(duzMetin(q.html)):kelimeSes(arW));
   opts.querySelectorAll("button[data-j]").forEach(b=>{const o=q.opts[+b.dataset.j];const s=document.createElement("button");s.type="button";s.className="ops-ses";s.setAttribute("aria-label",`${+b.dataset.j+1}. şıkkı dinle`);s.textContent="🔊";
-    s.onclick=ev=>{ev.stopPropagation();if(q.arOpts){kelimeSes(kelimeBul(o));}else soyle(o);};b.after(s);});
+    s.onclick=ev=>{ev.stopPropagation();if(q.sikAyet&&CUR&&CUR.ses){ayetCal(q.sikAyet[+b.dataset.j]);}else if(q.arOpts){kelimeSes(kelimeBul(o));}else soyle(o);};b.after(s);});
   opts.classList.add("ops-kucuk");
   if(!q.otoSesYok)setTimeout(()=>{if(arW)kelimeSes(arW);else if(trSesVar())soyle(duzMetin(q.html));},350);}
 document.addEventListener("click",ev=>{if(!CUR||!CUR.ayetler)return;const kl=ev.target.closest(".read-ayet .kelimeler[lang=ar], .read-ayet [lang=ar].kelimeler");if(!kl)return;
@@ -40,8 +40,10 @@ function molaGoster(){const p=aktifKisi();const once=document.activeElement;cons
   d.innerHTML=`<div class="mola-kutu pop"><div style="font-size:54px">🌿</div><h2>${p&&p.ad?esc(p.ad)+", b":"B"}ugün çok güzel çalıştın!</h2><p style="font-size:19px">Şimdi biraz mola verelim. Öğrendiğin ayeti annene ya da babana okur musun?</p>
   <div style="display:grid;gap:8px"><button class="primary" id="molaTamam" style="font-size:20px;min-height:56px">Mola veriyorum</button>${molaSonra>0?`<p style="font-size:15px">Bir kez uzattık. Daha fazla süre için annen ya da baban <b>Ebeveyn özeti</b>nden mola ayarını değiştirebilir.</p>`:`<button id="molaBes">5 dakika daha</button>`}</div></div>`;
   document.body.appendChild(d);efekt("gorev");
+  const ana=document.querySelector("main");if(ana)ana.inert=true;
+  if(kucuk())setTimeout(()=>{if(d.isConnected)soyle(d.querySelector("h2").textContent+" "+d.querySelector("p").textContent);},400);
   /* kapanınca odak, pencere açılmadan önceki öğeye döner (o öğe yerinde kaldıysa) */
-  const kapat=()=>{d.remove();if(once&&once.isConnected&&once.focus)try{once.focus({preventScroll:true});}catch(e){}};
+  const kapat=()=>{d.remove();if(ana)ana.inert=false;if(once&&once.isConnected&&once.focus)try{once.focus({preventScroll:true});}catch(e){}};
   $("molaTamam").onclick=()=>{S.oturumDk=0;molaSonra=0;save();kapat();durSes();animDur&&animDur();anaSayfa();};
   const mb=$("molaBes");if(mb)mb.onclick=()=>{molaSonra+=5;kapat();};
   /* Esc: uzatma hakkı varsa "5 dakika daha", yoksa "Mola veriyorum"; Tab odağı pencere içinde tutar */
@@ -70,7 +72,7 @@ async function ebeveynOzet(){CUR=null;baslik();setTabs();$("baslik").textContent
     let soru="";if(enCok.length){try{const E=await ekParca(enCok[0],"a");const Q=((E.cocuk||{}).ayetler||[]).filter(a=>a.soru);if(Q.length)soru=Q[new Date().getDate()%Q.length].soru;}catch(e){}}
     const zorU=[];zor.forEach(z=>{if(!zorU.some(y=>y.s===z.s&&y.a===z.a))zorU.push(z);});
     const yanlis=Object.values(X.yanlis||{}).length;
-    bolum.push(`<section class="detay"><h2>👤 ${esc(p.ad||"Adsız kişi")}${p.yas?` · ${p.yas} yaş`:""}</h2>
+    bolum.push(`<section class="detay"><h3>👤 ${esc(p.ad||"Adsız kişi")}${p.yas?` · ${p.yas} yaş`:""}</h3>
      <div class="ozet-satir"><div><b>${aktifGun}/7</b><span>gün çalıştı</span></div><div><b>${Math.round(top.dk)}</b><span>dakika</span></div><div><b>${top.dogru}/${top.soru}</b><span>doğru cevap</span></div><div><b>${top.tekrar}</b><span>ayet tekrarı</span></div><div><b>${top.hikaye}</b><span>hikâye</span></div></div>
      <p><b>En çok çalıştığı:</b> ${enCok.length?enCok.map(n=>esc(adBul(n))).join(", "):"Bu hafta henüz çalışmadı."}</p>
      <p><b>Zorlandığı ayetler:</b> ${zorU.length?zorU.slice(0,8).map(z=>`${esc(adBul(z.s))} ${z.a}`).join(" · "):"Ezberde zorlandığını söylediği ayet yok."}</p>
@@ -103,7 +105,8 @@ async function benOku(i,btn,durum){
   if(!navigator.mediaDevices||!window.MediaRecorder){durum.textContent="Bu cihazda ses kaydı yapılamıyor.";return;}
   let st;try{st=await navigator.mediaDevices.getUserMedia({audio:true});}catch(e){durum.textContent="Mikrofon izni verilmedi. Sayfanın mikrofon kullanmasına izin verirsen kendi okuyuşunu dinleyebilirsin.";return;}
   if(KAYIT&&KAYIT.url)URL.revokeObjectURL(KAYIT.url);const parca=[];const rec=new MediaRecorder(st);KAYIT={rec};
-  const bekci=setInterval(()=>{if(rec.state!=="recording"){clearInterval(bekci);return;}if(!btn.isConnected)rec.stop();},1000);   // ekrandan çıkılırsa mikrofonu kapatrec.ondataavailable=e=>{if(e.data.size)parca.push(e.data);};
+  const bekci=setInterval(()=>{if(rec.state!=="recording"){clearInterval(bekci);return;}if(!btn.isConnected)rec.stop();},1000);   /* ekrandan çıkılırsa mikrofonu kapat */
+  rec.ondataavailable=e=>{if(e.data.size)parca.push(e.data);};
   rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());btn.textContent="🎙 Yeniden oku";btn.classList.remove("kayit");
     const url=URL.createObjectURL(new Blob(parca,{type:rec.mimeType||"audio/webm"}));KAYIT.url=url;
     durum.innerHTML=`<b>Önce kendi sesini, sonra Alafasy'yi dinle. Farkı duyuyor musun?</b><br><button id="kendim" class="dn">▶ Benim okuyuşum</button> <button id="hoca" class="dn">▶ Alafasy</button>`;
@@ -131,6 +134,6 @@ function kisiSec(){CUR=null;baslik();setTabs();const V=$("view");$("baslik").tex
   window.scrollTo({top:0});}
 function confirmSil(p){const b=document.querySelector(`[data-sil="${p.id}"]`);if(b.dataset.onay)return true;b.dataset.onay="1";b.textContent="Emin misin? Bir daha bas";return false;}
 async function kisiGec(id,yeni){if(PROF.aktif&&PROF.aktif!==id){save();bulutGonder();}PROF.aktif=id;profKaydet();profYukle(id);const p=aktifKisi();if(p&&p.yas)S.seviye=yasSeviye(p.yas);sonPuan=S.puan;
-  if(DB&&UID){docRef=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await docRef.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;}catch(e){}}
+  if(DB&&UID){docRef=null;const ref=DB.collection("data/users/"+UID).doc(docAdi(id));try{const istek=id,sn=await ref.get();if(PROF.aktif!==istek)return;const raw=sn&&sn.exists?sn.data():null;const rem=raw?normalize(JSON.parse(JSON.stringify(raw))):null;if(rem){S=normalize(birlestir(S,rem));if(p&&p.yas)S.seviye=yasSeviye(p.yas);}sonPuan=S.puan;docRef=ref;}catch(e){}}   /* okuma düşerse docRef boş kalır: yerel durum bulutun üstüne yazılmaz */
   save();toast(yeni?`Hoş geldin ${p.ad}!`:`${p.ad||"Kişi"} seçildi`);anaSayfa();}
 function kisiDugme(){const p=aktifKisi();return p?`<button id="kisiDeg" style="min-height:44px">👤 ${esc(p.ad||"Adsız")}${p.yas?" · "+p.yas:""} · Değiştir</button>`:"";}

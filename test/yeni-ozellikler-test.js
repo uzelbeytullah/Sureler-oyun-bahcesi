@@ -111,7 +111,7 @@ for(let k=0;k<8;k++){const q=V().querySelector('.opts');if(!q)break;const dogru=
   // doğru şıkkı bul: bir sonraki ayetin ilk kelimeleri
   const btns=[...V().querySelectorAll('.opts button[data-j]')];const i=+(V().querySelector('[data-ayetcal]').dataset.ayetcal);
   const hedef=ev(`(()=>{const a=CUR.ayetler[${i}+1];return a.w.slice(0,Math.min(3,a.w.length)).map(x=>x.a).join(" ")+(a.w.length>3?" …":"")})()`);
-  (btns.find(b=>b.textContent.trim()===hedef)||btns[0]).click();await new Promise(r=>setTimeout(r,1000));}
+  (btns.find(b=>b.textContent.trim()===hedef)||btns[0]).click();await new Promise(r=>setTimeout(r,1700));}
 ok('sırala yıldızı alındı',ev('S.sure["1"].yildiz.sirala')===true);
 ev('anaSayfa()');ok('ilk yıldızdan sonra normal ana sayfa',!!w.document.getElementById('grid'));
 ok('rozetler kısaltıldı',/Sıradaki rozetler/.test(V().textContent));

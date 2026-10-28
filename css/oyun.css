@@ -2,7 +2,7 @@
 :root{
   --bg:#F3F5FA; --surface:#FFFFFF; --card:#FFFFFF; --ink:#101A33; --soft:#2A3656;
   --lapis:#1D4AA0; --gold:#8A6200; --gold-bg:#FFF4D6;
-  --ok:#11734A; --ok-bg:#DDF5E8; --bad:#B3261E; --bad-bg:#FCE3E1; --line:#C9D2E6;
+  --ok:#11734A; --ok-bg:#DDF5E8; --bad:#B3261E; --bad-bg:#FCE3E1; --line:#7D89A6;
   --c0:#B3261E; --c1:#1D4AA0; --c2:#11734A; --c3:#8A4B00; --c4:#7A1FA2; --c5:#00727A; --c6:#A0275C; --c7:#4A5A00; --c8:#5B3FA8; --c9:#8C2F00; --c10:#2F6B1F; --c11:#0B5E8A;
   --t-sessiz:#7A5A1E; --t-medd1:#B3261E; --t-medd2:#C2410C; --t-medd3:#7F1D1D; --t-medd4:#A0136B; --t-gunne:#11734A; --t-ihfa:#6D28D9; --t-iklab:#1D4AA0; --t-idgam:#0B6E6E; --t-kalkale:#1F5FB8;
   --f-ui:"Rubik",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -11,12 +11,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0C1222; --surface:#151E35; --card:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
   --lapis:#8FB1F2; --gold:#F0C35A; --gold-bg:#3A2E0E;
-  --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#2E3A5C;
+  --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#62729C;
   --c0:#FF8F87; --c1:#8FB1F2; --c2:#6FE0A8; --c3:#F5B661; --c4:#D9A0F5; --c5:#5FD8E0; --c6:#F59AC2; --c7:#C8DB6A; --c8:#B9A6F5; --c9:#FFA77A; --c10:#9FE08A; --c11:#7CC8F2; --t-sessiz:#D9B26F; --t-medd1:#FF8F87; --t-medd2:#FDBA74; --t-medd3:#FCA5A5; --t-medd4:#F59AC2; --t-gunne:#6FE0A8; --t-ihfa:#C4B5FD; --t-iklab:#8FB1F2; --t-idgam:#5FD8E0; --t-kalkale:#93C5FD; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0C1222; --surface:#151E35; --card:#151E35; --ink:#F2F4FA; --soft:#D5DCEE;
   --lapis:#8FB1F2; --gold:#F0C35A; --gold-bg:#3A2E0E;
-  --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#2E3A5C;
+  --ok:#6FE0A8; --ok-bg:#103626; --bad:#FF9C94; --bad-bg:#47191A; --line:#62729C;
   --c0:#FF8F87; --c1:#8FB1F2; --c2:#6FE0A8; --c3:#F5B661; --c4:#D9A0F5; --c5:#5FD8E0; --c6:#F59AC2; --c7:#C8DB6A; --c8:#B9A6F5; --c9:#FFA77A; --c10:#9FE08A; --c11:#7CC8F2; --t-sessiz:#D9B26F; --t-medd1:#FF8F87; --t-medd2:#FDBA74; --t-medd3:#FCA5A5; --t-medd4:#F59AC2; --t-gunne:#6FE0A8; --t-ihfa:#C4B5FD; --t-iklab:#8FB1F2; --t-idgam:#5FD8E0; --t-kalkale:#93C5FD; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-ui);font-weight:600;font-size:17px;line-height:1.5;
@@ -41,6 +41,9 @@ header.top{display:grid;gap:10px}
 .tabs .geri{flex:0 0 auto;border-color:var(--lapis);color:var(--lapis)}
 button{font:inherit;font-weight:700;cursor:pointer;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 14px;min-height:44px}
 button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.yesil-dug{background:#2E7D5B;border-color:#2E7D5B;color:#fff}
+button.devam-buyuk{min-height:64px;min-width:64px;font-size:26px;padding:12px 28px}
 button.on{background:var(--lapis);border-color:var(--lapis);color:var(--bg)}
 button.primary{background:var(--lapis);border-color:var(--lapis);color:var(--bg)}
 button:disabled{cursor:default;opacity:.85}
@@ -54,6 +57,9 @@ section.panel{background:var(--surface);border:2px solid var(--line);border-radi
 .opts.ar-opts button{font-family:var(--f-ar);font-size:26px;direction:rtl}
 .opts button.ok{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
 .opts button.bad{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+.opts button.ok:disabled,.opts button.bad:disabled{opacity:1}
+.order-item .isaret{font-weight:800;font-size:20px}
+.order-item.ok .isaret{color:var(--ok)} .order-item.bad .isaret{color:var(--bad)}
 .feedback{min-height:26px;font-weight:800}
 .feedback.ok{color:var(--ok)} .feedback.bad{color:var(--bad)}
 .blank{display:inline-block;min-width:3.2em;border-bottom:3px dashed var(--gold);text-align:center}

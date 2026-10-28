@@ -22,7 +22,7 @@ function iKart(el){
   el.querySelectorAll("[data-ik]").forEach(b=>b.onclick=()=>{const x=L.ilkeler[+b.dataset.ik],d=$("ikd");
     d.hidden=false;d.className="detay pop";
     d.innerHTML=`<p><b style="font-size:19px">${esc(x.ad)}</b></p><p>${esc(x.tanim)}</p>${x.ayetler.map(n=>{const r=ayetBul(n);return r?`<div class="read-ayet"><span class="n-ayet">${n}</span><div class="kelimeler" lang="ar">${r.a.w.map((w,j)=>`<span class="k${j%12}">${w.a}</span>`).join("")}</div><p class="meal">${esc(r.a.meal)}</p></div>`:"";}).join("")}<button id="ikk">Kapat</button>`;
-    $("ikk").onclick=()=>{d.hidden=true;};d.scrollIntoView({block:"nearest",behavior:"smooth"});});
+    $("ikk").onclick=()=>{d.hidden=true;};d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});});
 }
 function iAgac(el){
   const L=CUR.ilke,A=L.agac,T=ekS("ilke");T.agac=T.agac||{};const bugun=today();
@@ -108,7 +108,7 @@ async function atlas(){
     const sira=Object.keys(gruplu).map(Number).sort((a,b)=>sureSira(a)-sureSira(b));
     V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="atGeri">← Atlas</button><button class="geri" id="atSure">← Sureler</button></div>
     <h2>${esc(t.ad)}</h2><p>${esc(t.aciklama)}</p><p><b>${t.uyeler.length} ilke · ${sira.length} sure ya da grup</b></p>
-    ${sira.map(sid=>`<div class="read-ayet"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:19px;color:var(--lapis)">${esc(adBul(sid))}</b><button data-git="${sid}" style="min-height:36px;padding:4px 10px">Surenin ilkelerine git</button></div>
+    ${sira.map(sid=>`<div class="read-ayet"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b style="font-size:19px;color:var(--lapis)">${esc(adBul(sid))}</b><button data-git="${sid}" style="min-height:44px;padding:4px 10px">Surenin ilkelerine git</button></div>
       ${gruplu[sid].map(u=>`<p><b>${esc(u.ad)}:</b> ${esc(u.tanim)}${u.ayetler&&u.ayetler.length?` <span style="font-size:14px;font-weight:800;color:var(--gold)">(${u.ayetler.join(", ")}. ayet)</span>`:""}</p>`).join("")}</div>`).join("")}`;
     $("atGeri").onclick=()=>{atlasTema=null;atlas();};$("atSure").onclick=()=>{atlasTema=null;anaSayfa();};
     V.querySelectorAll("[data-git]").forEach(b=>b.onclick=()=>{ilkeAlt="kart";ac(+b.dataset.git,"ilkeler");});
@@ -128,7 +128,7 @@ async function atlas(){
   }else{
     ic.innerHTML=`<input class="ara" id="atAra" type="search" placeholder="Bir kelime yaz: şükür, sabır, adalet…" aria-label="İlke ara" value="${esc(atlasAra)}"><div id="atSonuc" style="display:grid;gap:8px"></div>`;
     const ciz=()=>{const q=kucult(atlasAra.trim());const r=[];if(q.length>=2)T.forEach(t=>t.uyeler.forEach(u=>{if(kucult(u.ad+" "+u.tanim).includes(q))r.push({t,u});}));
-      $("atSonuc").innerHTML=q.length<2?"<p>En az iki harf yaz.</p>":r.length?`<p><b>${r.length} ilke bulundu</b></p>`+r.slice(0,80).map(({t,u})=>`<div class="read-ayet"><p style="font-size:14px"><b style="color:var(--lapis)">${esc(adBul(u.s))}</b> · tema: <button data-t="${t.id}" style="min-height:32px;padding:2px 8px">${esc(t.ad)}</button></p><p><b>${esc(u.ad)}:</b> ${esc(u.tanim)}</p></div>`).join(""):"<p>Bu kelimeyle bir ilke bulunamadı.</p>";
+      $("atSonuc").innerHTML=q.length<2?"<p>En az iki harf yaz.</p>":r.length?`<p><b>${r.length} ilke bulundu</b></p>`+r.slice(0,80).map(({t,u})=>`<div class="read-ayet"><p style="font-size:14px"><b style="color:var(--lapis)">${esc(adBul(u.s))}</b> · tema: <button data-t="${t.id}" style="min-height:44px;padding:2px 8px">${esc(t.ad)}</button></p><p><b>${esc(u.ad)}:</b> ${esc(u.tanim)}</p></div>`).join(""):"<p>Bu kelimeyle bir ilke bulunamadı.</p>";
       $("atSonuc").querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{atlasTema=b.dataset.t;atlas();});};
     $("atAra").oninput=e=>{atlasAra=e.target.value;ciz();};ciz();
   }

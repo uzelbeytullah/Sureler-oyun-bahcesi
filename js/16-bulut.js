@@ -52,7 +52,7 @@ async function yarKatil(){const V=$("view");CUR=null;baslik();setTabs();$("basli
   <p><label><b>Adın</b><br><input id="yAd" class="ara" value="${esc(ad)}" maxlength="20" placeholder="Adını yaz"></label></p>
   <p><label><b>Katılım kodu</b><br><input id="yKod" class="ara" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="8 harfli kod" style="text-transform:uppercase;letter-spacing:2px"></label></p><button class="primary" id="yGir" style="font-size:20px">Katıl</button>`;
   $("yG").onclick=()=>anaSayfa();
-  $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim().toUpperCase().replace(/\s/g,"");if(!a||!/^[A-Z2-9]{8}$/.test(k)){toast("Adını ve 8 harfli kodu yaz");return;}
+  $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim().toUpperCase().replace(/\s/g,"");if(!a||!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(k)){toast("Adını ve 8 harfli kodu yaz");return;}
     try{localStorage.setItem("yaris-ad",a);}catch(e){}
     let R;try{R=await oda.join("yaris-"+k);}catch(e){toast("Katılamadım, kodu denetle");return;}
     YAR={host:false,R,kod:k,ad:a,son:null,secim:{}};R.presence({ad:a}).catch(()=>{});
@@ -83,7 +83,9 @@ let hedefYazT=null,hedefDegisen=new Set();
 function hedefIsle(tur){const H=S.hedefler||{};Object.entries(H).forEach(([kod,h])=>{if(h.tur===tur){h.n=(h.n||0)+1;hedefDegisen.add(kod);}});
   if(hedefDegisen.size&&DB&&UID&&!hedefYazT)hedefYazT=setTimeout(hedefGonder,20000);}
 function hedefGonder(){clearTimeout(hedefYazT);hedefYazT=null;if(!DB||!UID)return;const H=S.hedefler||{};
-  [...hedefDegisen].forEach(kod=>{const n=hSayi((H[kod]||{}).n),ref=DB.collection("hedef").doc(kod);if(typeof ref.update==="function")ref.update({["u_"+UID]:n}).catch(()=>{});});hedefDegisen.clear();}
+  [...hedefDegisen].forEach(kod=>{const h=H[kod]||{},n=hSayi(h.n),ref=DB.collection("hedef").doc(kod);if(typeof ref.update!=="function")return;
+    /* kurallar bir yazmada en çok 1000 artışa izin verir: büyük farkı adım adım gönder */
+    const g=Math.min(n,(h.g||0)+1000);ref.update({["u_"+UID]:g}).then(()=>{h.g=g;save();if(g<n){hedefDegisen.add(kod);if(!hedefYazT)hedefYazT=setTimeout(hedefGonder,2000);}}).catch(()=>{});});hedefDegisen.clear();}
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&hedefDegisen.size)hedefGonder();});
 window.addEventListener("pagehide",()=>{if(hedefDegisen.size)hedefGonder();});
 async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent="Ortak hedef";$("altbaslik").textContent="Aile ya da sınıfça birlikte ulaşılan hedef";

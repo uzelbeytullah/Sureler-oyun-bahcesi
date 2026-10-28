@@ -17,7 +17,7 @@ async function onayEkrani(){CUR=null;baslik();setTabs();durSes();$("baslik").tex
   V.innerHTML=`<button class="geri" id="oG">← Sureler</button><h2>👨‍👩‍👧 ${esc(adBul(x.id))} · ${ilk+x.i}. ayet</h2>
   <p style="font-size:19px"><b>Çocuk:</b> Ayeti ezberden, sesli oku. <b>Ebeveyn:</b> Metne bakarak dinle.</p>
   <details class="detay"><summary><b>Ebeveyn için: ayetin metni ve kâri okuyuşu</b></summary><div class="kelimeler" lang="ar" style="justify-content:center">${a.w.map((w,j)=>`<span class="k${j%12}">${esc(w.a)}</span>`).join("")}</div><p class="okunus">${esc(a.ok||"")}</p><button class="dn" id="oDinle">▶ Kâriden dinle</button></details>
-  <div class="odak" style="display:grid;gap:8px"><b>Ebeveyn şifresi</b>${pinVar()?`<input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" style="max-width:200px">`:`<p>Henüz ebeveyn şifresi yok. Şimdi 4 haneli bir şifre belirleyin (çocuğunuz görmesin):</p><input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni şifre" style="max-width:200px"><input id="oPin2" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeniden yazın" style="max-width:200px">`}
+  <div class="odak" style="display:grid;gap:8px"><b>Ebeveyn şifresi</b>${pinVar()?`<input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" aria-label="Ebeveyn şifresi (4 rakam)" style="max-width:200px">`:`<p>Henüz ebeveyn şifresi yok. Şimdi 4 haneli bir şifre belirleyin (çocuğunuz görmesin):</p><input id="oPin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni şifre" aria-label="Yeni ebeveyn şifresi (4 rakam)" style="max-width:200px"><input id="oPin2" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeniden yazın" aria-label="Yeni ebeveyn şifresini yeniden yazın" style="max-width:200px">`}
    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" data-on="1" style="font-size:19px">✓ Doğru okudu</button><button data-on="0">Biraz daha çalışsın</button></div></div>
   <p style="font-size:14px">Sırada ${L.length} ayet var. Onaylanan ayet "ezberde" sayılır; namaz hazırlığı yolunda ilerler.</p>`;
   $("oG").onclick=()=>anaSayfa();
@@ -36,7 +36,7 @@ function namazDurum(){return namazSureler().map(no=>{const k=KATALOG.find(x=>x.n
 function namazKart(){if(S.seviye==="yetiskin"&&!S.namazAcik)return "";const L=namazDurum(),tam=L.every(x=>x.n>=x.top);
   return `<section class="detay aile-kart" aria-label="Namaz hazırlığı yolu"><h3>🕌 Namaz hazırlığı yolu</h3>
   <p>Fâtiha ve üç kısa sureyi ezberle; ${onayGerek()?"ebeveynin onaylayınca ":""}"Namazda okuyabilirim" belgeni al.</p>
-  <div style="display:flex;gap:6px;flex-wrap:wrap">${L.map(x=>`<button data-nz="${x.no}" class="${x.n>=x.top?"on":""}" style="min-height:40px">${x.n>=x.top?"✓ ":""}${esc(x.ad)} ${x.n}/${x.top}</button>`).join("")}</div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap">${L.map(x=>`<button data-nz="${x.no}" class="${x.n>=x.top?"on":""}" style="min-height:44px">${x.n>=x.top?"✓ ":""}${esc(x.ad)} ${x.n}/${x.top}</button>`).join("")}</div>
   ${tam?`<button class="primary" id="namazBelge" style="font-size:19px;margin-top:8px">🎉 Belgeni al</button>`:""}</section>`;}
 function namazBelgesi(){const p=aktifKisi()||{};S.namazBelge=S.namazBelge||today();checkBadges();save();CUR=null;baslik();setTabs();
   $("baslik").textContent="Namazda okuyabilirim";$("altbaslik").textContent="Tebrikler!";const L=namazDurum();
@@ -59,9 +59,9 @@ function ebeveynAyarHtml(){const L=KATALOG.filter(k=>!k.gruplar&&k.no>=78&&k.aye
   return `<section class="detay"><h3>Ebeveyn onayı (${esc((aktifKisi()||{}).ad||"bu kişi")} için)</h3>
   <p>Açıkken ezberde son basamağa gelen ayet, siz dinleyip şifrenizle onaylayınca "ezberde" sayılır.</p>
   <p style="display:flex;gap:6px;flex-wrap:wrap"><button data-onay="1" class="${onayGerek()?"on":""}">Açık</button><button data-onay="0" class="${onayGerek()?"":"on"}">Kapalı</button></p>
-  <p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
+  <p><b>Ebeveyn şifresi:</b> ${pinVar()?"belirlendi":"henüz yok"} <input id="ePin" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Yeni 4 haneli şifre" aria-label="Yeni 4 haneli ebeveyn şifresi" style="max-width:190px"> ${pinVar()?`<input id="ePinEski" class="ara" type="password" inputmode="numeric" maxlength="4" placeholder="Mevcut şifre" aria-label="Mevcut ebeveyn şifresi" style="max-width:150px">`:""} <button id="ePinKaydet">Kaydet</button></p></section>
   <section class="detay"><h3>Namaz hazırlığı yolu</h3><p>Fâtiha'nın yanında ezberlenecek üç kısa sureyi seçin:</p>
-  <p style="display:flex;gap:6px;flex-wrap:wrap">${L.map(k=>`<button data-nzs="${k.no}" class="${sec.includes(k.no)?"on":""}" style="min-height:40px">${esc(k.ad)}</button>`).join("")}</p>
+  <p style="display:flex;gap:6px;flex-wrap:wrap">${L.map(k=>`<button data-nzs="${k.no}" class="${sec.includes(k.no)?"on":""}" style="min-height:44px">${esc(k.ad)}</button>`).join("")}</p>
   ${S.seviye==="yetiskin"?`<p><button data-nzac="1" class="${S.namazAcik?"on":""}">Ana sayfada göster</button></p>`:""}</section>`;}
 function ebeveynAyarBagla(){const V=$("view");
   V.querySelectorAll("[data-onay]").forEach(b=>b.onclick=()=>{const ac=b.dataset.onay==="1";

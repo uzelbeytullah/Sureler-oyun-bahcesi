@@ -30,9 +30,9 @@ function aracCiz(){
     const A=S.dtAyar=S.dtAyar||{bas:0,tekrar:2,carpan:1,gizle:false};
     V.innerHTML=`${ust}<h2>Dinle ve tekrarla</h2><p>Kâri ayeti okur; ardından ekranda <b>“Şimdi sen oku”</b> yazar ve ayetin süresi kadar boşluk bırakılır. O boşlukta ayeti yüksek sesle tekrar et.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><label><b>Başlangıç:</b> ${ayetSec("dtBas",A.bas)}</label>
-    <span><b>Her ayet:</b> ${[1,2,3].map(t=>`<button data-tk="${t}" class="${A.tekrar===t?"on":""}" style="min-height:38px;padding:4px 10px">${t} kez</button>`).join("")}</span>
-    <span><b>Boşluk:</b> ${[[1,"Ayet kadar"],[1.5,"Bir buçuk katı"],[2,"İki katı"]].map(([c,a])=>`<button data-cp="${c}" class="${A.carpan===c?"on":""}" style="min-height:38px;padding:4px 10px">${a}</button>`).join("")}</span>
-    <button data-gz="1" class="${A.gizle?"on":""}" style="min-height:38px">${A.gizle?"Metin: yalnız ilk harfler":"Metin: tam"}</button></div>
+    <span><b>Her ayet:</b> ${[1,2,3].map(t=>`<button data-tk="${t}" class="${A.tekrar===t?"on":""}" style="min-height:44px;padding:4px 10px">${t} kez</button>`).join("")}</span>
+    <span><b>Boşluk:</b> ${[[1,"Ayet kadar"],[1.5,"Bir buçuk katı"],[2,"İki katı"]].map(([c,a])=>`<button data-cp="${c}" class="${A.carpan===c?"on":""}" style="min-height:44px;padding:4px 10px">${a}</button>`).join("")}</span>
+    <button data-gz="1" class="${A.gizle?"on":""}" style="min-height:44px">${A.gizle?"Metin: yalnız ilk harfler":"Metin: tam"}</button></div>
     <div style="display:flex;gap:8px"><button class="primary" id="dtBasla">▶ Başlat</button><button id="dtDur">■ Durdur</button></div>
     <div id="dtEkran" class="odak" style="text-align:center;display:grid;gap:8px"><b id="dtDurum">Hazır</b><div id="dtMetin">${metin(A.bas,A.gizle)}</div></div>`;
     geriBagla();
@@ -58,9 +58,9 @@ function aracCiz(){
   }else if(ezberArac==="zincir"){
     const Z=SS(CUR.no).zincir=SS(CUR.no).zincir||{halka:0,gizle:true,carpan:1};const n=CUR.ayetler.length;const k=Math.min(Z.halka,n-1);
     V.innerHTML=`${ust}<h2>Zincirleme ezber</h2><p>Kitabınızdaki çivileme yöntemi: Her halkada baştan o ayete kadar hepsi okunur, sonra sen hepsini art arda tekrar edersin. Halka tamam olunca bir sonraki ayet zincire eklenir.</p>
-    <div style="display:flex;gap:4px;flex-wrap:wrap">${CUR.ayetler.map((_,i)=>`<button data-h="${i}" class="${i===k?"on":""}" style="min-height:38px;padding:4px 10px;${i<k?"border-color:var(--ok);color:var(--ok)":""}">${i===0?ilk:ilk+"-"+(ilk+i)}</button>`).join("")}</div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap">${CUR.ayetler.map((_,i)=>`<button data-h="${i}" class="${i===k?"on":""}" style="min-height:44px;padding:4px 10px;${i<k?"border-color:var(--ok);color:var(--ok)":""}">${i===0?ilk:ilk+"-"+(ilk+i)}</button>`).join("")}</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button data-gz="1" class="${Z.gizle?"on":""}">${Z.gizle?"Tekrarda metin: yalnız ilk harfler":"Tekrarda metin: tam"}</button>
-    <span><b>Boşluk:</b> ${[[1,"Okuma kadar"],[1.5,"Bir buçuk katı"]].map(([c,a])=>`<button data-cp="${c}" class="${Z.carpan===c?"on":""}" style="min-height:38px;padding:4px 10px">${a}</button>`).join("")}</span></div>
+    <span><b>Boşluk:</b> ${[[1,"Okuma kadar"],[1.5,"Bir buçuk katı"]].map(([c,a])=>`<button data-cp="${c}" class="${Z.carpan===c?"on":""}" style="min-height:44px;padding:4px 10px">${a}</button>`).join("")}</span></div>
     <div class="odak" style="display:grid;gap:8px;text-align:center"><b id="zDurum">${k+1}. halka: ${k===0?`${ilk}. ayet`:`${ilk}-${ilk+k}. ayetler`}</b><div id="zMetin">${[...Array(k+1)].map((_,i)=>metin(i,false)).join("")}</div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="primary" id="zBasla">▶ Halkayı başlat</button><button id="zDur">■ Durdur</button></div>
     <div id="zSonra" hidden style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="primary" id="zTamam">Halkayı doğru okudum →</button><button id="zTekrar">Bu halkayı tekrarla</button></div></div>`;

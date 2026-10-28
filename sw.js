@@ -3,17 +3,19 @@
    - Sürüm ekli (?v=) veri ve kod: önce kayıtlı kopya, yoksa ağ; yeni sürüm kaydedilince eskisi silinir
    - Sürüm eki olmayan kendi dosyalarımız: önce ağ, yoksa kayıtlı kopya
    - Yazı tipleri ve Firebase kütüphanesi: kayıtlı kopya varsa o, arkada tazelenir
-   - Ses dosyaları (mp3) tarayıcının kendi önbelleğine bırakılır (kısmi isteklerle çalıştıkları için)
+   - İndirilmiş sure sesleri (ses/*.mp3, sob-ses önbelleği) kısmi isteklere parça parça verilir; ötekiler tarayıcıya bırakılır
+   - Kabuk her değişince sürüm önbelleği yenilenir; indirilen sesler ve sure metinleri sob-ses'te kalır
+   - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-3ae0cf29";
-const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=227aefad", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
+const SURUM = "sob-4b82c136";
+const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=e17d7ded", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(SURUM).then(c => c.addAll(KABUK)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
 });
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x !== SURUM && x !== SES).map(x => caches.delete(x)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(k => Promise.all(k.filter(x => x.startsWith("sob-") && x !== SURUM && x !== SES).map(x => caches.delete(x)))).then(() => self.clients.claim()));
 });
 
 const SES = "sob-ses";   // "çevrimdışı için indir" ile kaydedilen sure sesleri; sürüm değişince silinmez

@@ -41,7 +41,7 @@ function elifba(){CUR=null;baslik();setTabs();durSes();$("baslik").textContent="
       ${harfSesHtml(h)}<p style="font-size:14px;margin:0">Örnek kelimeler kâri Mişari Râşid el-Afasi'nin okuyuşundan.</p>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">${["tek","bas","orta","son"].map(y=>`<div style="border:2px solid var(--line);border-radius:12px;padding:6px"><div class="ar" lang="ar" style="font-size:44px;line-height:1.4">${harfSekil(h,y)}</div><span style="font-size:13px;font-weight:700">${YER_AD[y]}</span></div>`).join("")}</div>
       ${h[3]?"":`<p style="font-size:15px"><b>Dikkat:</b> ${h[1]} kendinden sonraki harfe bağlanmaz.</p>`}<button id="ebK">Kapat</button>`;
-      $("ebK").onclick=()=>{d.hidden=true;};d.scrollIntoView({block:"nearest",behavior:"smooth"});});
+      $("ebK").onclick=()=>{d.hidden=true;};d.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});});
     return;}
   const adlar=HARFLER.map(h=>h[1]),harf=HARFLER.map(h=>h[0]);
   const geri=()=>elifba(),bitti=(d,t)=>{S.elifEnIyi=Math.max(S.elifEnIyi||0,Math.round(d/t*100));checkBadges();save();};

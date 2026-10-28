@@ -13,21 +13,27 @@ async function bulutBasla(){
     if(!db||!user)return;
     const id=await user.id();if(!id)return;DB=db;USR=user;UID=id;try{USR_EDIT=!!(await user.canEdit());USR_YAZ=await user.can("data.write");}catch(e){}
     window.DBK=db.collection("data/users/"+id).doc("profiller");
-    try{const ps=await DBK.get();const rl=(ps&&ps.exists?(ps.data().liste||[]):[]).filter(p=>p&&/^[\w-]{1,40}$/.test(String(p.id))).map(p=>({...p,yas:Number(p.yas)||undefined}));   // buluttan gelen kişi kaydını ekrana basmadan önce denetlelet deg=false;rl.forEach(p=>{if(!PROF.liste.some(x=>x.id===p.id)){PROF.liste.push(p);deg=true;}});
+    try{const ps=await DBK.get();const rl=(ps&&ps.exists?(ps.data().liste||[]):[]).filter(p=>p&&/^[A-Za-z0-9_]{1,24}$/.test(String(p.id))).map(p=>({...p,yas:Number(p.yas)||undefined}));   /* buluttan gelen kişi kaydını ekrana basmadan önce denetle; desen kurallardaki belge adıyla aynı */
+      let deg=false;rl.forEach(p=>{if(!PROF.liste.some(x=>x.id===p.id)){PROF.liste.push(p);deg=true;}});
       try{localStorage.setItem("bahce-profil",JSON.stringify(PROF));}catch(e){}if(rl.length<PROF.liste.length||deg)DBK.set({liste:PROF.liste}).catch(()=>{});}catch(e){}
-    if(!PROF.aktif){if(!CUR)anaSayfa();return;}
-    docRef=db.collection("data/users/"+id).doc(docAdi(PROF.aktif));
-    const once=JSON.stringify(S);   // bulut gelirken çocuk ilerleme yaptıysa açık ekranı yeni durumla yeniden çizeceğiz
-    const snap=await docRef.get();
+    if(!PROF.aktif){if(!CUR&&anaSayfa.no===EKRAN_NO)anaSayfa();bulutBasla.tamam=true;return;}
+    /* docRef ancak buluttaki kayıt okunup birleştirildikten sonra atanır; okuma düşerse yerel durum buluttakinin üstüne yazılmaz */
+    const aktif=PROF.aktif,ref=db.collection("data/users/"+id).doc(docAdi(aktif));
+    const once=JSON.stringify(S);   /* bulut gelirken çocuk ilerleme yaptıysa açık ekranı yeni durumla yeniden çizeceğiz */
+    const snap=await ref.get();
+    if(PROF.aktif!==aktif)return;   /* bu arada kişi değiştiyse kisiGec kendi eşitlemesini yapar */
     const raw=snap&&snap.exists?snap.data():null;
     const remote=raw?normalize(JSON.parse(JSON.stringify(raw))):null;
     if(remote){S=normalize(birlestir(S,remote));try{localStorage.setItem(lsAnahtar(PROF.aktif),JSON.stringify(S));}catch(e){}}
-    sonPuan=S.puan;
+    sonPuan=S.puan;docRef=ref;
     bulutGonder();
-    $("sync").textContent="İlerleme hesabına kaydediliyor; telefonda ve bilgisayarda aynı kalır";
-    renderStats();if(!CUR)anaSayfa();else if(cur==="harita")harita();else if(remote&&cur&&JSON.stringify(S)!==once)show(cur);
+    $("sync").textContent="İlerleme hesabına kaydediliyor; telefonda ve bilgisayarda aynı kalır";bulutBasla.tamam=true;
+    renderStats();
+    /* yalnız ana sayfa ya da yıldız haritası açıksa yeniden çiz; oyun, Elif-ba, ebeveyn gibi ekranlarda çocuğu yerinden atma */
+    if(!CUR){if(anaSayfa.no===EKRAN_NO)anaSayfa();}else if(cur==="harita")harita();
+    else if(cur==="ezber"&&remote&&JSON.stringify(S)!==once){try{aracDur();}catch(e){}show(cur);}   /* ezber ekranı eski kaydı tutar; yalnız o yeniden çizilir */
   }catch(e){}
 }
 bulutBasla();
 /* Uygulama çevrimdışı açıldıysa, bağlantı gelince bulut eşitlemesini bir kez yeniden dene */
-window.addEventListener("online",()=>{if(!UID&&window.claude&&claude.bulut&&!bulutBasla.denendi){bulutBasla.denendi=true;bulutBasla();}});
+window.addEventListener("online",()=>{if(!bulutBasla.tamam&&window.claude&&claude.bulut&&!bulutBasla.calisiyor){bulutBasla.calisiyor=true;bulutBasla().finally(()=>{bulutBasla.calisiyor=false;});}});

@@ -35,7 +35,7 @@ function tecvidLejant(){
   <p style="font-size:14px">Renkli harfe dokununca kuralın açıklaması çıkar. ${esc((CUR.ek&&CUR.ek.tecvid&&CUR.ek.tecvid.genel)||"Okuyuşunuzu bir hocaya dinletmeniz en sağlamıdır.")}</p>`;
 }
 function tecvidAc(V,ai,c){
-  const K=TKUR.kurallar[c]||{ad:c,kisa:"",nasil:""};const el=$("tv"+ai);if(!el)return;
+  const K=TKUR.kurallar[c]||{ad:c,kisa:"",nasil:""};const el=$("tv"+ai);if(!el)return;const acan=document.activeElement;
   const T=(CUR.ek&&CUR.ek.tecvid)||{};
   const gA=(CUR.ilkAyet||1)+ai;
   const notlar=(T.fatiha_notlari||[]).filter(n=>+n.ayet===gA);
@@ -46,7 +46,8 @@ function tecvidAc(V,ai,c){
   ${notlar.length?`<p><b>Kitaptaki notlar (${(CUR.ilkAyet||1)+ai}. ayet)</b></p><ul style="margin:0;padding-left:20px">${notlar.map(n=>`<li>${n.ar?`<span class="ar" lang="ar" style="font-size:22px">${n.ar}</span> `:""}<b>${esc(n.kelime)}</b>${n.kural?` <span style="color:var(--gold);font-weight:800">(${esc(n.kural)})</span>`:""}: ${esc(n.not)}</li>`).join("")}</ul>`:""}
   ${kir.length?`<p><b>Kıraat farkı:</b> ${kir.map(n=>esc(n.not)).join(" ")}</p>`:""}
   <button id="tvk${ai}">Kapat</button>`;
-  $("tvk"+ai).onclick=()=>{el.hidden=true;};
+  $("tvk"+ai).onclick=()=>{el.hidden=true;if(acan&&acan!==document.body&&acan.isConnected&&acan.focus)try{acan.focus({preventScroll:true});}catch(e){}};
+  el.tabIndex=-1;try{el.focus({preventScroll:true});el.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});}catch(e){}
 }
 
 /* ---------- ezber köşesi ---------- */
@@ -93,7 +94,7 @@ function ezberCalis(i){
   <p style="font-size:14px">Gizli kelimeyi önce aklından söyle, sonra üstüne dokunup denetle.</p>
   <div class="subtabs">${[["ilk_kelime","İlk kelime bağlantısı"],["civi","Çivi imgesi"],["kodlama","Ezber kodu"],["saray","Hafıza sarayı"],["sinema","Zihinsel sinema"]].filter(([k])=>ip[k]).map(([k,ad])=>`<button data-ip="${k}">${ad}</button>`).join("")}<button data-ip="meal">Meali göster</button></div>
   <div id="ipucu" hidden></div>
-  <div class="detay" style="border-color:#2E7D5B"><button id="benOkuB" class="primary" style="background:#2E7D5B;border-color:#2E7D5B;font-size:18px">🎙 Ben okuyayım</button><p id="benOkuD" style="font-size:15px;margin:6px 0 0">Ayeti kendin sesli oku; sonra kendi sesini ve Alafasy'yi art arda dinle.</p></div>
+  <div class="detay" style="border-color:#2E7D5B"><button id="benOkuB" class="primary yesil-dug" style="font-size:18px">🎙 Ben okuyayım</button><p id="benOkuD" style="font-size:15px;margin:6px 0 0">Ayeti kendin sesli oku; sonra kendi sesini ve Alafasy'yi art arda dinle.</p></div>
   <div class="odak"><b>Bu ayeti ne kadar hatırladın?</b>
    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="primary" data-d="2">Hatırladım</button><button data-d="1">Zorlandım</button><button data-d="0">Hatırlamadım</button></div></div>`;
   $("ezGeri").onclick=()=>{TEKRAR_AKIS=false;ezberAyet=null;durSes();ezber();};$("benOkuB").onclick=()=>benOku(i,$("benOkuB"),$("benOkuD"));
@@ -198,7 +199,7 @@ function dusun(){
     $("dkay").onclick=()=>{const m=$("dcvp").value.trim();if(!m){toast("Önce bir şey yaz");return;}const yeni=!T[k.id];T[k.id]={t:new Date().toLocaleDateString("tr-TR"),metin:m};gun();if(yeni){S.puan+=10;}checkBadges();save();renderStats();toast(yeni?"Kaydedildi, 10 puan":"Kaydedildi");dusun();};
     $("dbas").onclick=()=>{let n=dusunKart;while(n===dusunKart&&Y.kartlar.length>1)n=Math.floor(Math.random()*Y.kartlar.length);dusunKart=n;dusun();};
   }else if(dusunAlt==="yazdiklarim"){const ids=Object.keys(T);
-    el.innerHTML=ids.length?ids.map(id=>{const k=Y.kartlar.find(x=>x.id===id);return k?`<div class="read-ayet"><p><b>${esc(k.soru)}</b></p><p>${esc(T[id].metin)}</p><p style="font-size:14px">${esc(T[id].t)} · <button data-ac="${id}" style="min-height:36px;padding:4px 10px">Aç ve düzenle</button></p></div>`:"";}).join(""):"<p>Henüz bir karta cevap yazmadın. “Günün kartı”ndan başlayabilirsin.</p>";
+    el.innerHTML=ids.length?ids.map(id=>{const k=Y.kartlar.find(x=>x.id===id);return k?`<div class="read-ayet"><p><b>${esc(k.soru)}</b></p><p>${esc(T[id].metin)}</p><p style="font-size:14px">${esc(T[id].t)} · <button data-ac="${id}" style="min-height:44px;padding:4px 10px">Aç ve düzenle</button></p></div>`:"";}).join(""):"<p>Henüz bir karta cevap yazmadın. “Günün kartı”ndan başlayabilirsin.</p>";
     el.querySelectorAll("[data-ac]").forEach(b=>b.onclick=()=>{dusunKart=Y.kartlar.findIndex(x=>x.id===b.dataset.ac);dusunAlt="kart";dusun();});
   }else if(dusunAlt==="yontem"||dusunAlt==="durum"){
     const D2=CUR.ek.dusun2,liste=dusunAlt==="yontem"?D2.yontemler:D2.durum;

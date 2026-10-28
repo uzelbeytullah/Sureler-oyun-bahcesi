@@ -172,17 +172,18 @@ function animGit(i,devam){
   const sh=A.sahneler[i],bl=kutu.querySelector(".an-balon");D.ses.ontimeupdate=null;
   const ipK=$("anIpucu"),zamanli=D.sesli&&A.ses&&(D.oto||D.elle);let ipBek=[];
   const ipListe=sh.ipucuHepsi?(A.ipuclari||[]).map((p,k)=>({i:k})):(sh.ipucu||[]);
-  if(ipListe.length){ipK.hidden=false;ipK.innerHTML=ipListe.map(q=>{const p=A.ipuclari[q.i];return `<span class="an-ip ${zamanli&&q.p!==undefined?"bekle":""}" data-i="${q.i}">${esc(p.ses)} → ${esc(p.kelime)}<span class="ar" lang="ar">${p.ar}</span></span>`;}).join("");
+  if(ipListe.length){ipK.hidden=false;ipK.innerHTML=ipListe.map(q=>{const p=A.ipuclari[q.i];return `<span class="an-ip ${zamanli&&q.p!==undefined?"bekle":""}" data-i="${q.i}" role="button" tabindex="0">${esc(p.ses)} → ${esc(p.kelime)}<span class="ar" lang="ar">${p.ar}</span></span>`;}).join("");
     if(zamanli)ipBek=ipListe.filter(q=>q.p!==undefined&&sh.parca&&sh.parca[q.p]).map(q=>({i:q.i,t:sh.parca[q.p].t}));
     if(!zamanli||!sh.parca)ipK.querySelectorAll(".an-ip").forEach(e=>e.classList.remove("bekle"));}
   else{ipK.hidden=true;ipK.innerHTML="";}
   ipK.onclick=ev=>{const c=ev.target.closest(".an-ip");if(!c)return;const p=A.ipuclari[+c.dataset.i];const y=CUR&&CUR.ayetler[p.ayet-(CUR.ilkAyet||1)];if(y&&y.w[p.w])kelimeSes(y.w[p.w]);};
+  ipK.onkeydown=ev=>{if((ev.key==="Enter"||ev.key===" ")&&ev.target.closest(".an-ip")){ev.preventDefault();ev.target.closest(".an-ip").click();}};
   // balon: konuşan kişinin sözü başladığında açılsın
   let blT=null;if(bl&&sh.balon&&sh.parca&&D.sesli&&A.ses&&(D.oto||D.elle)){const p=sh.parca.find(q=>q.kim===sh.balon.kim);if(p){blT=p.t;bl.classList.add("bekle");}}
   clearInterval(D.izle);D.izle=setInterval(()=>{if(D.i!==i||animDurum!==D||!$("anOyna")){clearInterval(D.izle);return;}const t=animZaman(),cal=animCalar();
     if(blT!==null&&cal&&t>=blT-0.15){bl.classList.remove("bekle");blT=null;}
     if(ipBek.length&&cal){ipBek=ipBek.filter(q=>{if(t>=q.t-0.1){const e=ipK.querySelector(`[data-i="${q.i}"]`);if(e){e.classList.remove("bekle");e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1800);}return false;}return true;});}
-    if(ok&&cal){let k=-1;ok.forEach((o,j)=>{if(t>=o.t-0.05)k=j;});if(k>=0&&ok[k].bit&&t>ok[k].bit+0.3&&k===ok.length-1)k=-1;if(sh.okuma)ipK.querySelectorAll(".an-ip").forEach(e=>e.classList.toggle("on",k>=0&&A.ipuclari[+e.dataset.i].ayet===ok[k].ayet));kt.querySelectorAll(".an-ayet").forEach((e,j)=>{e.classList.toggle("on",j===k);if(j===k&&e.dataset.g!=="1"){e.dataset.g="1";e.scrollIntoView({block:"nearest",behavior:"smooth"});}});}},30);
+    if(ok&&cal){let k=-1;ok.forEach((o,j)=>{if(t>=o.t-0.05)k=j;});if(k>=0&&ok[k].bit&&t>ok[k].bit+0.3&&k===ok.length-1)k=-1;if(sh.okuma)ipK.querySelectorAll(".an-ip").forEach(e=>e.classList.toggle("on",k>=0&&A.ipuclari[+e.dataset.i].ayet===ok[k].ayet));kt.querySelectorAll(".an-ayet").forEach((e,j)=>{e.classList.toggle("on",j===k);if(j===k&&e.dataset.g!=="1"){e.dataset.g="1";e.scrollIntoView({block:"nearest",behavior:kaydirmaDavranisi()});}});}},30);
   $("anBar").style.width=((i+1)/A.sahneler.length*100)+"%";
   D.izlenen=D.izlenen||new Set();clearTimeout(D.izSure);{const sc=A.sahneler[i];D.izSure=setTimeout(()=>{if(D.i===i&&animDurum===D&&$("anOyna"))animIzlendi(i);},Math.max(3000,Math.min(((sc.sure||0)*1000)*0.8,(sc.metin||"").length*45+2000)));}
   D.ses.pause();animKlipDur();

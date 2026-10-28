@@ -26,8 +26,8 @@ let sesJeton=0;
 function calParca(no,bas,son,sonra){const j=++sesJeton;
   const src=surumle("ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM);
   sesSonra=sonra||null;sesBitis=son;
-  const go=()=>{if(j!==sesJeton)return;hizUygula();ses.currentTime=bas;ses.play().catch(()=>{sesBitis=null;sesSonra=null;toast("Ses çalınamadı");if(sonra)sonra(true);});};
-  const hata=()=>{if(j!==sesJeton)return;sesBitis=null;sesSonra=null;toast("Ses yüklenemedi; bağlantıyı denetle");if(sonra)sonra(true);};
+  const go=()=>{ses.removeEventListener("error",hata);if(j!==sesJeton)return;hizUygula();ses.currentTime=bas;ses.play().catch(()=>{sesBitis=null;sesSonra=null;toast("Ses çalınamadı");if(sonra)sonra(true);});};
+  const hata=()=>{ses.removeEventListener("loadedmetadata",go);if(j!==sesJeton)return;sesBitis=null;sesSonra=null;toast("Ses yüklenemedi; bağlantıyı denetle");if(sonra)sonra(true);};
   if(!ses.src.endsWith(src)){ses.src=src;ses.addEventListener("loadedmetadata",go,{once:true});ses.addEventListener("error",hata,{once:true});ses.load();}else go();
 }
 /* ---------- çevrimdışı için sure sesi indirme (yalnız GitHub sürümü; service worker gerekir) ---------- */
@@ -38,6 +38,6 @@ async function sesIndirildi(no){try{const c=await caches.open(SES_ONBELLEK);retu
 async function sesTemizle(c,u){for(const q of await c.keys())if(new URL(q.url).pathname===u.pathname)await c.delete(q);}
 async function sesIndir(no){const u=sesAdres(no),r=await fetch(u.href,{cache:"no-store"});if(!r.ok)throw new Error("indirilemedi");
   const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,u);await c.put(u.href,r);
-  try{await fetch("data/"+String(no).padStart(3,"0")+".json?v="+SURUM);}catch(e){}}   // sure metni de kayda girsin
-async function sesSil(no){try{const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,sesAdres(no));}catch(e){}}
+  try{const d=new URL("data/"+String(no).padStart(3,"0")+".json?v="+SURUM,location.href),y=await fetch(d.href);if(y.ok){await sesTemizle(c,d);await c.put(d.href,y);}}catch(e){}}   /* sure metni de kalıcı kayda girsin (sürüm değişse de silinmez) */
+async function sesSil(no){try{const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,sesAdres(no));await sesTemizle(c,new URL("data/"+String(no).padStart(3,"0")+".json",location.href));}catch(e){}}
 function durSes(){sesJeton++;sesBitis=null;sesSonra=null;izle=null;ses2Bitis=null;ses2Sonra=null;ses.pause();ses2.pause();}

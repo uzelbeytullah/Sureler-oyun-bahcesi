@@ -24,7 +24,8 @@
 ## Bir şeyi değiştirdikten sonra
 
 1. `python araclar/surum-guncelle.py` · sürüm eklerini yeniler (tarayıcılar yeni dosyayı alsın diye).
-2. `npm install jsdom@24` (bir kez) ve `node test/oyun-test.js`, `node test/yeni-ozellikler-test.js`.
+2. `npm install jsdom@24` (bir kez) ve `node test/oyun-test.js`, `node test/yeni-ozellikler-test.js`, `node test/yorum-test.js`.
+   Uzun tek satırlarda açıklama için `//` değil `/* */` kullanın; `//` satırın geri kalan kodunu da yoruma çevirir.
 3. `GITHUB-A-GONDER.bat` · GitHub'a gönderir.
 
 ## İki sürüm
