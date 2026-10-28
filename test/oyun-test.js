@@ -36,7 +36,7 @@ ev(`S.seri=4;S.sonGun="${gunOnce(1)}";gun()`);ok('dün çalıştıysa artar',ev(
 ev('toast("a");toast("b");toast("c")');ok('toast kuyrukta',w.document.getElementById('toast').textContent==='a'&&ev('toast.q.length')===2);
 // tekrar akışı: iki surede günü gelen ayet
 ev(`S.sure["112"]=Object.assign(S.sure["112"]||{},{ezberDurum:{"0":{kutu:1,sonraki:"2000-01-01"}}});S.sure["113"]=Object.assign(S.sure["113"]||{},{ezberDurum:{"2":{kutu:0,sonraki:"2000-01-01"}}});`);
-ev('PROF.liste=[{id:"p0",ad:"Test",yas:8}];PROF.aktif="p0";S.seviye="genc";anaSayfa()');const b=w.document.getElementById('tekrarHepsi');ok('Bugünün tekrarı düğmesi',!!b&&/2 ayet/.test(b.textContent));
+ev('PROF.liste=[{id:"p0",ad:"Test",yas:8}];PROF.aktif="p0";S.seviye="genc";S.ilkYolGec=true;anaSayfa()');const b=w.document.getElementById('tekrarHepsi');ok('Bugünün tekrarı düğmesi',!!b&&/2 ayet/.test(b.textContent));
 b.click();await new Promise(r=>setTimeout(r,800));ok('ilk surede ezber ekranı',ev('CUR&&CUR.no')===112&&!!w.document.querySelector('[data-d="2"]'));
 w.document.querySelector('[data-d="2"]').click();await new Promise(r=>setTimeout(r,800));
 ok('ikinci sureye geçti',ev('CUR&&CUR.no')===113&&!!w.document.querySelector('[data-d="2"]'));

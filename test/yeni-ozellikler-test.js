@@ -1,4 +1,4 @@
-/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz yolu, aile halkası, aile takımı, Elif-ba ve harf sesleri, çocuk oyunu
+/* Sureler Oyun Bahçesi · yeni özellik testleri: ebeveyn onayı, namaz yolu, aile halkası, aile takımı, Elif-ba, harf sesleri, çocuk oyunu, küçükler için sesli oyunlar, ilk giriş, bahçe
    Çalıştırmak için:  npm install jsdom@24  ardından  node test/yeni-ozellikler-test.js */
 let HATA=0;
 const {JSDOM}=require('jsdom');const fs=require('fs'),path=require('path');
@@ -17,7 +17,7 @@ await new Promise(r=>setTimeout(r,300));
 return {w,dom,errs,ev:s=>w.eval(s)};};
 
 async function test_t5(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
-ev('PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";S.seviye="kucuk";');
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";S.seviye="kucuk";S.ilkYolGec=true;');
 await ev('ac(112)');await new Promise(r=>setTimeout(r,500));
 ev('ekS("ezberDurum")[0]={kutu:3,sonraki:"2000-01-01"}');ev('ezberCalis(0)');w.document.querySelector('[data-d="2"]').click();
 const d0=ev('JSON.stringify(ekS("ezberDurum")[0])');ok('son basamakta onay bekliyor '+d0,/onayBekle/.test(d0)&&!ev('ezbTam(ekS("ezberDurum")[0])'));
@@ -40,7 +40,7 @@ V().querySelector('[data-nzs="108"]').click();await new Promise(r=>setTimeout(r,
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
 async function test_t6(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
-ev('PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";S.seviye="genc";S.log={};S.log[today()]={s:{"113":5}};anaSayfa()');await new Promise(r=>setTimeout(r,700));
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:8}];PROF.aktif="p0";S.seviye="genc";S.ilkYolGec=true;S.log={};S.log[today()]={s:{"113":5}};anaSayfa()');await new Promise(r=>setTimeout(r,700));
 const V=()=>w.document.getElementById('view');ok('halka kartı',/aile halkası/.test(V().textContent)&&/Felak/.test(V().textContent));
 w.document.getElementById('halkaBasla').click();await new Promise(r=>setTimeout(r,700));ok('halka ekranı 3 adım',V().querySelectorAll('[data-ha]').length===3);
 for(const k of ['oku','soru','etk']){V().querySelector(`[data-ha="${k}"]`).click();await new Promise(r=>setTimeout(r,500));}
@@ -67,7 +67,7 @@ ev('YAR.son=null');kopya.durum='sonuc';kopya.dogru=q.dogru;w.yarOyuncuCiz(kopya)
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
 async function test_t8(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
-ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";anaSayfa()');
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";S.ilkYolGec=true;anaSayfa()');
 w.document.getElementById('elifAc').click();const V=()=>w.document.getElementById('view');
 ok('tablo 28 harf',V().querySelectorAll('[data-hi]').length===28);V().querySelector('[data-hi="4"]').click();ok('cim şekilleri',/Cim/.test(V().textContent)&&V().querySelectorAll('#ebD .ar').length===4);
 V().querySelector('[data-hi="7"]').click();ok('dal bağlanmaz uyarısı',/bağlanmaz/.test(V().textContent));
@@ -91,4 +91,31 @@ w.document.getElementById('cOyun').click();const metin=V().textContent;ok('çocu
 const n=ev('CUR.ek.cocuk.oyun_sorulari.filter(q=>!q.ebeveyn).length');ok('İhlâs çocuk soru sayısı '+n,n>=6);
 if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
 
-(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();
+async function test_t10(){const {w,errs,ev}=await kur();const ok=(a,v)=>{if(!v)HATA++;console.log((v?'TAMAM ':'HATA  ')+a);};
+const calan=[];w.eval('calParca=function(no,b,e){window.__c.push([no,b])}');w.__c=calan;
+const V=()=>w.document.getElementById('view');
+// ilk giriş yolu
+ev('PROF.liste=[{id:"p0",ad:"Ali",yas:7}];PROF.aktif="p0";S.seviye="kucuk";anaSayfa()');
+ok('ilk giriş: tek yol',!!w.document.getElementById('ilkBasla')&&!w.document.getElementById('grid'));
+w.document.getElementById('ilkBasla').click();await new Promise(r=>setTimeout(r,600));ok('Fâtiha açıldı',ev('CUR&&CUR.no')===1);
+ok('sade görünümde tamamla ve sırala',!!w.document.querySelector('#tabs [data-v="tamamla"]')&&!!w.document.querySelector('#tabs [data-v="sirala"]'));
+// sesli tamamla
+await ev('show("tamamla")');await new Promise(r=>setTimeout(r,500));ok('tamamla: ayet otomatik çalındı',calan.length>=1);ok('yeniden dinle düğmesi',!!V().querySelector('[data-ayetcal]'));
+// sesli sırala ve yıldız
+await ev('show("sirala")');await new Promise(r=>setTimeout(r,500));ok('sırala küçük: sesli seçenek düğmeleri',V().querySelectorAll('[data-ayetcal]').length===3);
+for(let k=0;k<8;k++){const q=V().querySelector('.opts');if(!q)break;const dogru=ev('(()=>{return null})()');
+  // doğru şıkkı bul: bir sonraki ayetin ilk kelimeleri
+  const btns=[...V().querySelectorAll('.opts button[data-j]')];const i=+(V().querySelector('[data-ayetcal]').dataset.ayetcal);
+  const hedef=ev(`(()=>{const a=CUR.ayetler[${i}+1];return a.w.slice(0,Math.min(3,a.w.length)).map(x=>x.a).join(" ")+(a.w.length>3?" …":"")})()`);
+  (btns.find(b=>b.textContent.trim()===hedef)||btns[0]).click();await new Promise(r=>setTimeout(r,1000));}
+ok('sırala yıldızı alındı',ev('S.sure["1"].yildiz.sirala')===true);
+ev('anaSayfa()');ok('ilk yıldızdan sonra normal ana sayfa',!!w.document.getElementById('grid'));
+ok('rozetler kısaltıldı',/Sıradaki rozetler/.test(V().textContent));
+// bahçe: solgun fidan ve kilitli süs
+ev('S.sure["112"]={ezberDurum:{"0":{kutu:1,sonraki:"2000-01-01"}}};S.puan=5000;bahce()');
+ok('solgun fidan uyarısı',/suya ihtiyacı var/.test(V().textContent)&&!!V().querySelector('[data-su="1"]'));
+ok('kilitli süs',/🔒/.test(V().textContent));V().querySelector('[data-sus="havuz"]').click();ok('kilitli süs alınamadı',!(ev('S.sus')||[]).includes('havuz'));
+V().querySelector('[data-sus="kus"]').click();ok('kilitsiz süs alındı',(ev('S.sus')||[]).includes('kus'));
+if(errs.length){HATA++;console.log('sayfa hataları',errs);}}
+
+(async()=>{for(const f of [test_t5,test_t6,test_t7,test_t8,test_t9,test_t10]){console.log('--',f.name);await f();}console.log(HATA?HATA+' hata':'hepsi geçti');process.exit(HATA?1:0);})();

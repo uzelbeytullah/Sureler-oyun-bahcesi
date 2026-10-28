@@ -383,7 +383,7 @@ function answer(ok){gun();
   if(ok){S.dogru++;S.ardarda++;S.rekor=Math.max(S.rekor,S.ardarda);S.puan+=Math.round((10+(S.ardarda>=3?5:0))*gunlukCarpan());
     if(S.ardarda%5===0){efekt("seri");kutla(true);}else efekt("dogru");gorevIsle("soru");hedefIsle("soru");logIsle("dogru");}else{S.ardarda=0;efekt("yanlis");}logIsle("soru");
   checkBadges();save();renderStats();}
-function giveStar(k){const t=SS(CUR.no);if(!t.yildiz[k]){t.yildiz[k]=true;toast("Yıldız kazandın: "+STAR_NAMES[k]);efekt("yildiz");kutla();
+function giveStar(k){const t=SS(CUR.no);if(!t.yildiz[k]){if(hicYildizYok()&&!S.ilkYolGec){S.ilkYolGec=true;setTimeout(()=>toast("İlk yıldızın! Bahçende ilk fidan filizlendi 🌱"),600);}t.yildiz[k]=true;toast("Yıldız kazandın: "+STAR_NAMES[k]);efekt("yildiz");kutla();
   if(yildizSay(CUR.no)===4){S.puan+=50;toast(CUR.ad+" suresini dört yıldızla bitirdin, 50 ek puan");}
   checkBadges();save();renderStats();}}
 function renderStats(){
@@ -454,11 +454,14 @@ let araMetin="";
 function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
   CUR=null;baslik();setTabs();renderStats();
   const V=$("view");if(!aktifKisi()){kisiSec();return;}if(!S.seviye){seviyeSor(anaSayfa);return;}
+  if(ilkYolGoster()){ilkYol();return;}
   V.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:6px">${kisiDugme()}</div>${gorevKart()}<div id="eylemKart"></div><div id="halkaKart"></div>${namazKart()}${bugunPaneli()}<h2>Bir sure seç</h2><p>Her surede dört yıldız var: okudum, kelimeleri bildim, ayetleri tamamladım, sırayı bildim.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="primary" id="bahceAc" style="background:#2E7D5B;border-color:#2E7D5B">🌳 Bahçem</button><button id="hangiAc">🎧 Hangi sure?</button><button id="elifAc">🔤 Elif-ba</button><button id="yarKatil">👪 Aile yarışmasına katıl</button><button id="hedefAc">🤝 Ortak hedef</button><button id="ebeveynAc">👨‍👩‍👧 Ebeveyn özeti</button><button class="primary" id="atlasAc">İlke atlası: bütün surelerin ilkeleri</button></div>
   <input class="ara" id="ara" type="search" placeholder="Sure adı ya da numarası yaz" aria-label="Sure ara" value="${esc(araMetin)}">
   <div class="sure-grid" id="grid"></div>
-  <h2>Rozetler</h2><div class="badges">${BADGES.map(([id,ad])=>`<span class="badge ${S.rozet.includes(id)?"got":""}">${S.rozet.includes(id)?"✓ ":""}${ad}</span>`).join("")}</div>
+  <h2>Rozetler</h2>${(()=>{const var_=BADGES.filter(([id])=>S.rozet.includes(id)),yok=BADGES.filter(([id])=>!S.rozet.includes(id));
+    return `<div class="badges">${var_.map(([,ad])=>`<span class="badge got">✓ ${ad}</span>`).join("")||"<span>Henüz rozetin yok; ilk doğru cevapla ilk rozet gelir.</span>"}</div>
+    ${yok.length?`<p style="font-size:14px;margin:6px 0 0"><b>Sıradaki rozetler:</b></p><div class="badges">${yok.slice(0,3).map(([,ad])=>`<span class="badge">${ad}</span>`).join("")}</div>${yok.length>3?`<details><summary style="font-size:14px">Bütün rozetleri gör (${BADGES.length})</summary><div class="badges">${yok.slice(3).map(([,ad])=>`<span class="badge">${ad}</span>`).join("")}</div></details>`:""}`:""}`;})()}
   <p>Her çalışman bir emektir: doğru cevaplar, tekrarlar ve izlenen hikâyeler emek puanı olarak bahçeni büyütür. Asıl kazanç, öğrendiğin ayetin anlamını bilmek ve onu hayatına taşımaktır. Her gün biraz çalışırsan günlük serin büyür.</p>`;
   const kucult=t=>t.toLocaleLowerCase("tr").normalize("NFD").replace(/[̀-ͯ’'‘]/g,"");
   const ciz=()=>{const q=kucult(araMetin.trim());
@@ -470,6 +473,18 @@ function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
     $("grid").querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const k=KATALOG.find(x=>x.no===+b.dataset.n);if(k.gruplar)grupMenu(k);else ac(k.no);});};
   $("ara").oninput=e=>{araMetin=e.target.value;ciz();};ciz();bugunBagla();$("atlasAc").onclick=()=>{atlasTema=null;atlas();};$("bahceAc").onclick=()=>bahce();eylemKartCiz();halkaKartCiz();{const kd=$("kisiDeg");if(kd)kd.onclick=()=>kisiSec();}$("yarKatil").onclick=()=>yarKatil();$("hangiAc").onclick=()=>hangiSure();$("elifAc").onclick=()=>elifba();$("hedefAc").onclick=()=>hedefSayfa();$("ebeveynAc").onclick=()=>ebeveynOzet();
 }
+/* İlk giriş: henüz hiç yıldızı olmayan kişiye tek bir yol gösterilir */
+function hicYildizYok(){return !Object.values(S.sure||{}).some(x=>x.yildiz&&Object.values(x.yildiz).some(Boolean));}
+function ilkYolGoster(){return !S.ilkYolGec&&hicYildizYok()&&!S.dogru;}
+function ilkYol(){const V=$("view"),p=aktifKisi()||{},k1=kucuk();
+  V.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:6px">${kisiDugme()}</div>
+  <section class="detay pop" style="text-align:center;display:grid;gap:12px"><div style="font-size:54px">🌱</div><h2>Hoş geldin${p.ad?", "+esc(p.ad):""}!</h2>
+  <p style="font-size:19px">Bahçene ilk fidanı birlikte dikelim. Üç küçük adım:</p>
+  <ol style="text-align:left;font-size:19px;margin:0 auto;max-width:420px;display:grid;gap:6px"><li><b>Fâtiha'yı dinle</b> ${k1?"(kâri okur, sen dinlersin)":"ve okuduğun ayetleri işaretle"}</li><li><b>Bir kelime oyunu</b> oyna</li><li><b>İlk yıldızını</b> al</li></ol>
+  <button class="primary" id="ilkBasla" style="font-size:22px;min-height:64px">▶ Başlayalım</button>
+  <button id="ilkGec" style="font-size:15px">Her şeyi göster</button></section>`;
+  $("ilkBasla").onclick=()=>ac(1,"oku");$("ilkGec").onclick=()=>{S.ilkYolGec=true;save();anaSayfa();};
+  {const kd=$("kisiDeg");if(kd)kd.onclick=()=>kisiSec();}}
 function grupMenu(k){
   CUR=null;baslik();setTabs();renderStats();
   $("baslik").textContent="Yâsîn Suresi";$("altbaslik").textContent="83 ayet · 29 grup · bir grup seç";$("baslikAr").textContent="يس";
@@ -1762,10 +1777,19 @@ function yanlisCalis(){const L=shuffle(yanlisSirada()).slice(0,10);if(!L.length)
 
 /* --- bahçe --- */
 const SUSLER=[["kus","Kuşlar",100],["cit","Çit",120],["tarh","Çiçek tarhı",150],["kelebek","Kelebekler",180],["bank","Bank",200],["fener","Bahçe feneri",250],["cesme","Çeşme",300],["havuz","Havuz",400],["gokkusagi","Gökkuşağı",600]];
+/* Süs dükkânı: puan yetmez, bazı süsler ezber ve yıldız emeğiyle açılır */
+const SUS_KILIT={cit:["Bir sureyi dört yıldızla bitir",()=>tamSure()>=1],tarh:["İki sureyi dört yıldızla bitir",()=>tamSure()>=2],
+  kelebek:["Beş ayeti ezberle",()=>ezberToplam()>=5],bank:["Bir sureyi baştan sona ezberle",()=>sureEzberSay()>=1],fener:["Beş sureyi dört yıldızla bitir",()=>tamSure()>=5],
+  cesme:["Fâtiha'yı ezberle",()=>[0,1,2,3,4,5,6].every(i=>ezbTam(((S.sure["1"]||{}).ezberDurum||{})[i]))],havuz:["On sureyi dört yıldızla bitir",()=>tamSure()>=10],gokkusagi:["Namaz hazırlığı yolunu tamamla",()=>!!S.namazBelge]};
+function ezberToplam(){let n=0;Object.values(S.sure||{}).forEach(x=>Object.values(x.ezberDurum||{}).forEach(d=>{if(ezbTam(d))n++;}));return n;}
+function sureEzberSay(){return KATALOG.filter(k=>!k.gruplar&&k.ayet&&Object.values(((S.sure[k.no]||{}).ezberDurum)||{}).filter(ezbTam).length>=k.ayet).length;}
+/* Tekrar günü üç günden fazla geçmiş ayet sayısı: ağaç hafifçe solar, tekrar edince canlanır */
+function susuz(no,kat){const ids=kat&&kat.gruplar?kat.gruplar.map(g=>g.id):[no];const sinir=gunEkle(-3);let n=0;
+  ids.forEach(id=>Object.values(((S.sure[id]||{}).ezberDurum)||{}).forEach(d=>{if(d&&d.sonraki&&d.sonraki<sinir)n++;}));return n;}
 function harcanabilir(){return S.puan-(S.harcanan||0);}
 function bitkiAsama(k){if(k.gruplar){const t=grupYildiz(k),m=k.gruplar.length*4;if(t===0)return k.gruplar.some(g=>S.sure[g.id])?0.5:0;return Math.max(1,Math.round(t/m*4));}
   const y=yildizSay(k.no);if(y)return y;return S.sure[k.no]?0.5:0;}
-function bitkiSvg(a,ezb){
+function bitkiSvg(a,ezb,solgun){if(solgun)return `<g style="filter:saturate(.35) brightness(1.08)">${bitkiSvg(a,ezb,false)}</g><text x="78" y="22" font-size="18">💧</text>`;
   const toprak=`<ellipse cx="50" cy="92" rx="34" ry="8" fill="#8C6A45"/>`;
   if(a===0)return toprak+`<ellipse cx="50" cy="88" rx="5" ry="3.5" fill="#5A3A22"/>`;
   if(a===0.5)return toprak+`<path d="M50,90 v-14" stroke="#2F7A3B" stroke-width="3"/><path d="M50,80 q-10,-6 -12,-14 q10,2 12,12z M50,78 q10,-6 12,-14 q-10,2 -12,12z" fill="#4CAF50"/>`;
@@ -1786,17 +1810,19 @@ function bahce(){sayacIsle("bahce");CUR=null;baslik();setTabs();renderStats();$(
   const V=$("view"),sus=S.sus||[];
   const ust=`<svg viewBox="0 0 800 240" style="width:100%;display:block;border-radius:16px" role="img" aria-label="Bahçenin süsleri"><defs><linearGradient id="bg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD3FE"/><stop offset="1" stop-color="#E9F7FF"/></linearGradient><radialGradient id="anIsik"><stop offset="0" stop-color="#FFE9A0" stop-opacity=".95"/><stop offset="1" stop-color="#FFD866" stop-opacity="0"/></radialGradient></defs>
    <rect width="800" height="240" fill="url(#bg1)"/>${sus.includes("gokkusagi")?susSvg("gokkusagi"):""}<circle cx="720" cy="50" r="26" fill="#FFD23F"/><rect y="200" width="800" height="40" fill="#5DA05A"/>${[...Array(Math.min(12,S.halkaSay||0))].map((_,k)=>`<g transform="translate(${70+k*58},${120+(k%2)*14})">${anFener(true,0.7)}</g>`).join("")}${sus.filter(s=>s!=="gokkusagi").map(susSvg).join("")}${[...Array(Math.min(60,S.cicek||0))].map((_,k)=>`<g transform="translate(${20+(k*53)%760},${206+(k%3)*9})"><path d="M0,0 v-12" stroke="#2F6230" stroke-width="2"/><circle cy="-14" r="5" fill="${["#F7C548","#F28AB2","#E4572E","#8E44AD"][k%4]}"/><circle cy="-14" r="2" fill="#fff"/></g>`).join("")}</svg>`;
-  const tum=KATALOG.map(k=>({k,a:bitkiAsama(k),ezb:!k.gruplar&&k.ayet&&Object.values(((S.sure[k.no]||{}).ezberDurum)||{}).filter(ezbTam).length>=k.ayet}));
+  const tum=KATALOG.map(k=>({k,su:susuz(k.no,k)>0,a:bitkiAsama(k),ezb:!k.gruplar&&k.ayet&&Object.values(((S.sure[k.no]||{}).ezberDurum)||{}).filter(ezbTam).length>=k.ayet}));
   const sayac=[0,0,0,0,0];tum.forEach(x=>{sayac[Math.ceil(x.a)>=4?4:Math.ceil(x.a)]++;});
   V.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="geri" id="bGeri">← Sureler</button></div>
   ${ust}
   ${S.cicek?`<p><b>🌼 Yaptığın iyiliklerle bahçende ${S.cicek} çiçek açtı.</b></p>`:""}${S.halkaSay?`<p><b>🏮 Ailece ${S.halkaSay} haftalık halka tamamladınız; her biri bahçede bir fener yaktı.</b></p>`:""}<p><b>Bahçende ${tum.length} sure var:</b> ${sayac[4]} çiçekli ağaç · ${sayac[3]+sayac[2]} fidan · ${sayac[1]} filiz · ${sayac[0]} tohum. Bir surede yıldız kazandıkça fidanı büyür; dört yıldızla çiçek açar, sureyi ezberleyince çiçekleri altın sarısı olur.</p>
-  <div class="bahce-grid">${tum.map(({k,a,ezb})=>`<button class="bahce-hucre" data-n="${k.no}" aria-label="${esc(k.ad)}: ${a===0?"tohum":a<1?"filiz":a>=4?"çiçekli ağaç":"fidan"}"><svg viewBox="0 0 100 100" style="width:100%;display:block">${bitkiSvg(a,ezb)}</svg><b>${esc(k.ad)}</b></button>`).join("")}</div>
+  ${(()=>{const n=tum.filter(x=>x.su).length;return n?`<p><b>💧 ${n} fidanın suya ihtiyacı var:</b> tekrar günü geçmiş ayetleri var. Fidana dokun, ezber tekrarını yap; yeniden canlanır.</p>`:"";})()}
+  <div class="bahce-grid">${tum.map(({k,a,ezb,su})=>`<button class="bahce-hucre" data-n="${k.no}" ${su?'data-su="1"':""} aria-label="${esc(k.ad)}: ${a===0?"tohum":a<1?"filiz":a>=4?"çiçekli ağaç":"fidan"}${su?", tekrar bekliyor":""}"><svg viewBox="0 0 100 100" style="width:100%;display:block">${bitkiSvg(a,ezb,su)}</svg><b>${esc(k.ad)}</b></button>`).join("")}</div>
   <h2>Süs dükkânı</h2><p>Harcanabilir puanın: <b style="font-size:20px">${harcanabilir()}</b> · Toplam kazandığın puan değişmez, rozetlerin de korunur.</p>
-  <div class="sure-grid">${SUSLER.map(([id,ad,f])=>{const var_=sus.includes(id);return `<button class="sure-kart ${var_?"tam":""}" data-sus="${id}" ${var_?"disabled":""}><span class="sad">${esc(ad)}</span><span class="sbilgi"><b>${var_?"Bahçende ✓":f+" puan"}</b></span></button>`;}).join("")}</div>`;
+  <p style="font-size:14px">Bazı süsler emekle açılır: yıldızlar, ezber ve namaz hazırlığı yolu.</p>
+  <div class="sure-grid">${SUSLER.map(([id,ad,f])=>{const var_=sus.includes(id),kl=SUS_KILIT[id],acik=!kl||kl[1]();return `<button class="sure-kart ${var_?"tam":""}" data-sus="${id}" ${var_?"disabled":""}><span class="sad">${acik?"":"🔒 "}${esc(ad)}</span><span class="sbilgi"><b>${var_?"Bahçende ✓":f+" puan"}</b>${!var_&&!acik?`<br>${esc(kl[0])}`:""}</span></button>`;}).join("")}</div>`;
   $("bGeri").onclick=()=>anaSayfa();
-  V.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const k=KATALOG.find(x=>x.no===+b.dataset.n);if(k.gruplar)grupMenu(k);else ac(k.no);});
-  V.querySelectorAll("[data-sus]").forEach(b=>b.onclick=()=>{const it=SUSLER.find(s=>s[0]===b.dataset.sus);if(harcanabilir()<it[2]){toast(`Bunun için ${it[2]-harcanabilir()} puan daha gerekiyor`);efekt("yanlis");return;}
+  V.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{const k=KATALOG.find(x=>x.no===+b.dataset.n);if(k.gruplar)grupMenu(k);else ac(k.no,b.dataset.su?"ezber":undefined);});
+  V.querySelectorAll("[data-sus]").forEach(b=>b.onclick=()=>{const it=SUSLER.find(s=>s[0]===b.dataset.sus);const kl=SUS_KILIT[it[0]];if(kl&&!kl[1]()){toast("Bu süs emekle açılır: "+kl[0]);return;}if(harcanabilir()<it[2]){toast(`Bunun için ${it[2]-harcanabilir()} puan daha gerekiyor`);efekt("yanlis");return;}
     S.harcanan=(S.harcanan||0)+it[2];S.sus=[...sus,it[0]];save();efekt("satin");kutla(true);toast(it[1]+" bahçene eklendi");bahce();});
   window.scrollTo({top:0});}
 
