@@ -13,7 +13,7 @@
   var SDK = "https://www.gstatic.com/firebasejs/10.12.2/firebase-";
   function yukle(ad) {
     return new Promise(function (ok, hata) {
-      var e = document.createElement("script"); e.src = SDK + ad + "-compat.js"; e.async = false;
+      var e = document.createElement("script"); e.src = SDK + ad + "-compat.js"; e.async = false; e.crossOrigin = "anonymous";
       e.onload = ok; e.onerror = hata; document.head.appendChild(e);
     });
   }
@@ -106,13 +106,15 @@
   /* ---------- room (canlı oda) ---------- */
   function oda(u) {
     return {
-      join: function (ad) {
+      join: function (ad, secenek) {
         var kok = fs.collection("odalar").doc(String(ad).replace(/[^\w-]/g, "_"));
         var esler = kok.collection("esler"), olaylar = kok.collection("olaylar");
         var benim = esler.doc(u.uid);
         var liste = [], peerCb = [], olayCb = {}, sonYayin = {}, kapat = [], acik = true, sahibim = false;
         var benimDurum = {}, fark = 0, sahipT = 0, eslerAcik = false;   // fark: sunucu saati - cihaz saati (cihaz saati yanlış olabilir)
         var SUNUCU = firebase.firestore.FieldValue.serverTimestamp;
+        /* Dinleme koparsa (ör. okul ağı engelliyor) oyuna haber ver; sessiz kalmasın */
+        function hataBildir(e) { try { document.dispatchEvent(new CustomEvent("bulut-hata", { detail: String(e && e.code || e) })); } catch (x) {} }
         function ms(t) { return t && t.toMillis ? t.toMillis() : (typeof t === "number" ? t : 0); }
         function simdi() { return Date.now() + fark; }
         /* son: Firestore TTL politikası bu zamandan sonra belgeyi kendiliğinden siler (çocuk adları kalıcı kalmasın) */
@@ -138,19 +140,20 @@
           liste = s.docs.filter(function (d) { return ms(d.data({ serverTimestamps: "estimate" }).t) > sinir || d.id === u.uid; })
             .map(function (d) { return { peer: d.id, isMe: d.id === u.uid, presence: ac(d.data().presence || {}) }; });
           peerCb.forEach(function (f) { try { f(liste); } catch (e) {} });
-          }, function () {}));
+          }, hataBildir));
         }
 
         kapat.push(olaylar.onSnapshot(function (s) {
           s.docChanges().forEach(function (c) {
             if (c.type === "removed") return;
+            /* Saate bakılmaz (cihaz saati yanlış olabilir); oda kodu her oyunda yenidir, eski oyunun durumunu
+               oyuncu tarafı durumdaki kodla ayırt eder */
             var d = c.doc.data({ serverTimestamps: "estimate" }) || {};
-            if (ms(d.t) < simdi() - 60000) return;   // eski yarışmalardan kalan
             (olayCb[c.doc.id] || []).forEach(function (f) {
               try { f({ data: ac(d.data), peer: d.kimden, isMe: d.kimden === u.uid }); } catch (e) {}
             });
           });
-        }, function () {}));
+        }, hataBildir));
 
         /* Odaya ilk yayın yapan oda sahibi olur; olaylara yalnız sahibi yazabilir (kurallar da bunu denetler) */
         function sahiplen() {
@@ -158,7 +161,12 @@
           return kok.set({ sahip: u.uid, t: SUNUCU(), son: son() }).then(function () { sahibim = true; sahipT = Date.now(); });
         }
 
-        return nabiz().then(function () {
+        /* Oda sahibi önce oda belgesini kurar; kurallar oyuncu kaydını yalnız var olan odaya izin verir */
+        var ilk = (secenek && secenek.sahip) ? sahiplen().then(nabiz) : nabiz();
+        var zaman;
+        var sure = new Promise(function (_, hata) { zaman = setTimeout(function () { hata(new Error("zaman aşımı")); }, 10000); });
+        return Promise.race([ilk, sure]).then(function () {
+          clearTimeout(zaman);
           return {
             peers: function () { return liste.slice(); },
             onPeers: function (f) { eslerDinle(); peerCb.push(f); return function () { peerCb = peerCb.filter(function (x) { return x !== f; }); }; },
@@ -172,8 +180,8 @@
             emit: function (olay, veri) {
               var j = JSON.stringify(veri);
               var o = sonYayin[olay];
-              /* değişmeyeni yeniden yazma; yalnız 50 sn'de bir tazele ki sonradan katılan (60 sn'den eskiyi saymayan) durumu görsün */
-              if (o && o.j === j && Date.now() - o.t < 50000) return Promise.resolve();
+              /* değişmeyeni yeniden yazma (sonradan katılan, dinlemeye başlayınca son durumu zaten alır); 5 dk'da bir tazele */
+              if (o && o.j === j && Date.now() - o.t < 300000) return Promise.resolve();
               sonYayin[olay] = { j: j, t: Date.now() };
               return sahiplen().then(function () {
                 return olaylar.doc(String(olay)).set({ data: temiz(veri), kimden: u.uid, t: SUNUCU(), son: son() });
@@ -191,6 +199,11 @@
               return benim.delete().catch(function () {});
             }
           };
+        }, function (e) {
+          /* katılamadı (kod yanlış, bağlantı yok ya da zaman aşımı): dinleyicileri ve nabzı kapat */
+          clearTimeout(zaman); acik = false; clearInterval(nabizT);
+          kapat.forEach(function (f) { try { f(); } catch (x) {} });
+          throw e;
         });
       }
     };

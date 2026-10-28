@@ -33,7 +33,7 @@ function yarTakimHtml(t){if(!t)return "";const c=Number(t.c)||0,n=Number(t.n)||0
 function yarSkor(){if(YAR.takim)return "";return Object.entries(YAR.puan).sort((a,b)=>b[1]-a[1]).map(([p,n])=>`<li><b>${esc(YAR.ad[p]||"Oyuncu")}</b> · ${Number(n)||0} puan</li>`).join("")||"<li>Henüz katılan yok</li>";}
 async function yarAc(){const V=$("view"),oda=await odaAl();
   if(!oda){V.innerHTML=`<p>Canlı yarışma için buluta bağlanılamadı. İnternet bağlantını denetleyip sayfayı yenile.</p><button class="geri" id="yG">${ikon("arrow-left")}Geri</button>`;$("yG").onclick=()=>show("harita");return;}
-  const kod=rastgeleKod(8);let R;try{R=await oda.join("yaris-"+kod);}catch(e){toast("Oda açılamadı");return;}
+  const kod=rastgeleKod(8);let R;try{R=await oda.join("yaris-"+kod,{sahip:true});}catch(e){toast("Oda açılamadı");return;}
   YAR={kod,R,host:true,Q:yarSorular(),i:-1,durum:"bekle",puan:{},ad:{},cevap:{},sure:CUR.ad,takim:true,tp:0,tc:0};
   R.onPeers(()=>{R.peers().forEach(p=>{if(p.isMe)return;const pr=p.presence||{};if(pr.ad){YAR.ad[p.peer]=pr.ad;if(YAR.puan[p.peer]===undefined)YAR.puan[p.peer]=0;}
     if(pr.c&&YAR.durum==="soru"&&pr.c.q===YAR.i&&YAR.cevap[p.peer]===undefined)YAR.cevap[p.peer]=pr.c.j;});yarCiz();});
@@ -65,11 +65,13 @@ async function yarKatil(){const V=$("view");CUR=null;baslik();setTabs();$("basli
   $("yG").onclick=()=>anaSayfa();
   $("yGir").onclick=async()=>{const a=$("yAd").value.trim().slice(0,20),k=$("yKod").value.trim().toUpperCase().replace(/\s/g,"");if(!a||!/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(k)){toast("Adını ve 8 harfli kodu yaz");return;}
     try{localStorage.setItem("yaris-ad",a);}catch(e){}
-    let R;try{R=await oda.join("yaris-"+k);}catch(e){toast("Katılamadım, kodu denetle");return;}
+    let R;yarBirak.hataDendi=0;try{R=await oda.join("yaris-"+k);}catch(e){toast(navigator.onLine===false||String(e&&e.message).includes("zaman")?"Bağlanamadım, internetini denetle":"Katılamadım, kodu denetle");return;}
     YAR={host:false,R,kod:k,ad:a,son:null,secim:{}};R.presence({ad:a}).catch(()=>{});
     V.innerHTML=`<h2>${ikon("trophy")} ${esc(a)}, yarışmaya katıldın</h2><div id="yEkran"><p>Sunucunun başlatmasını bekliyoruz…</p></div><button class="geri" id="yCik">Yarışmadan çık</button>`;
     $("yCik").onclick=()=>{yarBirak();anaSayfa();};
-    R.on("durum",m=>{if(!YAR||YAR.host||m.isMe)return;yarOyuncuCiz(m.data||{});});};}
+    R.on("durum",m=>{if(!YAR||YAR.host||m.isMe)return;const d=m.data||{};if(d.kod!==undefined&&d.kod!==YAR.kod)return;yarOyuncuCiz(d);});};}
+/* canlı bağlantı koparsa bir kez haber ver */
+document.addEventListener("bulut-hata",()=>{if(YAR&&!yarBirak.hataDendi){yarBirak.hataDendi=1;toast("Canlı bağlantı kurulamadı; internetini denetleyip yeniden dene");}});
 function yarOyuncuCiz(d){const Y=YAR,E=$("yEkran");if(!E||!d||typeof d!=="object")return;d.opts=Array.isArray(d.opts)?d.opts.map(String):[];d.i=Number(d.i)||0;d.n=Number(d.n)||0;const ar=d.tur==="bosluk";const sh=yarSoruHtml({tur:d.tur,ar:d.soruAr,kel:d.kel,k:d.k});const imza=d.durum+"|"+d.i;const skor=(Array.isArray(d.skor)?d.skor:[]).filter(Array.isArray).sort((a,b)=>(Number(b[1])||0)-(Number(a[1])||0));
   const benim=skor.find(s=>s[2]===undefined);
   if(Y.son===imza&&d.durum!=="bekle")return;Y.son=imza;
@@ -112,10 +114,10 @@ async function hedefSayfa(){CUR=null;baslik();setTabs();$("baslik").textContent=
   ${yaz===false&&!(window.claude&&claude.bulut)?`<p class="detay"><b>Bu sayfayı yalnız görüntüleyebiliyorsun.</b> Ortak hedefe katkı vermek için sayfanın sahibi seni paylaşım menüsünden <b>Katkıda bulunan</b> olarak eklemeli.</p>`:""}
   ${L.map(h=>{const hd=Math.max(1,hSayi(h.hedef)),{t,k}=hedefToplam(h),y=Math.min(100,Math.round(t/hd*100));return `<section class="detay"><h3>${esc(h.ad)}</h3><div class="bar" style="height:16px"><i style="width:${y}%"></i></div><p><b>${t} / ${hd}</b> ${h.tur==="tekrar"?"ayet tekrarı":"doğru cevap"} · ${k} kişi katıldı · Benim katkım: <b>${hSayi((H[h.id]||{}).n)}</b> · Kod: <b>${esc(h.id)}</b>${t>=hd?" · <b>Hedefe ulaşıldı, maşallah!</b>":""}</p></section>`;}).join("")||"<p>Henüz bir hedefe katılmadın.</p>"}
   <h3>Bir hedefe katıl</h3><p><input id="hKod" class="ara" maxlength="8" placeholder="Hedef kodu" aria-label="Hedef kodu"> <button class="primary" id="hKatil">Katıl</button></p>
-  <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Yılmaz ailesi Ekim hedefi)" aria-label="Hedefin adı"></p>
+  <h3>Yeni hedef koy</h3><p><input id="hAd" class="ara" maxlength="40" placeholder="Hedefin adı (ör. Ekim ezber hedefi)" aria-label="Hedefin adı"></p><p class="kucuk-yazi"><b>Hedefin adını kodu bilen herkes görür; ad, soyad ya da okul adı yazmayın.</b></p>
   <p class="esnek ara-2 sarmal"><select id="hTur" aria-label="Hedef türü" class="dokun44 yazi-3"><option value="tekrar">Ayet tekrarı</option><option value="soru">Doğru cevap</option></select><input id="hSay" type="number" min="10" max="10000" value="100" aria-label="Hedef sayısı" style="min-height:44px;width:120px;font-size:17px"><button class="primary" id="hKoy">Hedefi koy</button></p>`;
   $("hG").onclick=()=>anaSayfa();
-  $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();if(!/^[A-Z0-9]{4,8}$/.test(k)){toast("Hedef kodunu denetle");return;}const h=await hedefGetir(k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
+  $("hKatil").onclick=async()=>{const k=$("hKod").value.trim().toUpperCase();if(!/^[A-Z0-9]{8}$/.test(k)){toast("Hedef kodunu denetle");return;}const h=await hedefGetir(k);if(!h){toast("Bu kodla bir hedef bulunamadı");return;}
     S.hedefler=S.hedefler||{};S.hedefler[k]=S.hedefler[k]||{tur:h.tur,n:0};save();hedefDegisen.add(k);hedefGonder();toast("Hedefe katıldın");hedefSayfa();};
   $("hKoy").onclick=async()=>{const ad=$("hAd").value.trim(),n=Math.max(10,Math.min(10000,Math.round(+$("hSay").value)||100)),tur=$("hTur").value;if(!ad){toast("Hedefe bir ad ver");return;}
     const kod=rastgeleKod(8);

@@ -63,7 +63,10 @@ async function aileBirak(){const kod=aileKodu();if(!kod)return 0;if(!await bulut
   try{localStorage.removeItem(AILE_KEY);}catch(e){}
   return hata;}
 /* Sahip: diğer cihazların bağlantısını keser (kodu bilen yeniden katılabilir; tamamen kesmek için aileyi silip yeni kod alın) */
-async function aileDigerleriniCikar(){const kod=aileKodu();if(!kod||!await bulutDB())throw new Error("bağlantı yok");await DB.collection("aileler").doc(kod).update({uyeler:[UID]});}
+async function aileDigerleriniCikar(){const kod=aileKodu();if(!kod||!await bulutDB())throw new Error("bağlantı yok");const ref=DB.collection("aileler").doc(kod);
+  /* çıkarılanlar yasak listesine yazılır; kodu bilseler de kendilerini yeniden ekleyemezler */
+  const s=await ref.get(),d=(s&&s.exists&&s.data())||{};const yasak=[...new Set([...(Array.isArray(d.yasak)?d.yasak:[]),...(Array.isArray(d.uyeler)?d.uyeler:[]).filter(u=>u!==UID)])].slice(-50);
+  await ref.update({uyeler:[UID],yasak});}
 
 /* ========== SINIF: öğretmen tarafı ========== */
 const SINIF_KEY="bahce-siniflarim";

@@ -16,7 +16,7 @@ service cloud.firestore {
     // Ortak hedefler: herkes gorur, herkes yeni hedef koyabilir; konan hedef degistirilemez
     match /hedef/{kod} {
       allow get: if girisli();
-      allow create: if girisli() && kod.matches('[A-Z0-9]{4,8}')
+      allow create: if girisli() && kod.matches('[A-Z0-9]{8}')
                     && yeni().keys().hasOnly(['ad', 'hedef', 'tur', 't'])
                     && yeni().ad is string && yeni().ad.size() > 0 && yeni().ad.size() <= 40
                     && yeni().hedef is int && yeni().hedef >= 10 && yeni().hedef <= 10000
@@ -44,8 +44,9 @@ service cloud.firestore {
     // Odaya ilk yayin yapan sahip olur; sahip her nabizda zamani tazeler, 3 saat sessiz kalan odayi baskasi devralabilir
     // Oda adi: yaris- + 8 harf/rakam (tahmin edilemeyen kod)
     function odaAdi(oda) { return oda.matches('yaris-[A-Z2-9]{8}'); }
-    // son: TTL politikasinin silme zamani (en cok 8 gun sonrasi)
-    function sonIyi() { return !('son' in yeni()) || (yeni().son is timestamp && yeni().son < request.time + duration.value(8, 'd')); }
+    // son: TTL politikasinin silme zamani; zorunlu, gelecekte ve en cok 8 gun sonrasi (gonderilmezse belge hic silinmezdi)
+    function sonIyi() { return 'son' in yeni() && yeni().son is timestamp
+                          && yeni().son > request.time && yeni().son < request.time + duration.value(8, 'd'); }
     match /odalar/{oda} {
       allow get: if girisli();
       allow create: if girisli() && odaAdi(oda) && yeni().keys().hasOnly(['sahip', 't', 'son']) && sonIyi()
@@ -56,22 +57,35 @@ service cloud.firestore {
     }
     match /odalar/{oda}/esler/{uid} {
       allow read: if girisli() && odaAdi(oda);
-      // Oyuncu kaydi: yalniz ad (en cok 20 harf) ve secilen cevap
-      allow create, update: if ben(uid) && odaAdi(oda) && yeni().keys().hasOnly(['presence', 't', 'son']) && sonIyi() && yeni().t == request.time
+      // Oyuncu kaydi: yalniz ad (en cok 20 harf) ve secilen cevap; ilk kayit yalniz var olan odaya (uydurma odalara yazilmasin)
+      allow create: if oyuncuIyi(uid, oda) && exists(/databases/$(database)/documents/odalar/$(oda));
+      allow update: if oyuncuIyi(uid, oda);
+      allow delete: if ben(uid);
+    }
+    function oyuncuIyi(uid, oda) {
+      return ben(uid) && odaAdi(oda) && yeni().keys().hasOnly(['presence', 't', 'son']) && sonIyi() && yeni().t == request.time
                     && yeni().presence is map && yeni().presence.keys().hasOnly(['ad', 'c'])
                     && (!('ad' in yeni().presence) || (yeni().presence.ad is string && yeni().presence.ad.size() <= 20))
                     && (!('c' in yeni().presence) || (yeni().presence.c is map && yeni().presence.c.keys().hasOnly(['q', 'j'])
                          && yeni().presence.c.q is int && yeni().presence.c.j is int && yeni().presence.c.j >= 0 && yeni().presence.c.j < 8));
-      allow delete: if ben(uid);
     }
     match /odalar/{oda}/olaylar/{olay} {
       allow read: if girisli() && odaAdi(oda);
-      allow create, update: if girisli()
-                    && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid
-                    && odaAdi(oda) && yeni().keys().hasOnly(['data', 'kimden', 't', 'son']) && sonIyi()
-                    && yeni().kimden == request.auth.uid && yeni().t == request.time;
-      allow delete: if girisli()
+      // Yalniz "durum" olayi; ilk yazimda oda sahipligi denetlenir (1 okuma), sonraki yazimlarda yalniz ilk yazan degistirebilir (okuma yok)
+      allow create: if olayIyi(oda, olay)
                     && get(/databases/$(database)/documents/odalar/$(oda)).data.sahip == request.auth.uid;
+      allow update: if olayIyi(oda, olay) && resource.data.kimden == request.auth.uid;
+      allow delete: if girisli() && resource.data.kimden == request.auth.uid;
+    }
+    function olayIyi(oda, olay) {
+      return girisli() && odaAdi(oda) && olay == 'durum'
+        && yeni().keys().hasOnly(['data', 'kimden', 't', 'son']) && sonIyi()
+        && yeni().kimden == request.auth.uid && yeni().t == request.time
+        && yeni().data is map && yeni().data.size() <= 20
+        && (!('kel' in yeni().data) || (yeni().data.kel is list && yeni().data.kel.size() <= 60))
+        && (!('opts' in yeni().data) || (yeni().data.opts is list && yeni().data.opts.size() <= 8))
+        && (!('skor' in yeni().data) || (yeni().data.skor is list && yeni().data.skor.size() <= 60))
+        && (!('sure' in yeni().data) || (yeni().data.sure is string && yeni().data.sure.size() <= 60));
     }
 
     // Aile kodu: ayni ailenin cihazlari kayitlari ortak yoldan esitler
@@ -85,10 +99,14 @@ service cloud.firestore {
       allow create: if girisli() && aileKod(kod) && yeni().keys().hasOnly(['sahip', 'uyeler', 't'])
                     && yeni().sahip == request.auth.uid && yeni().uyeler == [request.auth.uid]
                     && yeni().t is string && yeni().t.size() <= 10;
-      allow update: if girisli() && yeni().diff(resource.data).affectedKeys().hasOnly(['uyeler']) && yeni().uyeler is list
+      // sahip uye cikarirken cikanlari 'yasak' listesine yazar (en cok 50); baskasi yasak listesine dokunamaz
+      allow update: if girisli() && yeni().uyeler is list
+                    && (yeni().diff(resource.data).affectedKeys().hasOnly(['uyeler'])
+                        || (resource.data.sahip == request.auth.uid && yeni().diff(resource.data).affectedKeys().hasOnly(['uyeler', 'yasak'])
+                            && yeni().yasak is list && yeni().yasak.size() <= 50 && !(request.auth.uid in yeni().yasak)))
                     && (
-                      // (i) uye olmayan yalniz kendini sona ekler
-                      (!(request.auth.uid in resource.data.uyeler)
+                      // (i) uye olmayan (ve sahibin cikardiklari arasinda olmayan) yalniz kendini sona ekler
+                      (!(request.auth.uid in resource.data.uyeler) && !(request.auth.uid in resource.data.get('yasak', []))
                         && yeni().uyeler == resource.data.uyeler.concat([request.auth.uid]) && yeni().uyeler.size() <= 8)
                       // (ii) sahip uyeleri cikarabilir (kendisi listede kalir)
                       || (resource.data.sahip == request.auth.uid && resource.data.uyeler.hasAll(yeni().uyeler)
