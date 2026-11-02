@@ -66,7 +66,7 @@ function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
   {const md=$("minikDon");if(md)md.onclick=()=>{anaSayfa.buyuk=null;anaSayfa();};}
 }
 /* Minik (4-6 yaş) ana ekranı: okuma bilmeyen çocuk için dört büyük resimli düğme; puan, seri, rozet, arama ve sure listesi yok */
-const MINIK_DUGME=[["dinle",ikon("play"),"Dinle"],["hikaye",ikon("clapperboard"),"Hikâye"],["bahce",ikon("tree-deciduous"),"Bahçem"],["aile",ikon("users"),"Ailemle"]];   /* düğme adları sesli: ses/yonerge/minik-<anahtar>.mp3 */
+const MINIK_DUGME=[["dinle",ikon("play"),"Dinle"],["hikaye",ikon("clapperboard"),"Hikâye"],["bahce",ikon("tree-deciduous"),"Bahçem"],["aile",ikon("users"),"Ailemle"]];   /* düğme adları sesli: ses/yonerge/minik-<anahtar>.webm */
 function minikAna(){const V=$("view");const ekran=EKRAN_NO;
   $("baslik").textContent="Sureler Oyun Bahçesi";$("altbaslik").textContent="Dinle, izle, bahçeni büyüt";
   V.innerHTML=`<div class="minik-ana"><div class="esnek saga-yasla">${kisiDugme()}</div>

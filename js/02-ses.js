@@ -24,7 +24,7 @@ SIK.add(()=>{
 /* sesJeton: yeni çalma ya da durdurma gelince, yüklenmesi süren eski isteği geçersiz kılar */
 let sesJeton=0;
 function calParca(no,bas,son,sonra){const j=++sesJeton;
-  const src=surumle("ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM);
+  const src=surumle("ses/"+String(no).padStart(3,"0")+".webm?v="+SURUM);
   sesSonra=sonra||null;sesBitis=son;
   const go=()=>{ses.removeEventListener("error",hata);if(j!==sesJeton)return;hizUygula();ses.currentTime=bas;ses.play().catch(()=>{sesBitis=null;sesSonra=null;toast("Ses çalınamadı");if(sonra)sonra(true);});};
   const hata=()=>{ses.removeEventListener("loadedmetadata",go);if(j!==sesJeton)return;sesBitis=null;sesSonra=null;toast("Ses yüklenemedi; bağlantıyı denetle");if(sonra)sonra(true);};
@@ -33,7 +33,7 @@ function calParca(no,bas,son,sonra){const j=++sesJeton;
 /* ---------- çevrimdışı için sure sesi indirme (yalnız GitHub sürümü; service worker gerekir) ---------- */
 const SES_ONBELLEK="sob-ses";
 function indirVar(){try{return !!(window.claude&&claude.bulut&&"caches" in window&&navigator.serviceWorker&&navigator.serviceWorker.controller);}catch(e){return false;}}
-const sesAdres=no=>new URL(surumle("ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM),location.href);
+const sesAdres=no=>new URL(surumle("ses/"+String(no).padStart(3,"0")+".webm?v="+SURUM),location.href);
 async function sesIndirildi(no){try{const c=await caches.open(SES_ONBELLEK);return !!(await c.match(sesAdres(no).href));}catch(e){return false;}}
 async function sesTemizle(c,u){for(const q of await c.keys())if(new URL(q.url).pathname===u.pathname)await c.delete(q);}
 async function sesIndir(no){const u=sesAdres(no),r=await fetch(u.href,{cache:"no-store"});if(!r.ok)throw new Error("indirilemedi");
@@ -41,11 +41,11 @@ async function sesIndir(no){const u=sesAdres(no),r=await fetch(u.href,{cache:"no
   try{const d=new URL("data/"+String(no).padStart(3,"0")+".json?v="+SURUM,location.href),y=await fetch(d.href);if(y.ok){await sesTemizle(c,d);await c.put(d.href,y);}}catch(e){}}   /* sure metni de kalıcı kayda girsin (sürüm değişse de silinmez) */
 async function sesSil(no){try{const c=await caches.open(SES_ONBELLEK);await sesTemizle(c,sesAdres(no));await sesTemizle(c,new URL("data/"+String(no).padStart(3,"0")+".json",location.href));}catch(e){}}
 function durSes(){sesJeton++;sesBitis=null;sesSonra=null;izle=null;ses2Bitis=null;ses2Sonra=null;ses.pause();ses2.pause();}
-/* ---------- sesli yönergeler: sabit metinler ses/yonerge/<anahtar>.mp3 olarak hazır (Piper TTS, araclar/yonerge-uret.py) ---------- */
+/* ---------- sesli yönergeler: sabit metinler ses/yonerge/<anahtar>.webm olarak hazır (Piper TTS, araclar/yonerge-uret.py) ---------- */
 /* Cihazda Türkçe ses olmasa da okuma bilmeyen küçükler yönergeyi duyar. Ayrı bir Audio ile çalar; kâri sesine (ses, ses2) dokunmaz, kelime sesini ve cihaz konuşmasını keser (soyle gibi). Dosya yüklenemez ya da çalınamazsa soyle(yedek)'e düşer. Sürüm eki SURUM (surum-guncelle.py ses/yonerge/ altını taramaz). */
 const YON=new Audio();YON.preload="auto";let yonJeton=0;
 function yonerge(k,yedek){const j=++yonJeton;let dustu=false;const dus=()=>{if(dustu||j!==yonJeton)return;dustu=true;if(yedek&&typeof soyle==="function")soyle(yedek);};
   try{if(typeof KEL!=="undefined")KEL.pause();}catch(e){}try{speechSynthesis.cancel();}catch(e){}
   if(!k)return dus();
-  try{YON.pause();YON.onerror=dus;YON.src="ses/yonerge/"+k+".mp3?v="+SURUM;const p=YON.play();if(p&&p.catch)p.catch(e=>{if(!(e&&e.name==="AbortError"))dus();});}catch(e){dus();}}
+  try{YON.pause();YON.onerror=dus;YON.src="ses/yonerge/"+k+".webm?v="+SURUM;const p=YON.play();if(p&&p.catch)p.catch(e=>{if(!(e&&e.name==="AbortError"))dus();});}catch(e){dus();}}
 function yonergeDur(){yonJeton++;try{YON.onerror=null;YON.pause();}catch(e){}}

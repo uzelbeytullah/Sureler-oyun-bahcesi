@@ -1,4 +1,4 @@
-# Sureler Oyun Bahçesi · sesli yönerge dosyalarını üretir (ses/yonerge/<anahtar>.mp3)
+# Sureler Oyun Bahçesi · sesli yönerge dosyalarını üretir (ses/yonerge/<anahtar>.webm)
 # Okuma bilmeyen küçükler, cihazda Türkçe ses olmasa da yönergeleri duysun diye sabit metinler önceden seslendirilir.
 #
 # Araç: Piper TTS (pip: piper-tts 1.8.0, GPL-3.0-or-later, https://github.com/OHF-Voice/piper1-gpl), çevrimdışı çalışır; depoya girmez.
@@ -108,7 +108,7 @@ def main():
     hepsi = "--hepsi" in sys.argv
     n = 0
     for k, metin in L.items():
-        hedef = os.path.join(CIKIS, k + ".mp3")
+        hedef = os.path.join(CIKIS, k + ".webm")
         if os.path.exists(hedef) and not hepsi:
             continue
         parcalar, hz = [], 22050
@@ -128,12 +128,12 @@ def main():
             with wave.open(wav, "wb") as w:
                 w.setnchannels(1); w.setsampwidth(2); w.setframerate(hz)
                 w.writeframes(a.tobytes())
-            # 64 kbps mono mp3, üst veri yok
-            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", wav, "-ac", "1", "-codec:a", "libmp3lame", "-b:a", "64k",
-                            "-map_metadata", "-1", "-write_xing", "1", hedef], check=True)
+            # 24 kbps mono Opus (WebM kabı, kısıtlı değişken hız), üst veri yok
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", wav, "-ac", "1", "-codec:a", "libopus", "-b:a", "24k",
+                            "-vbr", "constrained", "-map_metadata", "-1", "-f", "webm", hedef], check=True)
         n += 1
         print(k, "\t", metin)
-    fazla = [f for f in os.listdir(CIKIS) if f.endswith(".mp3") and f[:-4] not in L]
+    fazla = [f for f in os.listdir(CIKIS) if f.endswith(".webm") and f[:-5] not in L]
     if fazla:
         print("UYARI: listede olmayan dosyalar:", ", ".join(fazla))
     print(n, "dosya üretildi;", len(L), "yönerge")

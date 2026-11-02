@@ -3,12 +3,12 @@
    - Sürüm ekli (?v=) veri ve kod: önce kayıtlı kopya, yoksa ağ; yeni sürüm kaydedilince eskisi silinir
    - Sürüm eki olmayan kendi dosyalarımız: önce ağ, yoksa kayıtlı kopya
    - Firebase kütüphanesi: kayıtlı kopya varsa o, arkada tazelenir (yazı tipleri siteden, fonts/ klasöründen)
-   - İndirilmiş sure sesleri (ses/*.mp3, sob-ses önbelleği) kısmi isteklere parça parça verilir; ötekiler tarayıcıya bırakılır
+   - İndirilmiş sure sesleri (ses/*.webm, sob-ses önbelleği) kısmi isteklere parça parça verilir; ötekiler tarayıcıya bırakılır
    - Kabuk her değişince sürüm önbelleği yenilenir; indirilen sesler ve sure metinleri sob-ses'te kalır
    - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-c4f7987a";
+const SURUM = "sob-553d83f6";
 const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=cef30bf8", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./simge-192.png", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
@@ -37,7 +37,7 @@ function sesYanit(r) {
       son = Math.min(son, b.size - 1);
       if (bas > son) return new Response(null, { status: 416, headers: { "Content-Range": "bytes */" + b.size } });
       return new Response(b.slice(bas, son + 1), { status: 206, headers: {
-        "Content-Type": "audio/mpeg", "Accept-Ranges": "bytes",
+        "Content-Type": "audio/webm", "Accept-Ranges": "bytes",
         "Content-Range": "bytes " + bas + "-" + son + "/" + b.size, "Content-Length": String(son - bas + 1) } });
     });
   }).catch(() => fetch(r));
@@ -64,8 +64,8 @@ self.addEventListener("fetch", e => {
   const ayni = u.origin === self.location.origin;
   if (!ayni && !DIS.includes(u.hostname)) return;          // Firestore vb. dokunma
   if (u.hostname === "www.gstatic.com" && !u.pathname.startsWith("/firebasejs/")) return;  // reCAPTCHA (App Check) dosyalarına dokunma
-  if (ayni && /\/ses\/[^/]+\.mp3$/i.test(u.pathname)) { e.respondWith(sesYanit(r)); return; }
-  if (/\.mp3$/i.test(u.pathname) || r.headers.has("range")) return;
+  if (ayni && /\/ses\/[^/]+\.webm$/i.test(u.pathname)) { e.respondWith(sesYanit(r)); return; }
+  if (/\.webm$/i.test(u.pathname) || r.headers.has("range")) return;
 
   if (r.mode === "navigate") {                             // sayfa: önce ağ
     /* zayıf bağlantıda 4 sn içinde yanıt gelmezse kayıtlı kopya açılır (kopya yoksa ağ beklenir) */

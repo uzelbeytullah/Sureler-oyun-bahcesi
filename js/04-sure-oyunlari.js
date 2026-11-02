@@ -65,7 +65,7 @@ function oku(){
   V.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{S.renkModu=b.dataset.rm;save();durSes();oku();});
   V.querySelectorAll(".kelimeler[data-ai] [data-c]").forEach(sp=>{sp.style.cursor="pointer";sp.onclick=()=>tecvidAc(V,+sp.closest(".kelimeler").dataset.ai,sp.dataset.c);});
   V.querySelectorAll(".hz").forEach(b=>b.onclick=()=>{S.hiz=+b.dataset.h;hizUygula();save();V.querySelectorAll(".hz").forEach(x=>{x.classList.toggle("on",x===b);x.setAttribute("aria-pressed",String(x===b));});});
-  const sureSrc="ses/"+String(no).padStart(3,"0")+".mp3?v="+SURUM;
+  const sureSrc="ses/"+String(no).padStart(3,"0")+".webm?v="+SURUM;
   {const ib=$("indir");if(ib){const no=CUR.no,yaz=v=>{ib.innerHTML=v?ikon("check")+" İnternetsiz dinlenebilir · kaldır":ikon("download")+" İnternetsiz dinlemek için indir";ib.dataset.var=v?"1":"";delete ib.dataset.onay;};
     sesIndirildi(no).then(yaz);
     ib.onclick=async()=>{if(ib.dataset.var){if(!ib.dataset.onay){ib.dataset.onay="1";ib.textContent="Emin misin? Bir daha bas";return;}await sesSil(no);yaz(false);toast("İndirilen ses kaldırıldı");return;}
@@ -89,7 +89,7 @@ function oku(){
       if(calan!==0){calan=0;guncelle();}$("ay0").scrollIntoView({block:"center",behavior:kaydirmaDavranisi()});
       ses.play().catch(()=>{izle=null;bitir();toast("Ses çalınamadı");});};
     if(besmeleVar){
-      await metaBekle(ses2,"ses/001.mp3?v="+SURUM);if(!sira)return;hizUygula();
+      await metaBekle(ses2,"ses/001.webm?v="+SURUM);if(!sira)return;hizUygula();
       const f1=CACHE[1]&&CACHE[1].ses?CACHE[1].ses.bas[1]:4.0;
       ses2.currentTime=0;ses2Bitis=f1;ses2Sonra=basla;
       ses2.play().catch(()=>{bitir();toast("Ses çalınamadı");});

@@ -14,14 +14,14 @@ def oz(yol):
 temel = "js/01-temel.js"
 s = open(temel, encoding="utf-8", newline="").read()
 deg = 0
-for yol in sorted(glob.glob("data/*.json")) + sorted(glob.glob("ses/*.mp3")) + sorted(glob.glob("kelime/*.mp3")) + sorted(glob.glob("anim/hk/*.mp3")):
+for yol in sorted(glob.glob("data/*.json")) + sorted(glob.glob("ses/*.webm")) + sorted(glob.glob("kelime/*.webm")) + sorted(glob.glob("anim/hk/*.webm")):
     k = yol.replace("\\", "/")
     m = re.search(re.escape('"' + k + '":"') + r"([0-9a-f]{8})", s)
     if m and m.group(1) != oz(yol):
         s = s[:m.start(1)] + oz(yol) + s[m.end(1):]
         deg += 1
 open(temel, "w", encoding="utf-8", newline="").write(s)
-eksik = [y.replace("\\", "/") for y in sorted(glob.glob("data/*.json")) + sorted(glob.glob("ses/*.mp3")) + sorted(glob.glob("kelime/*.mp3")) + sorted(glob.glob("anim/hk/*.mp3"))
+eksik = [y.replace("\\", "/") for y in sorted(glob.glob("data/*.json")) + sorted(glob.glob("ses/*.webm")) + sorted(glob.glob("kelime/*.webm")) + sorted(glob.glob("anim/hk/*.webm"))
          if '"' + y.replace("\\", "/") + '":"' not in s]
 if eksik:
     print("UYARI: şu dosyalar 01-temel.js içindeki SURUMLER haritasında yok (elle ekleyin):")

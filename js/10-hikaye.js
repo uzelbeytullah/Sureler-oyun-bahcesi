@@ -144,7 +144,7 @@ function animCalar(){const D=animDurum;if(!D)return false;return D.A.dosya?!!D.k
 function animKlipDur(){const D=animDurum;if(!D)return;D.klCal=false;D.kl=null;try{D.ses.pause();D.sa.pause();}catch(e){}}
 function animKlipBasla(){const D=animDurum;if(!D||!D.kl)return;const k=D.kl[D.ki];
   if(!k){const f=D.klBitti;D.klCal=false;D.kl=null;if(f)f();return;}
-  const a=k.s==="n"?D.ses:D.sa,src=surumle(k.s==="n"?`anim/${D.A.dosya}?v=${SURUM}`:`ses/${String(D.A.no).padStart(3,"0")}.mp3?v=${SURUM}`);
+  const a=k.s==="n"?D.ses:D.sa,src=surumle(k.s==="n"?`anim/${D.A.dosya}?v=${SURUM}`:`ses/${String(D.A.no).padStart(3,"0")}.webm?v=${SURUM}`);
   if(a.dataset.src!==src){a.dataset.src=src;a.src=src;}
   a.volume=k.f?0:1;D.kAud=a;D.klCal=true;
   const bas=()=>{try{a.currentTime=k.b;}catch(e){}a.play().catch(()=>animKlipAtla());};
