@@ -2,7 +2,7 @@
 /* ========== KÜÇÜKLER: kelime sesi, sesli sorular, sade yol ========== */
 const KEL=new Audio();KEL.preload="metadata";let kelBit=null;KEL.addEventListener("play",sikCalistir);
 SIK.add(()=>{if(kelBit!==null&&!KEL.paused&&KEL.currentTime>=kelBit-0.02){KEL.pause();kelBit=null;}return kelBit!==null&&!KEL.paused;});
-function kelimeSes(w){if(!w||!w.k)return false;const [g,b,e]=w.k,src=surumle(`kelime/k${g}.webm?v=${SURUM}`);
+function kelimeSes(w){if(!w||!w.k)return false;const [g,b,e]=w.k,src=surumle(typeof g==="string"?`ses/${g}.webm?v=${SURUM}`:`kelime/k${g}.webm?v=${SURUM}`);   /* metin numaralı (ör. "067"): sure sesinin içinden */
   try{speechSynthesis.cancel();}catch(x){}yonergeDur();
   const go=()=>{try{KEL.currentTime=b;}catch(x){}kelBit=e;KEL.play().catch(()=>{});};
   if(KEL.dataset.src!==src){KEL.dataset.src=src;KEL.src=src;KEL.addEventListener("loadedmetadata",go,{once:true});KEL.load();}else go();return true;}
