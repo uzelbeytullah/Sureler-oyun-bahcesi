@@ -100,7 +100,7 @@ function karneOneriler(v,X){const o=[];
   if(v.onayBek)o.push(`${v.onayBek} ayet sizi bekliyor: çocuğunuz ezberden okusun, siz dinleyip "Ebeveyn onayı" ekranından onaylayın.`);
   const z=v.zorlar.find(x=>x.tur==="ayet");if(z)o.push(`${z.ad} ayetini birlikte, yavaşça okuyun; önce kâriden dinlemek kolaylaştırır.`);
   const nz=v.namaz.find(x=>x.n<x.top);if(nz)o.push(`Namaz hazırlığı yolunda sırada ${nz.ad} var (${nz.n}/${nz.top} ayet ezberde). Günde bir ayet yeter.`);
-  if(!v.gec){const basl=new Set(v.sureler.map(s=>s.no));const aday=[1,...KATALOG.filter(k=>!k.gruplar&&k.no>=78&&k.no<=114).map(k=>k.no).reverse()].find(n=>!basl.has(n)&&!v.namaz.some(x=>x.no===n&&x.n<x.top));
+  if(!v.gec){const basl=new Set(v.sureler.map(s=>s.no));const aday=[1,...KATALOG.filter(k=>!k.gruplar&&k.no>=67&&k.no<=114).map(k=>k.no).reverse()].find(n=>!basl.has(n)&&!v.namaz.some(x=>x.no===n&&x.n<x.top));
     if(aday){const k=KATALOG.find(x=>x.no===aday);o.push(`Yeni sure olarak ${k.ad} (${k.ayet} ayet) ile başlayabilir; önce "Oku" ve "Kelime" oyunlarıyla tanışsın.`);}}
   if(v.aktifGun<3)o.push("Kısa ama sık: her gün aynı saatte 5–10 dakika, haftada birkaç uzun oturumdan daha kalıcıdır.");
   if(o.length<2)o.push("Bu hafta öğrendiği bir ayeti sofrada ailesine okusun; dinlemeniz ona güç verir.");
