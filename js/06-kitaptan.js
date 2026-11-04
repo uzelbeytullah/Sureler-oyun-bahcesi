@@ -8,7 +8,7 @@ const ekS=k=>{const t=SS(CUR.no);if(!t[k])t[k]={};return t[k];};
 let yaziTimer=null;const yaziKaydet=()=>{clearTimeout(yaziTimer);yaziTimer=setTimeout(save,900);};
 async function ekYukle(no){const k=KATALOG.find(x=>x.no===no);if(k&&!k.ek&&!k.etiket&&!k.gruplar&&no<36000)return null;return CACHE["ek"+no]=CACHE["ek"+no]||{};}   /* kitaptan ekleri henüz olmayan sureler (ek:true yok): sekmeler gizlenir */
 const EK_PARCA={oku:"a",ezber:"a",cocuk:"a",sinav:"b",yol:"b",sayilar:"b",dusun:"b"};
-async function ekParca(no,p){const E=CACHE["ek"+no]=CACHE["ek"+no]||{};E._y=E._y||{};if(E._y[p])return E;
+async function ekParca(no,p){const E=CACHE["ek"+no]=CACHE["ek"+no]||{};E._y=E._y||{};if(E._y[p])return E;const k=KATALOG.find(x=>x.no===no);if(k&&!k.ek&&!k.etiket&&!k.gruplar&&no<36000)return E;   /* ekleri olmayan sure: gereksiz istek atma */
   try{const r=await fetch("data/"+String(no).padStart(3,"0")+"_ek"+p+".json?v="+SURUM);if(r.ok){Object.assign(E,await r.json());E._y[p]=1;}}catch(e){}return E;}
 function ekRozet(){
   const t=(S.sure["1"]||{});const e=t.ezberDurum||{};
