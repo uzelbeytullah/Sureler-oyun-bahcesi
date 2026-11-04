@@ -1,7 +1,7 @@
 {
   "name": "Sureler Oyun Bahçesi",
   "short_name": "Sureler",
-  "description": "Fâtiha, son cüz, Yâsîn ve Âyetü'l-Kürsî için aile boyu oyunlu öğrenme bahçesi",
+  "description": "Fâtiha, Yâsîn, Âyetü'l-Kürsî ve 20.–30. cüz sureleri için aile boyu oyunlu öğrenme bahçesi",
   "lang": "tr",
   "start_url": "./",
   "scope": "./",
