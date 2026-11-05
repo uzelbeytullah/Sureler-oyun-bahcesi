@@ -8,7 +8,7 @@
    - Yalnız bu sitenin (sob-) önbelleklerine dokunulur
    - Firestore ve reCAPTCHA bağlantılarına hiç dokunulmaz
    - Yalnız başarılı yanıtlar kaydedilir */
-const SURUM = "sob-e03700ba";
+const SURUM = "sob-6f9b3144";
 const KABUK = ["./", "./index.html", "./bulut-ayar.js?v=dc657c3c", "./bulut.js?v=cef30bf8", "./kabuk.js?v=e532b473", "./manifest.json", "./simge.svg", "./simge-192.png", "./data/tecvid_kurallar.json"];
 
 self.addEventListener("install", e => {
