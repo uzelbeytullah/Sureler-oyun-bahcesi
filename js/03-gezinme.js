@@ -38,7 +38,7 @@ async function show(v){yarBirak();if(CUR&&CUR.no){S.sonSure=CUR.no;}const p=EK_P
 function baslik(){
   if(CUR&&CUR.ust){const son=CUR.ilkAyet+CUR.ayetler.length-1;$("baslik").textContent=`Yâsîn · ${CUR.ilkAyet}-${son}. ayetler`;$("altbaslik").textContent=`${CUR.grup} · ${CUR.ayetler.length} ayet`;$("baslikAr").textContent=CUR.adAr;}
   else if(CUR){$("baslik").textContent=CUR.etiket?CUR.ad:CUR.ad+" Suresi";$("altbaslik").textContent=CUR.etiket?`${CUR.etiket} · ${CUR.ayetler[0].w.length} kelime · ${(CUR.cumleler||[]).length} cümle`:`${CUR.no}. sure · ${CUR.ayetler.length} ayet · ${CUR.inis}`;$("baslikAr").textContent=CUR.adAr;}
-  else{$("baslik").textContent="Sureler Oyun Bahçesi";$("altbaslik").textContent="Fâtiha, Yâsîn ve 6.–30. cüzler · oyna, öğren, yıldızları topla";$("baslikAr").textContent="القرآن";}
+  else{$("baslik").textContent="Sureler Oyun Bahçesi";$("altbaslik").textContent="1.–30. cüzler (Fâtiha–Nâs) · oyna, öğren, yıldızları topla";$("baslikAr").textContent="القرآن";}
 }
 let araMetin="";
 function anaSayfa(){yarBirak();TEKRAR_AKIS=false;
