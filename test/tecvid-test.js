@@ -47,7 +47,7 @@ while(V().querySelector('.opts button[data-j]')&&say<20){say++;
     dogruJ=bs.findIndex(b=>kural.map(kurAd).includes(b.textContent));}
   else if(/nasıl okunur/.test(soru)){const ad=V().querySelector('#soruMetni b').textContent;const c=ev(`Object.keys(TKUR.kurallar).find(k=>TKUR.kurallar[k].ad===${JSON.stringify(ad)})`);const m=ev(`TKUR.kurallar[${JSON.stringify(c)}].nasil`);dogruJ=bs.findIndex(b=>b.textContent===m);}
   else {const ad=V().querySelector('#soruMetni b').textContent;const c=ev(`Object.keys(TKUR.kurallar).find(k=>TKUR.kurallar[k].ad===${JSON.stringify(ad)})`);
-    dogruJ=bs.findIndex(b=>ev(`(()=>{for(let ai=0;ai<CUR.ayetler.length;ai++)for(let wi=0;wi<CUR.ayetler[ai].w.length;wi++){if(CUR.ayetler[ai].w[wi].a===${JSON.stringify(b.textContent)})return tvoKelimeKural(CUR,ai,wi).includes(${JSON.stringify(c)});}return false;})()`));}
+    dogruJ=bs.findIndex(b=>ev(`(()=>{for(let ai=0;ai<CUR.ayetler.length;ai++)for(let wi=0;wi<CUR.ayetler[ai].w.length;wi++){if(CUR.ayetler[ai].w[wi].a.replace(/[\u064B-\u064D]/g,m=>({'\u064B':'\u064E','\u064C':'\u064F','\u064D':'\u0650'})[m])===${JSON.stringify(b.textContent)}.replace(/[\u064B-\u064D]/g,m=>({'\u064B':'\u064E','\u064C':'\u064F','\u064D':'\u0650'})[m])&&tvoKelimeKural(CUR,ai,wi).includes(${JSON.stringify(c)}))return true;}return false;})()`));}
   if(dogruJ<0){ok('doğru şık bulunamadı: '+soru.replace(/<[^>]+>/g,' ').slice(0,80),false);break;}
   if(say===1&&seviye!=='genc'){/* küçüklerde ilk yanlışta ikinci hak */const yj=bs.findIndex((b,j)=>j!==dogruJ);const pa=ev('S.puan');bs[yj].click();
     ok('küçüklerde ikinci deneme',/Bir daha dene/.test(V().querySelector('#fb').textContent)&&bs[yj].disabled&&!bs[dogruJ].disabled&&ev('S.puan')===pa);}

@@ -190,7 +190,7 @@ def hikaye_isle(ses, no, k, A, sure, zamanlar, ad):
                 rapor.append(f"oda eşleşmedi: {cift[0]}"); continue
             son_s = es
             for ad2 in [x.strip() for x in cift[0].split("·")]:
-                b = kelime_bul(sure, ad2, son_a, None, son_w if False else 0)
+                b = kelime_bul(sure, ad2, son_a, None, son_w if False else 0) or kelime_bul(sure, ad2, 1)
                 if not b:
                     rapor.append(f"kelime yok: {ad2}"); continue
                 ayet, wi, w = b
