@@ -22,6 +22,9 @@
 - `sw.js`, `manifest.json`, `simge.svg` · çevrimdışı çalışma ve ana ekrana ekleme.
 - `data/`, `ses/`, `kelime/`, `anim/` · içerik ve sesler.
 - `test/` · oyun mantığı testleri.
+- `dinle.html` · kitapçıklardaki karekodların açtığı dinleme sayfası (adres sonuna `#s2C` gibi kesit kimliği gelir). Yeni ses dosyası kullanmaz;
+  `ses/NNN.webm` içinden kesitin başlangıç ve bitiş saniyesini çalar. Kesit listesi ve saniyeler sayfanın içine gömülüdür
+  (`data/NNN.json` içindeki `ses.bas` değerlerinden üretildi); sure sesleri ya da zamanlaması değişirse sayfa yeniden üretilmelidir.
 
 ## Bir şeyi değiştirdikten sonra
 
